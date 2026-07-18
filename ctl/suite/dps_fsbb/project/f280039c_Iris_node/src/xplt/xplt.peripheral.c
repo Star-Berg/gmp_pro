@@ -29,6 +29,97 @@
 extern gpio_halt user_led;
 
 //=================================================================================================
+// VOUT ADC moving average
+
+volatile uint16_t g_fsbb_vout_adc_raw = 0U;
+volatile uint16_t g_fsbb_vout_adc_average = 0U;
+volatile uint16_t g_fsbb_vout_adc_window_min = 0U;
+volatile uint16_t g_fsbb_vout_adc_window_max = 0U;
+volatile fast_gt g_fsbb_vout_adc_average_enable = 1;
+volatile fast_gt g_fsbb_vout_adc_trim_enable = 1;
+
+static uint16_t vout_adc_average_buffer[FSBB_VOUT_ADC_AVERAGE_SAMPLES];
+static uint32_t vout_adc_average_sum = 0UL;
+static uint16_t vout_adc_average_index = 0U;
+static fast_gt vout_adc_average_primed = 0;
+
+uint16_t fsbb_average_vout_adc_sample(uint16_t sample)
+{
+    uint16_t i;
+    uint16_t average_divisor;
+    uint16_t window_min;
+    uint16_t window_max;
+    uint32_t average_sum;
+
+    g_fsbb_vout_adc_raw = sample;
+
+    if ((!g_fsbb_vout_adc_average_enable) || (FSBB_VOUT_ADC_AVERAGE_SAMPLES == 1U))
+    {
+        // Re-prime the history when averaging is enabled again so stale
+        // samples cannot create a step in the feedback signal.
+        vout_adc_average_primed = 0;
+        g_fsbb_vout_adc_window_min = sample;
+        g_fsbb_vout_adc_window_max = sample;
+        g_fsbb_vout_adc_average = sample;
+        return sample;
+    }
+
+    if (!vout_adc_average_primed)
+    {
+        // Fill the complete history with the first conversion. This avoids a
+        // false low-voltage transient while the moving-average window fills.
+        for (i = 0U; i < FSBB_VOUT_ADC_AVERAGE_SAMPLES; ++i)
+            vout_adc_average_buffer[i] = sample;
+
+        vout_adc_average_sum = (uint32_t)sample * FSBB_VOUT_ADC_AVERAGE_SAMPLES;
+        vout_adc_average_index = 0U;
+        vout_adc_average_primed = 1;
+        g_fsbb_vout_adc_window_min = sample;
+        g_fsbb_vout_adc_window_max = sample;
+        g_fsbb_vout_adc_average = sample;
+        return sample;
+    }
+
+    vout_adc_average_sum -= vout_adc_average_buffer[vout_adc_average_index];
+    vout_adc_average_buffer[vout_adc_average_index] = sample;
+    vout_adc_average_sum += sample;
+
+    if (++vout_adc_average_index >= FSBB_VOUT_ADC_AVERAGE_SAMPLES)
+        vout_adc_average_index = 0U;
+
+    average_sum = vout_adc_average_sum;
+    average_divisor = FSBB_VOUT_ADC_AVERAGE_SAMPLES;
+
+    window_min = vout_adc_average_buffer[0];
+    window_max = vout_adc_average_buffer[0];
+    for (i = 1U; i < FSBB_VOUT_ADC_AVERAGE_SAMPLES; ++i)
+    {
+        if (vout_adc_average_buffer[i] < window_min)
+            window_min = vout_adc_average_buffer[i];
+        if (vout_adc_average_buffer[i] > window_max)
+            window_max = vout_adc_average_buffer[i];
+    }
+
+    g_fsbb_vout_adc_window_min = window_min;
+    g_fsbb_vout_adc_window_max = window_max;
+
+    // Reject one high and one low outlier symmetrically. Rejecting only the
+    // maximum would bias the feedback low and make the voltage loop command a
+    // higher real output voltage.
+    if (g_fsbb_vout_adc_trim_enable && (FSBB_VOUT_ADC_AVERAGE_SAMPLES >= 3U))
+    {
+        average_sum -= (uint32_t)window_min + (uint32_t)window_max;
+        average_divisor -= 2U;
+    }
+
+    // Half-up rounding prevents the integer division from adding a persistent
+    // negative bias to the averaged ADC code.
+    g_fsbb_vout_adc_average = (uint16_t)((average_sum + (average_divisor / 2U)) / average_divisor);
+
+    return g_fsbb_vout_adc_average;
+}
+
+//=================================================================================================
 // Peripheral Setup Function
 
 // User should setup all the peripheral in this function.

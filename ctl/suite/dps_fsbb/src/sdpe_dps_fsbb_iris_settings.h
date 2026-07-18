@@ -27,7 +27,7 @@ extern "C"
 #define DPS_FSBB_IRIS_SDPE_PROJECT_ID "dps_fsbb_f280039c_Iris_node"
 #define DPS_FSBB_IRIS_SDPE_PROJECT_SUITE "dps_fsbb"
 #define DPS_FSBB_IRIS_SDPE_PROJECT_VERSION "0.1.0"
-#define DPS_FSBB_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-17"
+#define DPS_FSBB_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-18"
 
 //=================================================================================================
 /**

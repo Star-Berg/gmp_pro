@@ -29,6 +29,18 @@ extern "C"
 
 #include <core/dev/datalink.h>
 
+// Number of raw VOUT ADC conversions used by the trimmed moving average that
+// feeds the voltage-control path. With the default 8-point window, one maximum
+// and one minimum sample are rejected and the remaining six are averaged.
+// Set to 1 to compile without averaging.
+#ifndef FSBB_VOUT_ADC_AVERAGE_SAMPLES
+#define FSBB_VOUT_ADC_AVERAGE_SAMPLES (8U)
+#endif
+
+#if (FSBB_VOUT_ADC_AVERAGE_SAMPLES < 1U) || (FSBB_VOUT_ADC_AVERAGE_SAMPLES > 256U)
+#error "FSBB_VOUT_ADC_AVERAGE_SAMPLES must be in the range 1..256"
+#endif
+
 //=================================================================================================
 // definitions of peripheral
 
@@ -36,6 +48,17 @@ extern adc_channel_t adc_v_in;
 extern adc_channel_t adc_v_out;
 extern adc_channel_t adc_i_L;
 extern adc_channel_t adc_i_load;
+
+// VOUT ADC moving-average diagnostics. These can be added directly to the
+// CCS Expressions/Graph views without using calculated expressions.
+extern volatile uint16_t g_fsbb_vout_adc_raw;
+extern volatile uint16_t g_fsbb_vout_adc_average;
+extern volatile uint16_t g_fsbb_vout_adc_window_min;
+extern volatile uint16_t g_fsbb_vout_adc_window_max;
+extern volatile fast_gt g_fsbb_vout_adc_average_enable;
+extern volatile fast_gt g_fsbb_vout_adc_trim_enable;
+
+uint16_t fsbb_average_vout_adc_sample(uint16_t sample);
 
 // dlog DSA objects
 //extern basic_trigger_t trigger;

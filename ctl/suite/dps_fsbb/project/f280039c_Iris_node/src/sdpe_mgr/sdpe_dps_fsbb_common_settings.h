@@ -100,12 +100,12 @@ extern "C"
 /**
  * @brief Output-voltage sensor sensitivity in V/V.
  */
-#define CTRL_FSBB_VOUT_SENSITIVITY (0.02662933f)
+#define CTRL_FSBB_VOUT_SENSITIVITY GMP_LVFB_VOLTAGE_SENSITIVITY
 
 /**
  * @brief Output-voltage sensor bias in V.
  */
-#define CTRL_FSBB_VOUT_BIAS (-0.00667446f)
+#define CTRL_FSBB_VOUT_BIAS GMP_LVFB_VOLTAGE_BIAS_V
 
 /**
  * @brief Boost-side output-current sensor sensitivity in V/A.
@@ -120,12 +120,12 @@ extern "C"
 /**
  * @brief Inductor-current sensor sensitivity in V/A.
  */
-#define CTRL_FSBB_IL_SENSITIVITY (0.1482485f)
+#define CTRL_FSBB_IL_SENSITIVITY GMP_LVFB_CURRENT_SENSITIVITY
 
 /**
  * @brief Inductor-current sensor bias in V.
  */
-#define CTRL_FSBB_IL_BIAS (1.6145818f)
+#define CTRL_FSBB_IL_BIAS GMP_LVFB_CURRENT_BIAS_V
 
 /**
  * @brief Maximum input voltage.
@@ -195,7 +195,7 @@ extern "C"
 /**
  * @brief Current-loop crossover frequency.
  */
-#define FSBB_CURRENT_LOOP_BANDWIDTH (800.0f)
+#define FSBB_CURRENT_LOOP_BANDWIDTH (400.0f)
 
 /**
  * @brief Voltage-loop crossover frequency.
