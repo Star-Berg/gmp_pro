@@ -866,7 +866,7 @@ ec_gt gmp_hal_iic_read_mem(iic_halt h, addr16_gt dev_addr, addr32_gt mem_addr, s
 
         // 一旦开始顺利接收第 1 个字节，代表时序已经稳固建立，此时安全追加 Stop 指令
         // 这样硬件就能在收完最后一个字节时，正确发出 NACK + STOP。
-        if (!stop_conditioned)
+        if (!stop_conditioned && idx >= 0)
         {
             I2C_sendStopCondition(h);
             stop_conditioned = true;
