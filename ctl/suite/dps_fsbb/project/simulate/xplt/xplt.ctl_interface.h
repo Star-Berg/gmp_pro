@@ -17,7 +17,7 @@ typedef enum _tag_dcdc_adc_index_items {
 
 extern fast_gt g_fsbb_sim_enable_pending;
 
-GMP_STATIC_INLINE uint16_t ctl_fsbb_sim_active_faults(void)
+GMP_STATIC_INLINE uint16_t ctl_fsbb_active_faults(void)
 {
     uint16_t faults = FSBB_FAULT_NONE;
     if (adc_v_in.control_port.value < float2ctrl(FSBB_INPUT_VOLTAGE_MIN / CTRL_VOLTAGE_BASE))
@@ -43,7 +43,7 @@ GMP_STATIC_INLINE void ctl_input_callback(void)
     ctl_step_adc_channel(&adc_i_L, simulink_rx_buffer.adc_result[DCDC_ADC_ID_IL]);
     ctl_step_adc_channel(&adc_i_load, simulink_rx_buffer.adc_result[DCDC_ADC_ID_IOUT]);
     if (g_fsbb_output_enabled)
-        g_fsbb_faults |= ctl_fsbb_sim_active_faults();
+        g_fsbb_faults |= ctl_fsbb_active_faults();
 }
 
 GMP_STATIC_INLINE void ctl_output_callback(void)
@@ -56,10 +56,10 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     simulink_tx_buffer.monitor[1] = ctrl2float(adc_v_out.control_port.value) * CTRL_VOLTAGE_BASE;
     simulink_tx_buffer.monitor[2] = ctrl2float(adc_i_L.control_port.value) * CTRL_CURRENT_BASE;
     simulink_tx_buffer.monitor[3] = ctrl2float(adc_i_load.control_port.value) * CTRL_CURRENT_BASE;
-    simulink_tx_buffer.monitor[4] = ctrl2float(dcdc_core.v_out_formal) * CTRL_VOLTAGE_BASE;
-    simulink_tx_buffer.monitor[5] = ctrl2float(v_req) * CTRL_VOLTAGE_BASE;
-    simulink_tx_buffer.monitor[6] = (double)cia402_sm.current_state;
-    simulink_tx_buffer.monitor[7] = (double)cia402_sm.current_cmd;
+    simulink_tx_buffer.monitor[4] = ctrl2float(g_fsbb_i_ref_cv) * CTRL_CURRENT_BASE;
+    simulink_tx_buffer.monitor[5] = ctrl2float(g_fsbb_i_ref_cc) * CTRL_CURRENT_BASE;
+    simulink_tx_buffer.monitor[6] = ctrl2float(g_fsbb_i_L_ref_selected) * CTRL_CURRENT_BASE;
+    simulink_tx_buffer.monitor[7] = (double)g_fsbb_regulation_state;
     if (g_fsbb_sim_enable_pending)
     {
         csp_sl_enable_output();

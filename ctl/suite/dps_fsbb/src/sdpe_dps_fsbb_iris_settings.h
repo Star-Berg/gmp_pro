@@ -27,7 +27,7 @@ extern "C"
 #define DPS_FSBB_IRIS_SDPE_PROJECT_ID "dps_fsbb_f280039c_Iris_node"
 #define DPS_FSBB_IRIS_SDPE_PROJECT_SUITE "dps_fsbb"
 #define DPS_FSBB_IRIS_SDPE_PROJECT_VERSION "0.1.0"
-#define DPS_FSBB_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-19"
+#define DPS_FSBB_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-18"
 
 //=================================================================================================
 /**
@@ -67,12 +67,12 @@ extern "C"
 /**
  * @brief Enable output/load current sampling path.
  */
-#define FSBB_ENABLE_IOUT_SAMPLE
+// #define FSBB_ENABLE_IOUT_SAMPLE
 
 /**
  * @brief Enable input voltage sampling path.
  */
-#define FSBB_ENABLE_VIN_SAMPLE
+// #define FSBB_ENABLE_VIN_SAMPLE
 
 //=================================================================================================
 /**
@@ -94,7 +94,7 @@ extern "C"
  * @brief Gate-driver enable GPIO.
  *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
  */
-#define PWM_ENABLE_PORT IRIS_GPIO5
+#define PWM_ENABLE_PORT IRIS_GPIO1
 
 /**
  * @brief Gate-driver reset GPIO.

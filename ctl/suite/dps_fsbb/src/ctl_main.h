@@ -36,8 +36,24 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern volatile fast_gt index_adc_calibrator;
 
 extern ctrl_gt g_v_out_ref_user;
-extern ctrl_gt g_i_limit_user;
+extern ctrl_gt g_i_out_ref_user;
+/* Legacy name retained for existing CAN/SDPE/debug integrations. */
+#define g_i_limit_user g_i_out_ref_user
 extern ctrl_gt v_req;
+
+typedef enum _tag_fsbb_control_mode_t
+{
+    FSBB_CTRL_CV = 1,
+    FSBB_CTRL_CC = 2
+} fsbb_control_mode_t;
+
+typedef enum _tag_fsbb_regulation_state_t
+{
+    FSBB_REG_DISABLED = 0,
+    FSBB_REG_CV,
+    FSBB_REG_CC,
+    FSBB_REG_FAULT
+} fsbb_regulation_state_t;
 
 typedef enum _tag_fsbb_fault
 {
@@ -52,12 +68,29 @@ typedef enum _tag_fsbb_fault
 
 extern volatile uint16_t g_fsbb_faults;
 extern volatile fast_gt g_fsbb_output_enabled;
+extern volatile fsbb_control_mode_t g_fsbb_mode_request;
+extern volatile fsbb_control_mode_t g_fsbb_mode_active;
+extern volatile fsbb_regulation_state_t g_fsbb_regulation_state;
+
+extern ctl_pid_t output_current_pid;
+extern ctl_slope_limiter_t iout_ref_ramp;
+extern ctrl_gt g_fsbb_i_ref_cv;
+extern ctrl_gt g_fsbb_i_ref_cc;
+extern ctrl_gt g_fsbb_i_L_ref_selected;
 
 void ctl_init(void);
 void ctl_mainloop(void);
 void ctl_enable_pwm(void);
 void ctl_disable_pwm(void);
 void clear_all_controllers(void);
+/**
+ * @brief Request a latched-fault reset after all real-time fault conditions clear.
+ * @return 1 when the reset command is accepted; 0 while a fault is still active
+ *         or there is no latched fault to reset.
+ */
+fast_gt ctl_request_fault_reset(void);
+fast_gt ctl_request_control_mode(fsbb_control_mode_t mode);
+ctrl_gt ctl_step_fsbb_cv_cc(void);
 gmp_task_status_t tsk_protect(gmp_task_t* tsk);
 
 /** Execute one control sample after the platform input callback has run. */
@@ -77,7 +110,18 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
 #endif
 
     if (g_fsbb_faults != FSBB_FAULT_NONE)
+    {
+        g_fsbb_regulation_state = FSBB_REG_FAULT;
         return;
+    }
+
+#if (BUILD_LEVEL == 3)
+    if (g_fsbb_output_enabled == 0)
+    {
+        g_fsbb_regulation_state = FSBB_REG_DISABLED;
+        return;
+    }
+#endif
 
 #if (BUILD_LEVEL == 1)
     dcdc_core.mode = CTL_DCDC_MODE_OPENLOOP;
@@ -90,18 +134,8 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                                  float2ctrl(0.0f));
     v_req = ctl_step_dcdc_current_loop(&dcdc_core);
 #elif (BUILD_LEVEL == 3)
-    {
-        ctrl_gt current_limit = ctl_sat(g_i_limit_user,
-                                        float2ctrl(FSBB_OUTPUT_CURRENT_LIM / CTRL_CURRENT_BASE),
-                                        float2ctrl(0.0f));
-        dcdc_core.mode = CTL_DCDC_MODE_VOLTAGELOOP;
-        dcdc_core.v_target = ctl_sat(g_v_out_ref_user,
-                                     float2ctrl(FSBB_OUTPUT_VOLTAGE_MAX / CTRL_VOLTAGE_BASE),
-                                     float2ctrl(FSBB_OUTPUT_VOLTAGE_MIN / CTRL_VOLTAGE_BASE));
-        ctl_set_pid_limit(&dcdc_core.voltage_pid, current_limit, float2ctrl(0.0f));
-        ctl_set_pid_int_limit(&dcdc_core.voltage_pid, current_limit, float2ctrl(0.0f));
-        v_req = ctl_step_dcdc_cascade(&dcdc_core);
-    }
+    dcdc_core.mode = CTL_DCDC_MODE_VOLTAGELOOP;
+    v_req = ctl_step_fsbb_cv_cc();
 #endif
 
     ctl_step_fsbb_modulator(&fsbb_mod, v_req, adc_v_in.control_port.value);

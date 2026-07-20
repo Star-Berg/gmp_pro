@@ -13,7 +13,7 @@ DPS_FSBB_IRIS_SDPE_PROJECT_SUITE = 'dps_fsbb';
 
 DPS_FSBB_IRIS_SDPE_PROJECT_VERSION = '0.1.0';
 
-DPS_FSBB_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-19';
+DPS_FSBB_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-18';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -63,11 +63,11 @@ PWM_MODULATOR_USING_NEGATIVE_LOGIC = 1;
 DISABLE_FSBB_PROTECTION_FAULT_LOGIC = true;
 
 %% Optional Sampling Channels
-% Enable output/load current sampling path.
-FSBB_ENABLE_IOUT_SAMPLE = true;
+% FSBB_ENABLE_IOUT_SAMPLE is disabled in the SDPE project requirement.
+% FSBB_ENABLE_IOUT_SAMPLE = true;
 
-% Enable input voltage sampling path.
-FSBB_ENABLE_VIN_SAMPLE = true;
+% FSBB_ENABLE_VIN_SAMPLE is disabled in the SDPE project requirement.
+% FSBB_ENABLE_VIN_SAMPLE = true;
 
 %% Controller Options
 % Incremental debug build level. 1: modulation and hardware check; 2: current loop; 3: voltage loop.
@@ -77,7 +77,7 @@ BUILD_LEVEL = 3;
 %% Board GPIO
 % Gate-driver enable GPIO.
 % Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
-PWM_ENABLE_PORT = 'IRIS_GPIO5';
+PWM_ENABLE_PORT = 'IRIS_GPIO1';
 
 % Gate-driver reset GPIO.
 % Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6

@@ -25,7 +25,7 @@ extern "C"
 #define DPS_FSBB_COMMON_SDPE_PROJECT_ID "dps_fsbb_common"
 #define DPS_FSBB_COMMON_SDPE_PROJECT_SUITE "dps_fsbb"
 #define DPS_FSBB_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define DPS_FSBB_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-20"
+#define DPS_FSBB_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-19"
 
 //=================================================================================================
 /**
@@ -110,7 +110,7 @@ extern "C"
 /**
  * @brief QuadSensor TMCS1133B1A output-current sensitivity in V/A; theoretical value pending bench calibration.
  */
-#define CTRL_FSBB_IOUT_SENSITIVITY (0.15f)
+#define CTRL_FSBB_IOUT_SENSITIVITY (0.025f)
 
 /**
  * @brief QuadSensor TMCS1133B1A zero-current output bias in V; startup ADC calibration removes board offset.
@@ -160,22 +160,22 @@ extern "C"
 /**
  * @brief Default voltage-loop command.
  */
-#define FSBB_DEFAULT_OUTPUT_VOLTAGE (40.0f)
+#define FSBB_DEFAULT_OUTPUT_VOLTAGE (20.0f)
 
 /**
  * @brief Default current limit.
  */
-#define FSBB_DEFAULT_CURRENT_LIMIT (0.4f)
+#define FSBB_DEFAULT_CURRENT_LIMIT (3.0f)
 
 /**
  * @brief Maximum leg duty.
  */
-#define FSBB_DUTY_MAX (1.0f)
+#define FSBB_DUTY_MAX (0.95f)
 
 /**
  * @brief Minimum leg duty.
  */
-#define FSBB_DUTY_MIN (0.0f)
+#define FSBB_DUTY_MIN (0.05f)
 
 /**
  * @brief Positive inductor-current protection threshold.
@@ -195,12 +195,12 @@ extern "C"
 /**
  * @brief Current-loop crossover frequency.
  */
-#define FSBB_CURRENT_LOOP_BANDWIDTH (800.0f)
+#define FSBB_CURRENT_LOOP_BANDWIDTH (200.0f)
 
 /**
  * @brief Voltage-loop crossover frequency.
  */
-#define FSBB_VOLTAGE_LOOP_BANDWIDTH (40.0f)
+#define FSBB_VOLTAGE_LOOP_BANDWIDTH (20.0f)
 
 /**
  * @brief Buck-to-transition boundary.
@@ -235,7 +235,7 @@ extern "C"
 /**
  * @brief Minimum front-panel output-current setpoint in A.
  */
-#define FSBB_USER_ISET_MIN (0.0f)
+#define FSBB_USER_ISET_MIN (1.0f)
 
 /**
  * @brief Maximum front-panel output-current setpoint in A.
