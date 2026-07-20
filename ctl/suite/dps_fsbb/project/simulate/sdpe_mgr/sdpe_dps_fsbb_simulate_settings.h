@@ -25,7 +25,7 @@ extern "C"
 #define DPS_FSBB_SIM_SDPE_PROJECT_ID "dps_fsbb_simulate"
 #define DPS_FSBB_SIM_SDPE_PROJECT_SUITE "dps_fsbb"
 #define DPS_FSBB_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define DPS_FSBB_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-16"
+#define DPS_FSBB_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-20"
 
 //=================================================================================================
 /**
@@ -91,7 +91,7 @@ extern "C"
  * @brief 1: open loop, 2: current loop, 3: voltage/current cascade.
  *        Options: (1), (2), (3)
  */
-#define BUILD_LEVEL (3)
+#define BUILD_LEVEL (2)
 
 //=================================================================================================
 /**

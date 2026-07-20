@@ -45,7 +45,10 @@ GMP_STATIC_INLINE void ctl_input_callback(void)
     uint16_t vout_adc_sample;
 
 #if defined FSBB_ENABLE_VIN_SAMPLE
-    ctl_step_adc_channel(&adc_v_in, ADC_readResult(FSBB_VIN_ADC_BASE, FSBB_VIN));
+    uint16_t vin_adc_sample;
+
+    vin_adc_sample = ADC_readResult(FSBB_VIN_ADC_BASE, FSBB_VIN);
+    ctl_step_adc_channel(&adc_v_in, fsbb_average_vin_adc_sample(vin_adc_sample));
 #else
     adc_v_in.control_port.value = float2ctrl(FSBB_INPUT_VOLTAGE_NOMINAL / CTRL_VOLTAGE_BASE);
 #endif

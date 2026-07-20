@@ -5,7 +5,7 @@
   "description": "Platform-independent FSBB topology, sensing, protection and control contract shared by all hardware and SIL targets.",
   "suite": "dps_fsbb",
   "version": "1.0.0",
-  "updated_at": "2026-07-18",
+  "updated_at": "2026-07-20",
   "output_header": "sdpe_dps_fsbb_common_settings.h",
   "hardware": [
     {
@@ -71,7 +71,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "100.0"
+        "float": "20.0"
       },
       "description": "Minimum load resistance."
     },
@@ -131,9 +131,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "export": "gmp_lvfb_150_2ph_v2.voltage_sensitivity"
+        "float": "0.00204136"
       },
-      "description": "Input-voltage sensor sensitivity in V/V."
+      "description": "QuadSensor AMC1350 input-voltage sensitivity in V/V; theoretical value pending bench calibration."
     },
     {
       "role": "Input Voltage Bias",
@@ -141,9 +141,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "export": "gmp_lvfb_150_2ph_v2.voltage_bias_v"
+        "float": "1.656445"
       },
-      "description": "Input-voltage sensor bias in V."
+      "description": "QuadSensor input-voltage channel midpoint bias in V; theoretical value pending bench calibration."
     },
     {
       "role": "Output Voltage Sensitivity",
@@ -171,9 +171,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "export": "gmp_lvfb_150_2ph_v2.current_sensitivity"
+        "export": "${gmp_lvfb_150_2ph_v2.current_sensitivity}"
       },
-      "description": "Boost-side output-current sensor sensitivity in V/A."
+      "description": "QuadSensor TMCS1133B1A output-current sensitivity in V/A; theoretical value pending bench calibration."
     },
     {
       "role": "Output Current Bias",
@@ -181,9 +181,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "export": "gmp_lvfb_150_2ph_v2.current_bias_v"
+        "export": "${gmp_lvfb_150_2ph_v2.current_bias_v}"
       },
-      "description": "Boost-side output-current sensor bias in V."
+      "description": "QuadSensor TMCS1133B1A zero-current output bias in V; startup ADC calibration removes board offset."
     },
     {
       "role": "Inductor Current Sensitivity",
@@ -271,7 +271,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "25.0"
+        "float": "30.0"
       },
       "description": "Default voltage-loop command."
     },
@@ -341,7 +341,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "400.0"
+        "float": "250.0"
       },
       "description": "Current-loop crossover frequency."
     },
@@ -351,7 +351,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "40.0"
+        "float": "25.0"
       },
       "description": "Voltage-loop crossover frequency."
     },

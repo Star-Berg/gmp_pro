@@ -191,7 +191,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(3)",
+      "value": "(2)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -241,5 +241,5 @@
   ],
   "macro_prefix": "DPS_FSBB_SIM",
   "description": "",
-  "updated_at": "2026-07-18"
+  "updated_at": "2026-07-20"
 }

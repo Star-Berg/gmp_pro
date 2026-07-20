@@ -25,7 +25,7 @@ extern "C"
 #define DPS_FSBB_COMMON_SDPE_PROJECT_ID "dps_fsbb_common"
 #define DPS_FSBB_COMMON_SDPE_PROJECT_SUITE "dps_fsbb"
 #define DPS_FSBB_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define DPS_FSBB_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-18"
+#define DPS_FSBB_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-19"
 
 //=================================================================================================
 /**
@@ -60,7 +60,7 @@ extern "C"
 /**
  * @brief Minimum load resistance.
  */
-#define FSBB_PARAM_RLOAD_MIN (100.0f)
+#define FSBB_PARAM_RLOAD_MIN (2.0f)
 
 /**
  * @brief Input capacitance.
@@ -88,14 +88,14 @@ extern "C"
 #define FSBB_PARAM_L_ESR (0.05f)
 
 /**
- * @brief Input-voltage sensor sensitivity in V/V.
+ * @brief QuadSensor AMC1350 input-voltage sensitivity in V/V; theoretical value pending bench calibration.
  */
-#define CTRL_FSBB_VIN_SENSITIVITY GMP_LVFB_VOLTAGE_SENSITIVITY
+#define CTRL_FSBB_VIN_SENSITIVITY (0.00204136f)
 
 /**
- * @brief Input-voltage sensor bias in V.
+ * @brief QuadSensor input-voltage channel midpoint bias in V; theoretical value pending bench calibration.
  */
-#define CTRL_FSBB_VIN_BIAS GMP_LVFB_VOLTAGE_BIAS_V
+#define CTRL_FSBB_VIN_BIAS (1.656445f)
 
 /**
  * @brief Output-voltage sensor sensitivity in V/V.
@@ -108,12 +108,12 @@ extern "C"
 #define CTRL_FSBB_VOUT_BIAS GMP_LVFB_VOLTAGE_BIAS_V
 
 /**
- * @brief Boost-side output-current sensor sensitivity in V/A.
+ * @brief QuadSensor TMCS1133B1A output-current sensitivity in V/A; theoretical value pending bench calibration.
  */
 #define CTRL_FSBB_IOUT_SENSITIVITY GMP_LVFB_CURRENT_SENSITIVITY
 
 /**
- * @brief Boost-side output-current sensor bias in V.
+ * @brief QuadSensor TMCS1133B1A zero-current output bias in V; startup ADC calibration removes board offset.
  */
 #define CTRL_FSBB_IOUT_BIAS GMP_LVFB_CURRENT_BIAS_V
 
@@ -160,7 +160,7 @@ extern "C"
 /**
  * @brief Default voltage-loop command.
  */
-#define FSBB_DEFAULT_OUTPUT_VOLTAGE (25.0f)
+#define FSBB_DEFAULT_OUTPUT_VOLTAGE (30.0f)
 
 /**
  * @brief Default current limit.
@@ -195,12 +195,12 @@ extern "C"
 /**
  * @brief Current-loop crossover frequency.
  */
-#define FSBB_CURRENT_LOOP_BANDWIDTH (400.0f)
+#define FSBB_CURRENT_LOOP_BANDWIDTH (250.0f)
 
 /**
  * @brief Voltage-loop crossover frequency.
  */
-#define FSBB_VOLTAGE_LOOP_BANDWIDTH (40.0f)
+#define FSBB_VOLTAGE_LOOP_BANDWIDTH (25.0f)
 
 /**
  * @brief Buck-to-transition boundary.

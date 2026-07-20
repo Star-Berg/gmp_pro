@@ -84,7 +84,7 @@ adc1.soc4SampleWindow               = 9;
 adc1.soc4IndependentNameMode        = true;
 adc1.soc0Channel                    = "ADC_CH_ADCIN6";
 adc1.soc0Name                       = "ADC_CH1";
-adc1.enabledSOCs                    = ["ADC_SOC_NUMBER0"];
+adc1.enabledSOCs                    = ["ADC_SOC_NUMBER0","ADC_SOC_NUMBER1"];
 adc1.soc1Name                       = "ADC_CH5";
 adc1.soc2Name                       = "ADC_CH9";
 adc1.soc3Name                       = "ADC_CH12";
@@ -93,6 +93,7 @@ adc1.soc2Channel                    = "ADC_CH_ADCIN12";
 adc1.soc3Channel                    = "ADC_CH_ADCIN7";
 adc1.adcInt1.interruptHandler       = "MainISR";
 adc1.adcInt1.enableInterrupt        = true;
+adc1.interrupt1SOCSource            = "ADC_SOC_NUMBER1";
 
 adc2.$name                   = "IRIS_ADCB";
 adc2.adcBase                 = "ADCB_BASE";

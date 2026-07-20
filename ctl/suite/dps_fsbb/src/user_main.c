@@ -16,6 +16,20 @@
 #include <core/dev/pil_core.h>
 #include <core/dev/tunable.h>
 
+#if !defined SPECIFY_PC_ENVIRONMENT
+// Board-local HT16K33 keypad/display tasks. The implementation lives in the
+// Iris target so the SIL target remains independent of physical peripherals.
+extern ec_gt fsbb_ui_start(void);
+extern gmp_task_status_t tsk_fsbb_ui_key(gmp_task_t* tsk);
+extern gmp_task_status_t tsk_fsbb_ui_encoder(gmp_task_t* tsk);
+extern gmp_task_status_t tsk_fsbb_ui_display(gmp_task_t* tsk);
+extern gmp_task_status_t tsk_fsbb_ui_flush(gmp_task_t* tsk);
+
+// Include the target-local implementation in this already-linked translation
+// unit. The .inc suffix prevents CCS source discovery from compiling it twice.
+#include "../project/f280039c_Iris_node/src/user/fsbb_ui.inc"
+#endif
+
 //=================================================================================================
 // Datalink protocol online Debug module
 
@@ -197,6 +211,12 @@ gmp_task_t tasks[] = {
     {"monitor_data", tsk_monitor, 5, 0, 1, NULL},  // 5ms -> 200Hz refresh rate
     {"ctl_mainloop", tsk_ctl_main, 1, 0, 1, NULL}, // 1ms state machine tick
     {"slow_protect", tsk_protect, 10, 0, 1, NULL}, // 10ms thermal/RMS protection
+#if !defined SPECIFY_PC_ENVIRONMENT
+    {"ui_key", tsk_fsbb_ui_key, 50, 10, 1, NULL},
+    {"ui_encoder", tsk_fsbb_ui_encoder, 20, 40, 1, NULL},
+    {"ui_display", tsk_fsbb_ui_display, 50, 30, 1, NULL},
+    {"ui_flush", tsk_fsbb_ui_flush, 50, 20, 1, NULL},
+#endif
     {"startup", tsk_startup, 500, 0, 1, NULL},
 };
 
@@ -238,7 +258,10 @@ gmp_task_status_t tsk_startup(gmp_task_t* tsk)
 {
     GMP_UNUSED_VAR(tsk);
 
-    // Add necessary init code here.
+#if !defined SPECIFY_PC_ENVIRONMENT
+    if (fsbb_ui_start() != GMP_EC_OK)
+        gmp_base_print(TEXT_STRING("Panel display init failed; keypad/displays disabled.\r\n"));
+#endif
 
     // startup process is complete, close this task
     tsk->is_enabled = 0;

@@ -172,7 +172,12 @@ gmp_task_status_t tsk_protect(gmp_task_t* tsk)
     GMP_UNUSED_VAR(tsk);
 
 #if !defined DISABLE_FSBB_PROTECTION_FAULT_LOGIC
-    if (g_fsbb_faults != FSBB_FAULT_NONE)
+    // Request the CiA402 fault transition only once. Re-requesting it while
+    // already in FAULT_REACTION/FAULT would repeatedly restart the reaction
+    // state and could prevent a pending reset from being processed.
+    if ((g_fsbb_faults != FSBB_FAULT_NONE) &&
+        (cia402_sm.current_state != CIA402_SM_FAULT_REACTION) &&
+        (cia402_sm.current_state != CIA402_SM_FAULT))
         cia402_fault_request(&cia402_sm);
 #endif // DISABLE_FSBB_PROTECTION_FAULT_LOGIC
 
@@ -229,6 +234,49 @@ fast_gt ctl_exec_adc_calibration(void)
 void clear_all_controllers(void)
 {
     ctl_clear_dcdc_core(&dcdc_core);
+}
+
+fast_gt ctl_request_fault_reset(void)
+{
+    // The latched mask may only be cleared after the physical fault has gone.
+    // Check both here and again in ctl_fault_recover_routine(), because the
+    // command can be issued from CAN/UI before the next 1 ms dispatch.
+    if (ctl_fsbb_active_faults() != FSBB_FAULT_NONE)
+        return 0;
+
+    // The panel/CAN reset request may arrive before the 10 ms protection task
+    // has converted the latched FSBB fault into the CiA402 FAULT state. Enter
+    // the normal fault path here so that the standard recovery callback, PWM
+    // shutdown and status-word transition are still used.
+    if ((cia402_sm.current_state != CIA402_SM_FAULT_REACTION) &&
+        (cia402_sm.current_state != CIA402_SM_FAULT))
+    {
+        if (g_fsbb_faults == FSBB_FAULT_NONE)
+            return 0;
+
+        cia402_fault_request(&cia402_sm);
+    }
+
+    if ((cia402_sm.current_state != CIA402_SM_FAULT_REACTION) &&
+        (cia402_sm.current_state != CIA402_SM_FAULT))
+        return 0;
+
+    cia402_send_cmd(&cia402_sm, CIA402_CMD_FAULT_RESET);
+    return 1;
+}
+
+// Strong FSBB implementation of the weak CiA402 recovery callback. The state
+// machine invokes this in CIA402_SM_FAULT before returning to
+// CIA402_SM_SWITCH_ON_DISABLED.
+fast_gt ctl_fault_recover_routine(void)
+{
+    if (ctl_fsbb_active_faults() != FSBB_FAULT_NONE)
+        return 0;
+
+    ctl_disable_pwm();
+    clear_all_controllers();
+    g_fsbb_faults = FSBB_FAULT_NONE;
+    return 1;
 }
 
 void ctl_enable_pwm(void)

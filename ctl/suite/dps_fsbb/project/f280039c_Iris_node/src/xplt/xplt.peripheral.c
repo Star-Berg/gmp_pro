@@ -29,26 +29,69 @@
 extern gpio_halt user_led;
 
 //=================================================================================================
-// VOUT ADC moving average
+// VIN/VOUT ADC moving averages
+
+volatile uint16_t g_fsbb_vin_adc_raw = 0U;
+volatile uint16_t g_fsbb_vin_adc_average = 0U;
+volatile fast_gt g_fsbb_vin_adc_average_enable = 1;
+
+static uint16_t vin_adc_average_buffer[FSBB_VIN_ADC_AVERAGE_SAMPLES];
+static uint32_t vin_adc_average_sum = 0UL;
+static uint16_t vin_adc_average_index = 0U;
+static fast_gt vin_adc_average_primed = 0;
 
 volatile uint16_t g_fsbb_vout_adc_raw = 0U;
 volatile uint16_t g_fsbb_vout_adc_average = 0U;
-volatile uint16_t g_fsbb_vout_adc_window_min = 0U;
-volatile uint16_t g_fsbb_vout_adc_window_max = 0U;
 volatile fast_gt g_fsbb_vout_adc_average_enable = 1;
-volatile fast_gt g_fsbb_vout_adc_trim_enable = 1;
 
 static uint16_t vout_adc_average_buffer[FSBB_VOUT_ADC_AVERAGE_SAMPLES];
 static uint32_t vout_adc_average_sum = 0UL;
 static uint16_t vout_adc_average_index = 0U;
 static fast_gt vout_adc_average_primed = 0;
 
+uint16_t fsbb_average_vin_adc_sample(uint16_t sample)
+{
+    uint16_t i;
+    uint32_t average_sum;
+
+    g_fsbb_vin_adc_raw = sample;
+
+    if ((!g_fsbb_vin_adc_average_enable) || (FSBB_VIN_ADC_AVERAGE_SAMPLES == 1U))
+    {
+        vin_adc_average_primed = 0;
+        g_fsbb_vin_adc_average = sample;
+        return sample;
+    }
+
+    if (!vin_adc_average_primed)
+    {
+        for (i = 0U; i < FSBB_VIN_ADC_AVERAGE_SAMPLES; ++i)
+            vin_adc_average_buffer[i] = sample;
+
+        vin_adc_average_sum = (uint32_t)sample * FSBB_VIN_ADC_AVERAGE_SAMPLES;
+        vin_adc_average_index = 0U;
+        vin_adc_average_primed = 1;
+        g_fsbb_vin_adc_average = sample;
+        return sample;
+    }
+
+    vin_adc_average_sum -= vin_adc_average_buffer[vin_adc_average_index];
+    vin_adc_average_buffer[vin_adc_average_index] = sample;
+    vin_adc_average_sum += sample;
+
+    if (++vin_adc_average_index >= FSBB_VIN_ADC_AVERAGE_SAMPLES)
+        vin_adc_average_index = 0U;
+
+    average_sum = vin_adc_average_sum;
+    g_fsbb_vin_adc_average =
+        (uint16_t)((average_sum + (FSBB_VIN_ADC_AVERAGE_SAMPLES / 2U)) / FSBB_VIN_ADC_AVERAGE_SAMPLES);
+
+    return g_fsbb_vin_adc_average;
+}
+
 uint16_t fsbb_average_vout_adc_sample(uint16_t sample)
 {
     uint16_t i;
-    uint16_t average_divisor;
-    uint16_t window_min;
-    uint16_t window_max;
     uint32_t average_sum;
 
     g_fsbb_vout_adc_raw = sample;
@@ -58,8 +101,6 @@ uint16_t fsbb_average_vout_adc_sample(uint16_t sample)
         // Re-prime the history when averaging is enabled again so stale
         // samples cannot create a step in the feedback signal.
         vout_adc_average_primed = 0;
-        g_fsbb_vout_adc_window_min = sample;
-        g_fsbb_vout_adc_window_max = sample;
         g_fsbb_vout_adc_average = sample;
         return sample;
     }
@@ -74,8 +115,6 @@ uint16_t fsbb_average_vout_adc_sample(uint16_t sample)
         vout_adc_average_sum = (uint32_t)sample * FSBB_VOUT_ADC_AVERAGE_SAMPLES;
         vout_adc_average_index = 0U;
         vout_adc_average_primed = 1;
-        g_fsbb_vout_adc_window_min = sample;
-        g_fsbb_vout_adc_window_max = sample;
         g_fsbb_vout_adc_average = sample;
         return sample;
     }
@@ -88,33 +127,8 @@ uint16_t fsbb_average_vout_adc_sample(uint16_t sample)
         vout_adc_average_index = 0U;
 
     average_sum = vout_adc_average_sum;
-    average_divisor = FSBB_VOUT_ADC_AVERAGE_SAMPLES;
-
-    window_min = vout_adc_average_buffer[0];
-    window_max = vout_adc_average_buffer[0];
-    for (i = 1U; i < FSBB_VOUT_ADC_AVERAGE_SAMPLES; ++i)
-    {
-        if (vout_adc_average_buffer[i] < window_min)
-            window_min = vout_adc_average_buffer[i];
-        if (vout_adc_average_buffer[i] > window_max)
-            window_max = vout_adc_average_buffer[i];
-    }
-
-    g_fsbb_vout_adc_window_min = window_min;
-    g_fsbb_vout_adc_window_max = window_max;
-
-    // Reject one high and one low outlier symmetrically. Rejecting only the
-    // maximum would bias the feedback low and make the voltage loop command a
-    // higher real output voltage.
-    if (g_fsbb_vout_adc_trim_enable && (FSBB_VOUT_ADC_AVERAGE_SAMPLES >= 3U))
-    {
-        average_sum -= (uint32_t)window_min + (uint32_t)window_max;
-        average_divisor -= 2U;
-    }
-
-    // Half-up rounding prevents the integer division from adding a persistent
-    // negative bias to the averaged ADC code.
-    g_fsbb_vout_adc_average = (uint16_t)((average_sum + (average_divisor / 2U)) / average_divisor);
+    g_fsbb_vout_adc_average =
+        (uint16_t)((average_sum + (FSBB_VOUT_ADC_AVERAGE_SAMPLES / 2U)) / FSBB_VOUT_ADC_AVERAGE_SAMPLES);
 
     return g_fsbb_vout_adc_average;
 }
@@ -122,9 +136,37 @@ uint16_t fsbb_average_vout_adc_sample(uint16_t sample)
 //=================================================================================================
 // Peripheral Setup Function
 
+/**
+ * @brief Restore the HT16K33 panel's verified I2C controller settings.
+ *
+ * SysConfig currently generates I2C_BITCOUNT_1 for IRIS_IIC. The HT16K33
+ * command and RAM transactions use normal 8-bit bytes, so the generated setup
+ * must be overridden after Board_init() and before the UI startup task probes
+ * address 0x70. These settings match the verified Iris panel project.
+ */
+static void fsbb_init_panel_i2c(void)
+{
+    I2C_disableModule(IRIS_IIC_BASE);
+
+    I2C_initController(
+        IRIS_IIC_BASE,
+        DEVICE_SYSCLK_FREQ,
+        400000U,
+        I2C_DUTYCYCLE_33);
+    I2C_setBitCount(IRIS_IIC_BASE, I2C_BITCOUNT_8);
+    I2C_setTargetAddress(IRIS_IIC_BASE, 0x70U);
+    I2C_setEmulationMode(IRIS_IIC_BASE, I2C_EMULATION_FREE_RUN);
+
+    I2C_enableFIFO(IRIS_IIC_BASE);
+    I2C_clearInterruptStatus(IRIS_IIC_BASE, I2C_INT_RXFF | I2C_INT_TXFF);
+    I2C_enableModule(IRIS_IIC_BASE);
+}
+
 // User should setup all the peripheral in this function.
 void setup_peripheral(void)
 {
+    fsbb_init_panel_i2c();
+
     // Setup Debug UART
     debug_uart = IRIS_UART_USB_BASE;
 
@@ -259,10 +301,11 @@ interrupt void INT_IRIS_CAN_0_ISR(void)
         {
             cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
         }
-        else if ((rx_data[0] == 2) && (ctl_fsbb_active_faults() == FSBB_FAULT_NONE))
+        else if (rx_data[0] == 2)
         {
-            g_fsbb_faults = FSBB_FAULT_NONE;
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_FAULT_RESET);
+            // UI and CAN share the same checked recovery path. The request is
+            // ignored until all physical fault conditions have disappeared.
+            (void)ctl_request_fault_reset();
         }
     }
     // Mailbox 2: Reference Commands (V_out Setpoint & I_limit)

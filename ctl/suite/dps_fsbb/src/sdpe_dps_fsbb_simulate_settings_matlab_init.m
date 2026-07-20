@@ -9,7 +9,7 @@ DPS_FSBB_SIM_SDPE_PROJECT_SUITE = 'dps_fsbb';
 
 DPS_FSBB_SIM_SDPE_PROJECT_VERSION = '1.0.0';
 
-DPS_FSBB_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-18';
+DPS_FSBB_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-20';
 
 %% Hardware macros
 BSC093N15NS5_ID = 'bsc093n15ns5';
@@ -214,7 +214,7 @@ FSBB_ENABLE_IOUT_SAMPLE = true;
 %% Controller
 % 1: open loop, 2: current loop, 3: voltage/current cascade.
 % Options: (1), (2), (3)
-BUILD_LEVEL = 3;
+BUILD_LEVEL = 2;
 
 %% Requirement bindings
 % PWM compare maximum shared by controller and plant model.
