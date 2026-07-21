@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief Default active-power reference. Positive power exports energy to the grid.
  */
-#define GFL_ACTIVE_POWER_REF_PU (-0.03f)
+#define GFL_ACTIVE_POWER_REF_PU (-0.05f)
 
 /**
  * @brief Default reactive-power reference using Q = vq*id - vd*iq.

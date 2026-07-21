@@ -248,10 +248,13 @@ void ctl_enable_pwm()
     dc_bus_loop_tick = 0;
     dc_bus_power_ref_pu = 0;
 
-    // Start the reference ramp from the present DC-bus voltage to avoid a
-    // full-power step when PWM is enabled.
+    // Start the reference ramp from the present raw DC-bus sample.  The
+    // controller-side IIR state can still be zero on the first PWM-enable
+    // callback, while the ADC interface already contains the actual bus
+    // voltage.  Starting from the stale filtered value would temporarily
+    // command a reference below the real bus voltage and inhibit rectification.
     dc_bus_voltage_ref_ramp_pu = ctl_sat(
-        inv_ctrl.filter_udc.out, float2ctrl(GFL_DCBUS_VOLTAGE_REF_V / CTRL_DCBUS_VOLTAGE), 0);
+        udc.control_port.value, float2ctrl(GFL_DCBUS_VOLTAGE_REF_V / CTRL_DCBUS_VOLTAGE), 0);
     ctl_set_gfl_pq_ref(&pq_ctrl, 0, float2ctrl(GFL_REACTIVE_POWER_REF_PU));
     flag_enable_dc_bus_voltage_ctrl = 1;
 #endif

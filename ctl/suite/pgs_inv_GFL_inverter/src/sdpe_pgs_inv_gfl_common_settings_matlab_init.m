@@ -77,13 +77,13 @@ GFL_PQ_LOOP_DIVIDER = CONTROLLER_FREQUENCY / GFL_PQ_LOOP_FREQUENCY_HZ;
 GFL_PQ_ACTIVE_KP = 0.75;
 
 % Active-power loop integral gain in inverse seconds.
-GFL_PQ_ACTIVE_KI = 0.001;
+GFL_PQ_ACTIVE_KI = 10.0;
 
 % Reactive-power loop proportional gain from Q error PU to q-axis current PU.
 GFL_PQ_REACTIVE_KP = 0.75;
 
 % Reactive-power loop integral gain in inverse seconds.
-GFL_PQ_REACTIVE_KI = 0.001;
+GFL_PQ_REACTIVE_KI = 10.0;
 
 % Circular magnitude limit applied to the d/q current reference produced by the P/Q loop.
 GFL_PQ_CURRENT_LIMIT_PU = 1.0;
@@ -98,7 +98,7 @@ GFL_OPEN_LOOP_VQ_PU = 0.6;
 CTRL_SPLL_EPSILON = float2ctrl(0.005);
 
 % Default active-power reference. Positive power exports energy to the grid.
-GFL_ACTIVE_POWER_REF_PU = -0.03;
+GFL_ACTIVE_POWER_REF_PU = -0.05;
 
 % Default reactive-power reference using Q = vq*id - vd*iq.
 GFL_REACTIVE_POWER_REF_PU = 0.0;

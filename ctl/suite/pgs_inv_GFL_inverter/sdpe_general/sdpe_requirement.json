@@ -273,7 +273,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "-0.03"
+        "float": "-0.05"
       },
       "description": "Default active-power reference. Positive power exports energy to the grid."
     },
