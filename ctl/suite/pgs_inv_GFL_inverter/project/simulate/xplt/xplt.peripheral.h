@@ -19,6 +19,7 @@ extern "C"
 
 // controller settings
 #include "../sdpe_mgr/sdpe_pgs_inv_gfl_simulate_settings.h"
+#include "sim_control_overrides.h"
 
 // select ADC PTR interface
 #include <ctl/component/interface/adc_ptr_channel.h>
