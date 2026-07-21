@@ -36,11 +36,6 @@ extern "C"
 #define _USE_DEBUG_DISCRETE_PID
 
 /**
- * @brief Enable the outer DC-bus voltage loop that commands negative active power for rectification.
- */
-#define ENABLE_GFL_DCBUS_VOLTAGE_CTRL
-
-/**
  * @brief Use DSOGI PLL instead of the default SRF PLL.
  */
 // #define USING_DSOGI_PLL
@@ -92,41 +87,6 @@ extern "C"
 #define GFL_GRID_VOLTAGE_PU (0.4949f)
 
 /**
- * @brief Regulated DC-bus voltage target in volts.
- */
-#define GFL_DCBUS_VOLTAGE_REF_V (80.0f)
-
-/**
- * @brief DC-bus voltage-loop execution frequency in hertz.
- */
-#define GFL_DCBUS_LOOP_FREQUENCY_HZ (200.0f)
-
-/**
- * @brief Current-ISR to DC-bus voltage-loop execution divider.
- */
-#define GFL_DCBUS_LOOP_DIVIDER ((uint32_t)(CONTROLLER_FREQUENCY / GFL_DCBUS_LOOP_FREQUENCY_HZ))
-
-/**
- * @brief Initial DC-bus voltage-loop proportional gain from voltage error PU to absorbed-power PU.
- */
-#define GFL_DCBUS_VOLTAGE_KP (0.2f)
-
-/**
- * @brief Initial DC-bus voltage-loop integral gain in inverse seconds.
- */
-#define GFL_DCBUS_VOLTAGE_KI (5.0f)
-
-/**
- * @brief Maximum active-power magnitude that the DC-bus loop may absorb from the grid in per unit.
- */
-#define GFL_DCBUS_POWER_LIMIT_PU (0.2f)
-
-/**
- * @brief Soft-start slew rate of the DC-bus voltage reference in volts per second.
- */
-#define GFL_DCBUS_VOLTAGE_REF_RAMP_V_PER_S (40.0f)
-
-/**
  * @brief P/Q outer-loop execution frequency in hertz.
  */
 #define GFL_PQ_LOOP_FREQUENCY_HZ (1000.0f)
@@ -144,7 +104,7 @@ extern "C"
 /**
  * @brief Active-power loop integral gain in inverse seconds.
  */
-#define GFL_PQ_ACTIVE_KI (10.0f)
+#define GFL_PQ_ACTIVE_KI (0.001f)
 
 /**
  * @brief Reactive-power loop proportional gain from Q error PU to q-axis current PU.
@@ -154,7 +114,7 @@ extern "C"
 /**
  * @brief Reactive-power loop integral gain in inverse seconds.
  */
-#define GFL_PQ_REACTIVE_KI (10.0f)
+#define GFL_PQ_REACTIVE_KI (0.001f)
 
 /**
  * @brief Circular magnitude limit applied to the d/q current reference produced by the P/Q loop.

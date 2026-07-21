@@ -18,9 +18,6 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-21';
 % Enable the existing discrete PID anti-saturation path.
 USE_DEBUG_DISCRETE_PID = true;
 
-% Enable the outer DC-bus voltage loop that commands negative active power for rectification.
-ENABLE_GFL_DCBUS_VOLTAGE_CTRL = true;
-
 % USING_DSOGI_PLL is disabled in the SDPE project requirement.
 % USING_DSOGI_PLL = true;
 
@@ -46,27 +43,6 @@ GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
 % Nominal grid phase-voltage magnitude in controller per unit.
 GFL_GRID_VOLTAGE_PU = 0.4949;
 
-% Regulated DC-bus voltage target in volts.
-GFL_DCBUS_VOLTAGE_REF_V = 80.0;
-
-% DC-bus voltage-loop execution frequency in hertz.
-GFL_DCBUS_LOOP_FREQUENCY_HZ = 200.0;
-
-% Current-ISR to DC-bus voltage-loop execution divider.
-GFL_DCBUS_LOOP_DIVIDER = CONTROLLER_FREQUENCY / GFL_DCBUS_LOOP_FREQUENCY_HZ;
-
-% Initial DC-bus voltage-loop proportional gain from voltage error PU to absorbed-power PU.
-GFL_DCBUS_VOLTAGE_KP = 0.2;
-
-% Initial DC-bus voltage-loop integral gain in inverse seconds.
-GFL_DCBUS_VOLTAGE_KI = 5.0;
-
-% Maximum active-power magnitude that the DC-bus loop may absorb from the grid in per unit.
-GFL_DCBUS_POWER_LIMIT_PU = 0.2;
-
-% Soft-start slew rate of the DC-bus voltage reference in volts per second.
-GFL_DCBUS_VOLTAGE_REF_RAMP_V_PER_S = 40.0;
-
 % P/Q outer-loop execution frequency in hertz.
 GFL_PQ_LOOP_FREQUENCY_HZ = 1000.0;
 
@@ -77,13 +53,13 @@ GFL_PQ_LOOP_DIVIDER = CONTROLLER_FREQUENCY / GFL_PQ_LOOP_FREQUENCY_HZ;
 GFL_PQ_ACTIVE_KP = 0.75;
 
 % Active-power loop integral gain in inverse seconds.
-GFL_PQ_ACTIVE_KI = 10.0;
+GFL_PQ_ACTIVE_KI = 0.001;
 
 % Reactive-power loop proportional gain from Q error PU to q-axis current PU.
 GFL_PQ_REACTIVE_KP = 0.75;
 
 % Reactive-power loop integral gain in inverse seconds.
-GFL_PQ_REACTIVE_KI = 10.0;
+GFL_PQ_REACTIVE_KI = 0.001;
 
 % Circular magnitude limit applied to the d/q current reference produced by the P/Q loop.
 GFL_PQ_CURRENT_LIMIT_PU = 1.0;

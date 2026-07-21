@@ -31,6 +31,7 @@ cia402_sm_t cia402_sm;
 // Control Law Core
 // Current controller, Power controller / Voltage controller
 gfl_pq_ctrl_t pq_ctrl;
+ctl_pid_t dc_bus_voltage_ctrl;
 inv_neg_ctrl_init_t gfl_neg_init;
 inv_neg_ctrl_t neg_current_ctrl;
 gfl_inv_ctrl_init_t gfl_init;
@@ -56,6 +57,10 @@ volatile fast_gt flag_enable_adc_calibrator = 0;
 #endif
 volatile fast_gt index_adc_calibrator = 0;
 uint32_t pq_loop_tick = 0;
+uint32_t dc_bus_loop_tick = 0;
+volatile fast_gt flag_enable_dc_bus_voltage_ctrl = 0;
+ctrl_gt dc_bus_voltage_ref_ramp_pu = 0;
+ctrl_gt dc_bus_power_ref_pu = 0;
 
 // User commands
 
@@ -108,6 +113,20 @@ void ctl_init()
     ctl_set_gfl_pq_ref(&pq_ctrl, float2ctrl(GFL_ACTIVE_POWER_REF_PU), float2ctrl(GFL_REACTIVE_POWER_REF_PU));
     pq_loop_tick = 0;
 
+#if defined ENABLE_GFL_DCBUS_VOLTAGE_CTRL
+    // The DC-bus loop produces a positive absorbed-power magnitude. Its output
+    // is negated before being passed to the P/Q loop because P < 0 denotes
+    // rectification in this project.
+    ctl_init_pid(&dc_bus_voltage_ctrl, GFL_DCBUS_VOLTAGE_KP, GFL_DCBUS_VOLTAGE_KI, 0,
+                 GFL_DCBUS_LOOP_FREQUENCY_HZ);
+    ctl_set_pid_limit(&dc_bus_voltage_ctrl, float2ctrl(GFL_DCBUS_POWER_LIMIT_PU), 0);
+    ctl_set_pid_int_limit(&dc_bus_voltage_ctrl, float2ctrl(GFL_DCBUS_POWER_LIMIT_PU), 0);
+    dc_bus_loop_tick = 0;
+    flag_enable_dc_bus_voltage_ctrl = 0;
+    dc_bus_voltage_ref_ramp_pu = 0;
+    dc_bus_power_ref_pu = 0;
+#endif
+
 #if BUILD_LEVEL == 1
     // Voltage open loop, inverter
     ctl_set_gfl_inv_openloop_mode(&inv_ctrl);
@@ -153,8 +172,6 @@ void ctl_init()
     ctl_enable_gfl_inv_decouple(&inv_ctrl);
     ctl_enable_gfl_inv_active_damp(&inv_ctrl);
     ctl_enable_gfl_inv_lead_compensator(&inv_ctrl);
-    ctl_enable_gfl_pq_ctrl(&pq_ctrl);
-
 #endif // BUILD_LEVEL
 
     //
@@ -222,6 +239,24 @@ time_gt gmp_base_get_ctrl_tick(void)
 
 void ctl_enable_pwm()
 {
+#if BUILD_LEVEL == 5
+    ctl_clear_gfl_pq(&pq_ctrl);
+    ctl_enable_gfl_pq_ctrl(&pq_ctrl);
+
+#if defined ENABLE_GFL_DCBUS_VOLTAGE_CTRL
+    ctl_clear_pid(&dc_bus_voltage_ctrl);
+    dc_bus_loop_tick = 0;
+    dc_bus_power_ref_pu = 0;
+
+    // Start the reference ramp from the present DC-bus voltage to avoid a
+    // full-power step when PWM is enabled.
+    dc_bus_voltage_ref_ramp_pu = ctl_sat(
+        inv_ctrl.filter_udc.out, float2ctrl(GFL_DCBUS_VOLTAGE_REF_V / CTRL_DCBUS_VOLTAGE), 0);
+    ctl_set_gfl_pq_ref(&pq_ctrl, 0, float2ctrl(GFL_REACTIVE_POWER_REF_PU));
+    flag_enable_dc_bus_voltage_ctrl = 1;
+#endif
+#endif // BUILD_LEVEL == 5
+
     ctl_fast_enable_output();
 }
 
@@ -232,8 +267,45 @@ void ctl_disable_pwm()
     // clear controller here
     ctl_clear_gfl_inv(&inv_ctrl);
     ctl_clear_neg_inv(&neg_current_ctrl);
-    ctl_clear_gfl_pq(&pq_ctrl);
+    ctl_disable_gfl_pq_ctrl(&pq_ctrl);
     pq_loop_tick = 0;
+
+#if defined ENABLE_GFL_DCBUS_VOLTAGE_CTRL
+    flag_enable_dc_bus_voltage_ctrl = 0;
+    ctl_clear_pid(&dc_bus_voltage_ctrl);
+    dc_bus_loop_tick = 0;
+    dc_bus_voltage_ref_ramp_pu = 0;
+    dc_bus_power_ref_pu = 0;
+#endif
+}
+
+void ctl_step_dc_bus_voltage_ctrl(void)
+{
+#if defined ENABLE_GFL_DCBUS_VOLTAGE_CTRL && BUILD_LEVEL == 5
+    ctrl_gt voltage_ref_pu = float2ctrl(GFL_DCBUS_VOLTAGE_REF_V / CTRL_DCBUS_VOLTAGE);
+    ctrl_gt ramp_step_pu =
+        float2ctrl(GFL_DCBUS_VOLTAGE_REF_RAMP_V_PER_S / CTRL_DCBUS_VOLTAGE / GFL_DCBUS_LOOP_FREQUENCY_HZ);
+
+    if (!flag_enable_dc_bus_voltage_ctrl)
+        return;
+
+    if (dc_bus_voltage_ref_ramp_pu < voltage_ref_pu)
+    {
+        dc_bus_voltage_ref_ramp_pu += ramp_step_pu;
+        if (dc_bus_voltage_ref_ramp_pu > voltage_ref_pu)
+            dc_bus_voltage_ref_ramp_pu = voltage_ref_pu;
+    }
+    else if (dc_bus_voltage_ref_ramp_pu > voltage_ref_pu)
+    {
+        dc_bus_voltage_ref_ramp_pu -= ramp_step_pu;
+        if (dc_bus_voltage_ref_ramp_pu < voltage_ref_pu)
+            dc_bus_voltage_ref_ramp_pu = voltage_ref_pu;
+    }
+
+    dc_bus_power_ref_pu =
+        -ctl_step_pid_ser(&dc_bus_voltage_ctrl, dc_bus_voltage_ref_ramp_pu - inv_ctrl.filter_udc.out);
+    ctl_set_gfl_pq_ref(&pq_ctrl, dc_bus_power_ref_pu, float2ctrl(GFL_REACTIVE_POWER_REF_PU));
+#endif
 }
 
 fast_gt ctl_check_pll_locked(void)

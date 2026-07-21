@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-15",
+  "updated_at": "2026-07-21",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -17,13 +17,23 @@
       "group": "Control Algorithm",
       "macro": "_USE_DEBUG_DISCRETE_PID",
       "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Enable the existing discrete PID anti-saturation path."
     },
     {
       "group": "Control Algorithm",
+      "macro": "ENABLE_GFL_DCBUS_VOLTAGE_CTRL",
+      "enabled": true,
+      "weak": false,
+      "value": "",
+      "description": "Enable the outer DC-bus voltage loop that commands negative active power for rectification."
+    },
+    {
+      "group": "Control Algorithm",
       "macro": "USING_DSOGI_PLL",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Use DSOGI PLL instead of the default SRF PLL."
     },
@@ -31,6 +41,7 @@
       "group": "Control Algorithm",
       "macro": "USING_NPC_MODULATOR",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Use the three-level NPC modulator instead of the two-level SPWM modulator."
     },
@@ -38,6 +49,7 @@
       "group": "Runtime",
       "macro": "SPECIFY_ENABLE_ADC_CALIBRATE",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Enable startup ADC offset calibration. Only enable while all calibrated power inputs are in a known zero state."
     },
@@ -45,6 +57,7 @@
       "group": "Runtime",
       "macro": "ENABLE_GMP_DL_PIL_SIM",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Enable processor-in-the-loop input/output handling."
     },
@@ -52,6 +65,7 @@
       "group": "Runtime",
       "macro": "GMP_CTL_FM_CONFIG_ENABLE_DEBUG_INFO",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Enable CiA402/GMP framework debug information."
     }
@@ -61,7 +75,9 @@
       "group": "Sampling",
       "macro": "GFL_CAPACITOR_CURRENT_CALCULATE_MODE",
       "enabled": true,
+      "weak": false,
       "value": "(3)",
+      "options_preset": "",
       "options": [
         "(1)",
         "(2)",
@@ -74,22 +90,88 @@
     {
       "role": "grid_voltage_pu",
       "macro": "GFL_GRID_VOLTAGE_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
-        "float": "0.33"
+        "float": "0.4949"
       },
       "description": "Nominal grid phase-voltage magnitude in controller per unit."
     },
     {
-      "role": "grid_frequency",
-      "macro": "GFL_GRID_FREQUENCY_HZ",
+      "role": "dc_bus_voltage_ref",
+      "macro": "GFL_DCBUS_VOLTAGE_REF_V",
+      "enabled": true,
+      "weak": false,
       "binding": {
-        "float": "50.0"
+        "float": "80.0"
       },
-      "description": "Nominal grid frequency in hertz."
+      "description": "Regulated DC-bus voltage target in volts."
+    },
+    {
+      "role": "dc_bus_loop_frequency",
+      "macro": "GFL_DCBUS_LOOP_FREQUENCY_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "200.0"
+      },
+      "description": "DC-bus voltage-loop execution frequency in hertz."
+    },
+    {
+      "role": "dc_bus_loop_divider",
+      "macro": "GFL_DCBUS_LOOP_DIVIDER",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "((uint32_t)(CONTROLLER_FREQUENCY / GFL_DCBUS_LOOP_FREQUENCY_HZ))"
+      },
+      "description": "Current-ISR to DC-bus voltage-loop execution divider."
+    },
+    {
+      "role": "dc_bus_voltage_kp",
+      "macro": "GFL_DCBUS_VOLTAGE_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.2"
+      },
+      "description": "Initial DC-bus voltage-loop proportional gain from voltage error PU to absorbed-power PU."
+    },
+    {
+      "role": "dc_bus_voltage_ki",
+      "macro": "GFL_DCBUS_VOLTAGE_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Initial DC-bus voltage-loop integral gain in inverse seconds."
+    },
+    {
+      "role": "dc_bus_power_limit",
+      "macro": "GFL_DCBUS_POWER_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.2"
+      },
+      "description": "Maximum active-power magnitude that the DC-bus loop may absorb from the grid in per unit."
+    },
+    {
+      "role": "dc_bus_voltage_ref_ramp",
+      "macro": "GFL_DCBUS_VOLTAGE_REF_RAMP_V_PER_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "40.0"
+      },
+      "description": "Soft-start slew rate of the DC-bus voltage reference in volts per second."
     },
     {
       "role": "pq_loop_frequency",
       "macro": "GFL_PQ_LOOP_FREQUENCY_HZ",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "1000.0"
       },
@@ -98,6 +180,8 @@
     {
       "role": "pq_loop_divider",
       "macro": "GFL_PQ_LOOP_DIVIDER",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "literal": "((uint32_t)(CONTROLLER_FREQUENCY / GFL_PQ_LOOP_FREQUENCY_HZ))"
       },
@@ -106,6 +190,8 @@
     {
       "role": "pq_active_kp",
       "macro": "GFL_PQ_ACTIVE_KP",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.75"
       },
@@ -114,14 +200,18 @@
     {
       "role": "pq_active_ki",
       "macro": "GFL_PQ_ACTIVE_KI",
+      "enabled": true,
+      "weak": false,
       "binding": {
-        "float": "0.001"
+        "float": "10.0"
       },
       "description": "Active-power loop integral gain in inverse seconds."
     },
     {
       "role": "pq_reactive_kp",
       "macro": "GFL_PQ_REACTIVE_KP",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.75"
       },
@@ -130,38 +220,28 @@
     {
       "role": "pq_reactive_ki",
       "macro": "GFL_PQ_REACTIVE_KI",
+      "enabled": true,
+      "weak": false,
       "binding": {
-        "float": "0.001"
+        "float": "10.0"
       },
       "description": "Reactive-power loop integral gain in inverse seconds."
     },
     {
       "role": "pq_current_limit",
       "macro": "GFL_PQ_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "1.0"
       },
       "description": "Circular magnitude limit applied to the d/q current reference produced by the P/Q loop."
     },
     {
-      "role": "active_power_ref",
-      "macro": "GFL_ACTIVE_POWER_REF_PU",
-      "binding": {
-        "float": "0.1"
-      },
-      "description": "Default active-power reference. Positive power exports energy to the grid."
-    },
-    {
-      "role": "reactive_power_ref",
-      "macro": "GFL_REACTIVE_POWER_REF_PU",
-      "binding": {
-        "float": "0.0"
-      },
-      "description": "Default reactive-power reference using Q = vq*id - vd*iq."
-    },
-    {
       "role": "open_loop_vd",
       "macro": "GFL_OPEN_LOOP_VD_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.6"
       },
@@ -170,14 +250,48 @@
     {
       "role": "open_loop_vq",
       "macro": "GFL_OPEN_LOOP_VQ_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.6"
       },
       "description": "BUILD_LEVEL 1 q-axis open-loop voltage command."
     },
     {
+      "role": "pll_lock_epsilon",
+      "macro": "CTRL_SPLL_EPSILON",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "((float2ctrl(0.005)))"
+      },
+      "description": "PLL lock-error threshold in controller per unit."
+    },
+    {
+      "role": "active_power_ref",
+      "macro": "GFL_ACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "-0.03"
+      },
+      "description": "Default active-power reference. Positive power exports energy to the grid."
+    },
+    {
+      "role": "reactive_power_ref",
+      "macro": "GFL_REACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "Default reactive-power reference using Q = vq*id - vd*iq."
+    },
+    {
       "role": "level2_id",
       "macro": "GFL_CURRENT_LEVEL2_ID_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.1"
       },
@@ -186,6 +300,8 @@
     {
       "role": "level2_iq",
       "macro": "GFL_CURRENT_LEVEL2_IQ_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.1"
       },
@@ -194,6 +310,8 @@
     {
       "role": "level3_id",
       "macro": "GFL_CURRENT_LEVEL3_ID_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.1"
       },
@@ -202,6 +320,8 @@
     {
       "role": "level3_iq",
       "macro": "GFL_CURRENT_LEVEL3_IQ_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.0"
       },
@@ -210,6 +330,8 @@
     {
       "role": "level4_id",
       "macro": "GFL_CURRENT_LEVEL4_ID_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.6"
       },
@@ -218,6 +340,8 @@
     {
       "role": "level4_iq",
       "macro": "GFL_CURRENT_LEVEL4_IQ_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.6"
       },
@@ -226,6 +350,8 @@
     {
       "role": "adc_calibrator_cutoff",
       "macro": "GFL_ADC_CALIBRATOR_FC_HZ",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "20.0"
       },
@@ -234,6 +360,8 @@
     {
       "role": "adc_calibrator_q",
       "macro": "GFL_ADC_CALIBRATOR_Q",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.707"
       },
@@ -242,18 +370,22 @@
     {
       "role": "cia402_enable_delay",
       "macro": "GFL_CIA402_OPERATION_ENABLE_DELAY_MS",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "100"
       },
       "description": "Minimum CiA402 delay before Operation Enabled."
     },
     {
-      "role": "pll_lock_epsilon",
-      "macro": "CTRL_SPLL_EPSILON",
+      "role": "grid_frequency",
+      "macro": "GFL_GRID_FREQUENCY_HZ",
+      "enabled": true,
+      "weak": false,
       "binding": {
-        "literal": "((float2ctrl(0.005)))"
+        "float": "50.0"
       },
-      "description": "PLL lock-error threshold in controller per unit."
+      "description": "Nominal grid frequency in hertz."
     }
   ],
   "requirement_groups": [
@@ -261,6 +393,13 @@
       "name": "Control Loop Parameters",
       "requirements": [
         "grid_voltage_pu",
+        "dc_bus_voltage_ref",
+        "dc_bus_loop_frequency",
+        "dc_bus_loop_divider",
+        "dc_bus_voltage_kp",
+        "dc_bus_voltage_ki",
+        "dc_bus_power_limit",
+        "dc_bus_voltage_ref_ramp",
         "pq_loop_frequency",
         "pq_loop_divider",
         "pq_active_kp",

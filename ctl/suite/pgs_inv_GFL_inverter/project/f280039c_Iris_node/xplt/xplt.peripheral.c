@@ -96,7 +96,7 @@ void setup_peripheral(void)
     ctl_init_ptr_adc_channel(
         &udc, &udc_src,
         // ADC gain, ADC bias
-        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_SENSITIVITY, CTRL_VOLTAGE_BASE),
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_SENSITIVITY, CTRL_DCBUS_VOLTAGE),
         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
         // ADC resolution, IQN
         12, 24);

@@ -77,13 +77,13 @@ GFL_PQ_LOOP_DIVIDER = CONTROLLER_FREQUENCY / GFL_PQ_LOOP_FREQUENCY_HZ;
 GFL_PQ_ACTIVE_KP = 0.75;
 
 % Active-power loop integral gain in inverse seconds.
-GFL_PQ_ACTIVE_KI = 10.0;
+GFL_PQ_ACTIVE_KI = 0.001;
 
 % Reactive-power loop proportional gain from Q error PU to q-axis current PU.
 GFL_PQ_REACTIVE_KP = 0.75;
 
 % Reactive-power loop integral gain in inverse seconds.
-GFL_PQ_REACTIVE_KI = 10.0;
+GFL_PQ_REACTIVE_KI = 0.001;
 
 % Circular magnitude limit applied to the d/q current reference produced by the P/Q loop.
 GFL_PQ_CURRENT_LIMIT_PU = 1.0;

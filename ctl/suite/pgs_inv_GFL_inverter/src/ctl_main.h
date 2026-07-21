@@ -44,6 +44,7 @@ extern cia402_sm_t cia402_sm;
 extern gfl_inv_ctrl_init_t gfl_init;
 extern gfl_inv_ctrl_t inv_ctrl;
 extern gfl_pq_ctrl_t pq_ctrl;
+extern ctl_pid_t dc_bus_voltage_ctrl;
 extern inv_neg_ctrl_init_t gfl_neg_init;
 extern inv_neg_ctrl_t neg_current_ctrl;
 
@@ -63,11 +64,17 @@ extern adc_bias_calibrator_t adc_calibrator;
 extern volatile fast_gt flag_enable_adc_calibrator;
 extern volatile fast_gt index_adc_calibrator;
 extern uint32_t pq_loop_tick;
+extern uint32_t dc_bus_loop_tick;
+extern volatile fast_gt flag_enable_dc_bus_voltage_ctrl;
+extern ctrl_gt dc_bus_voltage_ref_ramp_pu;
+extern ctrl_gt dc_bus_power_ref_pu;
 
 // User commands
 
 //=================================================================================================
 // controller process
+
+void ctl_step_dc_bus_voltage_ctrl(void);
 
 // periodic callback function things.
 GMP_STATIC_INLINE void ctl_dispatch(void)
@@ -95,6 +102,17 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
         // run controller body
         ctl_step_gfl_inv_ctrl(&inv_ctrl);
         ctl_step_neg_inv_ctrl(&neg_current_ctrl);
+
+#if defined ENABLE_GFL_DCBUS_VOLTAGE_CTRL && BUILD_LEVEL == 5
+        // The DC-bus voltage loop is deliberately slower than the existing
+        // P/Q loop. It updates only the active-power reference.
+        ++dc_bus_loop_tick;
+        if (dc_bus_loop_tick >= GFL_DCBUS_LOOP_DIVIDER)
+        {
+            dc_bus_loop_tick = 0;
+            ctl_step_dc_bus_voltage_ctrl();
+        }
+#endif
 
         // Run the P/Q outer loop at its own lower rate. The current loop keeps
         // executing every ISR and consumes the most recent current reference.

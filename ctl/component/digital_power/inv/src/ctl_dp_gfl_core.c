@@ -127,6 +127,12 @@ void ctl_update_gfl_inv_coeff(gfl_inv_ctrl_t* inv, gfl_inv_ctrl_init_t* init)
         ctl_init_filter_iir1_lpf(&inv->filter_uabc[i], init->fs, init->voltage_adc_fc);
     }
 
+    // DC-side feedback channels use the same anti-aliasing bandwidths as
+    // their corresponding AC current and voltage measurements. These filters
+    // must be initialized before ctl_step_gfl_inv_ctrl() consumes them.
+    ctl_init_filter_iir1_lpf(&inv->filter_idc, init->fs, init->current_adc_fc);
+    ctl_init_filter_iir1_lpf(&inv->filter_udc, init->fs, init->voltage_adc_fc);
+
     parameter_gt kp_dq =
         init->grid_filter_L * CTL_PARAM_CONST_2PI * init->current_loop_bw * init->i_base / init->v_base;
     parameter_gt ki_dq = kp_dq * CTL_PARAM_CONST_2PI * init->current_loop_zero;

@@ -35,6 +35,8 @@ const gmp_param_item_t dict_m1[] = {
     {&pq_ctrl.pq_set.dat[1], GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RW},
     {&pq_ctrl.pq_meas.dat[0], GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {&pq_ctrl.pq_meas.dat[1], GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+    {&dc_bus_voltage_ref_ramp_pu, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+    {&dc_bus_power_ref_pu, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
 };
 const uint16_t var_tunable_count = sizeof(dict_m1) / sizeof(dict_m1[0]);
 gmp_param_tunable_t tunable;
