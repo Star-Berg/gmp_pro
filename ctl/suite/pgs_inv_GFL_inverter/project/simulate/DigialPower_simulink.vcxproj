@@ -251,6 +251,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ctl_main.h" />
+    <ClInclude Include="..\..\src\offgrid_voltage_ctrl.h" />
     <ClInclude Include="..\..\src\user_main.h" />
     <ClInclude Include="sdpe_mgr\sdpe_pgs_inv_gfl_simulate_settings.h" />
     <ClInclude Include="xplt\pc_simulate_buffer.h" />

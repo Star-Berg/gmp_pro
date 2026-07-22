@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-15",
+  "updated_at": "2026-07-22",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -224,6 +224,142 @@
       "description": "BUILD_LEVEL 4 q-axis current command."
     },
     {
+      "role": "level6_line_voltage_rms",
+      "macro": "GFL_LEVEL6_OUTPUT_LINE_RMS_V",
+      "binding": {
+        "float": "30.0"
+      },
+      "description": "BUILD_LEVEL 6 default line-to-line RMS voltage command in volts."
+    },
+    {
+      "role": "level6_voltage_min_rms",
+      "macro": "GFL_LEVEL6_VOLTAGE_MIN_RMS_V",
+      "binding": {
+        "float": "24.0"
+      },
+      "description": "Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface."
+    },
+    {
+      "role": "level6_voltage_max_rms",
+      "macro": "GFL_LEVEL6_VOLTAGE_MAX_RMS_V",
+      "binding": {
+        "float": "36.0"
+      },
+      "description": "Maximum line-to-line RMS voltage accepted by the Level 6 runtime interface."
+    },
+    {
+      "role": "level6_voltage_step_rms",
+      "macro": "GFL_LEVEL6_VOLTAGE_STEP_RMS_V",
+      "binding": {
+        "float": "0.5"
+      },
+      "description": "Line-to-line RMS voltage command resolution for Level 6."
+    },
+    {
+      "role": "level6_frequency",
+      "macro": "GFL_LEVEL6_OUTPUT_FREQUENCY_HZ",
+      "binding": {
+        "float": "50.0"
+      },
+      "description": "BUILD_LEVEL 6 default stand-alone output frequency."
+    },
+    {
+      "role": "level6_frequency_min",
+      "macro": "GFL_LEVEL6_FREQUENCY_MIN_HZ",
+      "binding": {
+        "float": "20.0"
+      },
+      "description": "Minimum Level 6 output-frequency command."
+    },
+    {
+      "role": "level6_frequency_max",
+      "macro": "GFL_LEVEL6_FREQUENCY_MAX_HZ",
+      "binding": {
+        "float": "100.0"
+      },
+      "description": "Maximum Level 6 output-frequency command."
+    },
+    {
+      "role": "level6_frequency_step",
+      "macro": "GFL_LEVEL6_FREQUENCY_STEP_HZ",
+      "binding": {
+        "float": "1.0"
+      },
+      "description": "Level 6 output-frequency command resolution."
+    },
+    {
+      "role": "level6_voltage_slew",
+      "macro": "GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S",
+      "binding": {
+        "float": "100.0"
+      },
+      "description": "Line-to-line RMS soft-start and command slew rate."
+    },
+    {
+      "role": "level6_voltage_loop_bw",
+      "macro": "GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ",
+      "binding": {
+        "float": "80.0"
+      },
+      "description": "Proportional design bandwidth for the Level 6 voltage QPR loop."
+    },
+    {
+      "role": "level6_current_loop_bw",
+      "macro": "GFL_LEVEL6_CURRENT_LOOP_BW_HZ",
+      "binding": {
+        "float": "400.0"
+      },
+      "description": "Proportional design bandwidth for the Level 6 estimated-inductor-current QPR loop."
+    },
+    {
+      "role": "level6_voltage_qpr_kr",
+      "macro": "GFL_LEVEL6_VOLTAGE_QPR_KR",
+      "binding": {
+        "float": "0.40"
+      },
+      "description": "Resonant gain from voltage error PU to estimated inductor-current reference PU."
+    },
+    {
+      "role": "level6_current_qpr_kr",
+      "macro": "GFL_LEVEL6_CURRENT_QPR_KR",
+      "binding": {
+        "float": "0.15"
+      },
+      "description": "Resonant gain from estimated inductor-current error PU to SPWM modulation index."
+    },
+    {
+      "role": "level6_qpr_bandwidth",
+      "macro": "GFL_LEVEL6_QPR_BANDWIDTH_HZ",
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Half-width of the Level 6 quasi-resonant terms around the commanded frequency."
+    },
+    {
+      "role": "level6_current_limit",
+      "macro": "GFL_LEVEL6_CURRENT_LIMIT_PU",
+      "binding": {
+        "float": "0.80"
+      },
+      "description": "Circular limit for the Level 6 estimated inductor-current reference."
+    },
+    {
+      "role": "level6_modulation_limit",
+      "macro": "GFL_LEVEL6_MODULATION_LIMIT_PU",
+      "binding": {
+        "float": "0.95"
+      },
+      "description": "Circular SPWM modulation limit used by Level 6."
+    },
+    {
+      "role": "level6_active_damping_resistance",
+      "macro": "GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM",
+      "binding": {
+        "float": "3.5"
+      },
+      "description": "Virtual resistance applied to estimated capacitor current for LC active damping."
+    },
+    {
       "role": "adc_calibrator_cutoff",
       "macro": "GFL_ADC_CALIBRATOR_FC_HZ",
       "binding": {
@@ -284,6 +420,28 @@
         "level3_iq",
         "level4_id",
         "level4_iq"
+      ]
+    },
+    {
+      "name": "BUILD_LEVEL 6 Off-Grid Voltage Control",
+      "requirements": [
+        "level6_line_voltage_rms",
+        "level6_voltage_min_rms",
+        "level6_voltage_max_rms",
+        "level6_voltage_step_rms",
+        "level6_frequency",
+        "level6_frequency_min",
+        "level6_frequency_max",
+        "level6_frequency_step",
+        "level6_voltage_slew",
+        "level6_voltage_loop_bw",
+        "level6_current_loop_bw",
+        "level6_voltage_qpr_kr",
+        "level6_current_qpr_kr",
+        "level6_qpr_bandwidth",
+        "level6_current_limit",
+        "level6_modulation_limit",
+        "level6_active_damping_resistance"
       ]
     },
     {

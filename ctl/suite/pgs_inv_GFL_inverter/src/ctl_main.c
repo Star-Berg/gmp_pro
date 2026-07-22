@@ -35,6 +35,8 @@ inv_neg_ctrl_init_t gfl_neg_init;
 inv_neg_ctrl_t neg_current_ctrl;
 gfl_inv_ctrl_init_t gfl_init;
 gfl_inv_ctrl_t inv_ctrl;
+offgrid_voltage_ctrl_init_t offgrid_voltage_init;
+offgrid_voltage_ctrl_t offgrid_voltage_ctrl;
 
 // Input channel
 
@@ -108,6 +110,28 @@ void ctl_init()
     ctl_set_gfl_pq_ref(&pq_ctrl, float2ctrl(GFL_ACTIVE_POWER_REF_PU), float2ctrl(GFL_REACTIVE_POWER_REF_PU));
     pq_loop_tick = 0;
 
+#if BUILD_LEVEL == 6
+    // Stand-alone alpha/beta voltage and estimated-inductor-current controller.
+    offgrid_voltage_init.fs = CONTROLLER_FREQUENCY;
+    offgrid_voltage_init.dc_bus_voltage = CTRL_DCBUS_VOLTAGE;
+    offgrid_voltage_init.voltage_base = CTRL_VOLTAGE_BASE;
+    offgrid_voltage_init.current_base = CTRL_CURRENT_BASE;
+    offgrid_voltage_init.filter_inductance = GFL_GRID_FILTER_INDUCTANCE_H;
+    offgrid_voltage_init.filter_capacitance = GFL_GRID_FILTER_CAPACITANCE_F;
+    offgrid_voltage_init.voltage_loop_bw_hz = GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ;
+    offgrid_voltage_init.current_loop_bw_hz = GFL_LEVEL6_CURRENT_LOOP_BW_HZ;
+    offgrid_voltage_init.voltage_qpr_kr = GFL_LEVEL6_VOLTAGE_QPR_KR;
+    offgrid_voltage_init.current_qpr_kr = GFL_LEVEL6_CURRENT_QPR_KR;
+    offgrid_voltage_init.qpr_bandwidth_hz = GFL_LEVEL6_QPR_BANDWIDTH_HZ;
+    offgrid_voltage_init.current_limit_pu = GFL_LEVEL6_CURRENT_LIMIT_PU;
+    offgrid_voltage_init.modulation_limit_pu = GFL_LEVEL6_MODULATION_LIMIT_PU;
+    offgrid_voltage_init.active_damping_resistance_ohm = GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM;
+    offgrid_voltage_init.voltage_slew_v_per_s = GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S;
+    offgrid_voltage_init.default_line_voltage_rms_v = GFL_LEVEL6_OUTPUT_LINE_RMS_V;
+    offgrid_voltage_init.default_frequency_hz = GFL_LEVEL6_OUTPUT_FREQUENCY_HZ;
+    ctl_init_offgrid_voltage_ctrl(&offgrid_voltage_ctrl, &offgrid_voltage_init);
+#endif // BUILD_LEVEL == 6
+
 #if BUILD_LEVEL == 1
     // Voltage open loop, inverter
     ctl_set_gfl_inv_openloop_mode(&inv_ctrl);
@@ -155,6 +179,14 @@ void ctl_init()
     ctl_enable_gfl_inv_lead_compensator(&inv_ctrl);
     ctl_enable_gfl_pq_ctrl(&pq_ctrl);
 
+#elif BUILD_LEVEL == 6
+    // The GFL core remains responsible only for input filtering and coordinate
+    // conversion. The Level 6 controller owns the angle and modulation output.
+    ctl_set_gfl_inv_openloop_mode(&inv_ctrl);
+    ctl_set_gfl_inv_voltage_openloop(&inv_ctrl, 0, 0);
+    ctl_disable_gfl_inv_pll(&inv_ctrl);
+    ctl_set_gfl_inv_freerun(&inv_ctrl);
+
 #endif // BUILD_LEVEL
 
     //
@@ -168,7 +200,7 @@ void ctl_init()
     cia402_sm.current_cmd = CIA402_CMD_ENABLE_OPERATION;
 #endif // SPECIFY_PC_ENVIRONMENT
 
-#if BUILD_LEVEL >= 3
+#if BUILD_LEVEL >= 3 && BUILD_LEVEL <= 5
 
     // NOTICE:
     // if grid connect is request disable switch delay from CIA402_SM_SWITCH_ON_DISABLED to CIA402_SM_SWITCHED_ON
@@ -176,7 +208,7 @@ void ctl_init()
     cia402_sm.minimum_transit_delay[CIA402_SM_READY_TO_SWITCH_ON] = 0;
     cia402_sm.minimum_transit_delay[CIA402_SM_SWITCHED_ON] = 0;
 
-#endif // BUILD_LEVEL
+#endif // BUILD_LEVEL >= 3 && BUILD_LEVEL <= 5
 
     //
     // init ADC Calibrator
@@ -233,7 +265,28 @@ void ctl_disable_pwm()
     ctl_clear_gfl_inv(&inv_ctrl);
     ctl_clear_neg_inv(&neg_current_ctrl);
     ctl_clear_gfl_pq(&pq_ctrl);
+#if BUILD_LEVEL == 6
+    ctl_clear_offgrid_voltage_ctrl(&offgrid_voltage_ctrl);
+#endif
     pq_loop_tick = 0;
+}
+
+void ctl_set_level6_voltage_rms(parameter_gt line_voltage_rms_v)
+{
+#if BUILD_LEVEL == 6
+    ctl_set_offgrid_line_voltage_rms(&offgrid_voltage_ctrl, line_voltage_rms_v);
+#else
+    GMP_UNUSED_VAR(line_voltage_rms_v);
+#endif
+}
+
+void ctl_set_level6_frequency_hz(parameter_gt frequency_hz)
+{
+#if BUILD_LEVEL == 6
+    ctl_set_offgrid_frequency_hz(&offgrid_voltage_ctrl, frequency_hz);
+#else
+    GMP_UNUSED_VAR(frequency_hz);
+#endif
 }
 
 fast_gt ctl_check_pll_locked(void)

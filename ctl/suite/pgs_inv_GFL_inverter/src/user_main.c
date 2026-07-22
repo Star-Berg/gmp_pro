@@ -35,6 +35,12 @@ const gmp_param_item_t dict_m1[] = {
     {&pq_ctrl.pq_set.dat[1], GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RW},
     {&pq_ctrl.pq_meas.dat[0], GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {&pq_ctrl.pq_meas.dat[1], GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+#if BUILD_LEVEL == 6
+    {&offgrid_voltage_ctrl.line_voltage_rms_cmd_v, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RW},
+    {&offgrid_voltage_ctrl.line_voltage_rms_active_v, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+    {&offgrid_voltage_ctrl.frequency_cmd_hz, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RW},
+    {&offgrid_voltage_ctrl.frequency_active_hz, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+#endif
 };
 const uint16_t var_tunable_count = sizeof(dict_m1) / sizeof(dict_m1[0]);
 gmp_param_tunable_t tunable;
