@@ -1,14 +1,15 @@
 /**
- * @file sdpe_pgs_inv_gfl_simulate_settings.h
- * @brief SDPE project bindings for PGS GFL Inverter Simulation.
- * @note Host simulation timing and sensing settings for the common GFL controller.
+ * @file sdpe_pgs_inv_gfl_stm32g431_settings.h
+ * @brief SDPE project bindings for PGS GFL Inverter STM32G431.
+ * @note Nucleo-G431 platform timing and sensing settings for the common GFL controller.
  */
 
-#ifndef _PROJECT_SDPE_PGS_INV_GFL_SIMULATE_SETTINGS_H_
-#define _PROJECT_SDPE_PGS_INV_GFL_SIMULATE_SETTINGS_H_
+#ifndef _PROJECT_SDPE_PGS_INV_GFL_STM32G431_SETTINGS_H_
+#define _PROJECT_SDPE_PGS_INV_GFL_STM32G431_SETTINGS_H_
 
 #include <ctl/hardware_preset/grid_lc_filter/gmp_harmonia_3ph_lc_filter.h>
 #include <ctl/hardware_preset/inverter_3ph/gmp_helios_3phganinv_lv.h>
+#include <ctl/hardware_preset/mcu_board/nucleo_g431rb_motor_board.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -23,10 +24,10 @@ extern "C"
  * @brief Project metadata.
  */
 
-#define PGS_INV_GFL_SIM_SDPE_PROJECT_ID "pgs_inv_gfl_simulate"
-#define PGS_INV_GFL_SIM_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
-#define PGS_INV_GFL_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-22"
+#define PGS_INV_GFL_STM32G431_SDPE_PROJECT_ID "pgs_inv_gfl_stm32g431"
+#define PGS_INV_GFL_STM32G431_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
+#define PGS_INV_GFL_STM32G431_SDPE_PROJECT_VERSION "1.0.0"
+#define PGS_INV_GFL_STM32G431_SDPE_PROJECT_UPDATED_AT "2026-07-22"
 
 //=================================================================================================
 /**
@@ -37,7 +38,7 @@ extern "C"
  * @brief Incremental control level; level 5 enables the cascaded P/Q power loop.
  *        Options: (1), (2), (3), (4), (5)
  */
-#define BUILD_LEVEL (2)
+#define BUILD_LEVEL (1)
 
 //=================================================================================================
 /**
@@ -51,10 +52,10 @@ extern "C"
 #define GFL_CURRENT_SAMPLE_PHASE_MODE (3)
 
 /**
- * @brief Simulation supplies two independent phase-voltage samples.
+ * @brief Number of directly sampled phase voltages.
  *        Options: (2), (3)
  */
-#define GFL_VOLTAGE_SAMPLE_PHASE_MODE (2)
+#define GFL_VOLTAGE_SAMPLE_PHASE_MODE (3)
 
 //=================================================================================================
 /**
@@ -62,22 +63,22 @@ extern "C"
  */
 
 /**
- * @brief Simulation control step frequency.
+ * @brief Control interrupt frequency.
  */
-#define CONTROLLER_FREQUENCY (20e3)
+#define CONTROLLER_FREQUENCY (10e3)
 
 /**
- * @brief Virtual PWM compare range.
+ * @brief TIM compare range.
  */
-#define CTRL_PWM_CMP_MAX (3000)
+#define CTRL_PWM_CMP_MAX (8500 - 1)
 
 /**
- * @brief Virtual PWM dead-band count.
+ * @brief TIM dead-time count.
  */
-#define CTRL_PWM_DEADBAND_CMP (50)
+#define CTRL_PWM_DEADBAND_CMP (100)
 
 /**
- * @brief Virtual ADC reference.
+ * @brief ADC reference.
  */
 #define CTRL_ADC_VOLTAGE_REF (3.3f)
 
@@ -169,7 +170,7 @@ extern "C"
 /**
  * @brief Startup delay in milliseconds.
  */
-#define CTRL_STARTUP_DELAY (50)
+#define CTRL_STARTUP_DELAY (100)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)
@@ -180,4 +181,4 @@ extern "C"
 }
 #endif
 
-#endif // _PROJECT_SDPE_PGS_INV_GFL_SIMULATE_SETTINGS_H_
+#endif // _PROJECT_SDPE_PGS_INV_GFL_STM32G431_SETTINGS_H_
