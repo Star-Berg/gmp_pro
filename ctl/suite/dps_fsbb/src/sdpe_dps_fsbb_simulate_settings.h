@@ -91,7 +91,7 @@ extern "C"
  * @brief 1: open loop, 2: current loop, 3: voltage/current cascade.
  *        Options: (1), (2), (3)
  */
-#define BUILD_LEVEL (2)
+#define BUILD_LEVEL (3)
 
 //=================================================================================================
 /**

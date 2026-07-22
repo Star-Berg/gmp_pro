@@ -214,7 +214,7 @@ FSBB_ENABLE_IOUT_SAMPLE = true;
 %% Controller
 % 1: open loop, 2: current loop, 3: voltage/current cascade.
 % Options: (1), (2), (3)
-BUILD_LEVEL = 2;
+BUILD_LEVEL = 3;
 
 %% Requirement bindings
 % PWM compare maximum shared by controller and plant model.
