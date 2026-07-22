@@ -200,8 +200,8 @@ GMP_STATIC_INLINE void ctl_input_callback_pil(const gmp_sim_rx_buf_t* rx)
     iuvw_src[phase_V] = 0;
     iuvw_src[phase_W] = 0;
 
-    udc_src = rx->adc_result[INV_ADC_ID_IDC];
-    idc_src = rx->adc_result[INV_ADC_ID_VDC];
+    idc_src = rx->adc_result[INV_ADC_ID_IDC];
+    udc_src = rx->adc_result[INV_ADC_ID_VDC];
 
     // invoke ADC p.u. routine
     ctl_step_tri_ptr_adc_channel(&iabc);

@@ -275,6 +275,9 @@
     <ClInclude Include="..\..\src\ctl_main.h">
       <Filter>implement_common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\offgrid_voltage_ctrl.h">
+      <Filter>implement_common</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\user_main.h">
       <Filter>implement_common</Filter>
     </ClInclude>

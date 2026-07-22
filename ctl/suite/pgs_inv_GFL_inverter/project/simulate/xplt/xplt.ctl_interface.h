@@ -61,8 +61,8 @@ GMP_STATIC_INLINE void ctl_input_callback(void)
     iuvw_src[phase_V] = 0;
     iuvw_src[phase_W] = 0;
 
-    udc_src = simulink_rx_buffer.adc_result[INV_ADC_ID_IDC];
-    idc_src = simulink_rx_buffer.adc_result[INV_ADC_ID_VDC];
+    idc_src = simulink_rx_buffer.adc_result[INV_ADC_ID_IDC];
+    udc_src = simulink_rx_buffer.adc_result[INV_ADC_ID_VDC];
 
     // invoke ADC p.u. routine
     ctl_step_tri_ptr_adc_channel(&iabc);
@@ -87,6 +87,30 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     // monitor
     //
 
+#if BUILD_LEVEL == 6
+    // Level 6 scopes: reference versus feedback first, then controller effort.
+    simulink_tx_buffer.monitor[0] = offgrid_voltage_ctrl.voltage_ref_ab.dat[phase_alpha];
+    simulink_tx_buffer.monitor[1] = inv_ctrl.vab0.dat[phase_alpha];
+
+    simulink_tx_buffer.monitor[2] = offgrid_voltage_ctrl.inductor_current_ref_ab.dat[phase_alpha];
+    simulink_tx_buffer.monitor[3] = offgrid_voltage_ctrl.inductor_current_est_ab.dat[phase_alpha];
+
+    simulink_tx_buffer.monitor[4] = offgrid_voltage_ctrl.modulation_ab.dat[phase_alpha];
+    simulink_tx_buffer.monitor[5] = offgrid_voltage_ctrl.modulation_ab.dat[phase_beta];
+
+    simulink_tx_buffer.monitor[6] =
+        offgrid_voltage_ctrl.line_voltage_rms_active_v / GFL_LEVEL6_VOLTAGE_MAX_RMS_V;
+    simulink_tx_buffer.monitor[7] = offgrid_voltage_ctrl.frequency_cmd_hz / GFL_LEVEL6_FREQUENCY_MAX_HZ;
+
+    simulink_tx_buffer.monitor[8] = offgrid_voltage_ctrl.capacitor_current_ref_ab.dat[phase_alpha];
+    simulink_tx_buffer.monitor[9] = offgrid_voltage_ctrl.capacitor_current_est_ab.dat[phase_alpha];
+
+    simulink_tx_buffer.monitor[10] = offgrid_voltage_ctrl.voltage_ref_ab.dat[phase_beta];
+    simulink_tx_buffer.monitor[11] = inv_ctrl.vab0.dat[phase_beta];
+
+    simulink_tx_buffer.monitor[12] = offgrid_voltage_ctrl.inductor_current_ref_ab.dat[phase_beta];
+    simulink_tx_buffer.monitor[13] = offgrid_voltage_ctrl.inductor_current_est_ab.dat[phase_beta];
+#else
     // Scope 1
     simulink_tx_buffer.monitor[0] = inv_ctrl.iabc.dat[phase_A];
     simulink_tx_buffer.monitor[1] = inv_ctrl.iabc.dat[phase_B];
@@ -119,6 +143,7 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     // Scope 7
     simulink_tx_buffer.monitor[12] = inv_ctrl.vdq.dat[phase_d];
     simulink_tx_buffer.monitor[13] = inv_ctrl.vdq.dat[phase_q];
+#endif // BUILD_LEVEL == 6
 }
 
 // Enable Motor Controller
@@ -136,6 +161,7 @@ GMP_STATIC_INLINE void ctl_fast_enable_output()
 GMP_STATIC_INLINE void ctl_fast_disable_output()
 {
     csp_sl_disable_output();
+    ctl_disable_gfl_inv(&inv_ctrl);
 }
 
 #ifdef __cplusplus

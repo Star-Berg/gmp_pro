@@ -5,7 +5,7 @@
   "description": "Host simulation timing and sensing settings for the common GFL controller.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-15",
+  "updated_at": "2026-07-22",
   "output_header": "sdpe_pgs_inv_gfl_simulate_settings.h",
   "hardware": [
     {
@@ -17,7 +17,7 @@
   ],
   "code_sections": {
     "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>",
-    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)\n#error BUILD_LEVEL_must_be_between_1_and_5\n#endif"
+    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)\n#error BUILD_LEVEL_must_be_between_1_and_6\n#endif"
   },
   "feature_macros": [],
   "option_macros": [
@@ -25,15 +25,16 @@
       "group": "Commissioning",
       "macro": "BUILD_LEVEL",
       "enabled": true,
-      "value": "(2)",
+      "value": "(6)",
       "options": [
         "(1)",
         "(2)",
         "(3)",
         "(4)",
-        "(5)"
+        "(5)",
+        "(6)"
       ],
-      "description": "Incremental control level; level 5 enables the cascaded P/Q power loop."
+      "description": "Incremental control level; level 5 is grid-connected P/Q control and level 6 is stand-alone line-voltage control for the resload model."
     },
     {
       "group": "Sampling",
@@ -50,12 +51,13 @@
       "group": "Sampling",
       "macro": "GFL_VOLTAGE_SAMPLE_PHASE_MODE",
       "enabled": true,
-      "value": "(2)",
+      "value": "(1)",
       "options": [
+        "(1)",
         "(2)",
         "(3)"
       ],
-      "description": "Simulation supplies two independent phase-voltage samples."
+      "description": "Simulation supplies Uab and Ubc line-to-line voltage samples; mode 1 reconstructs stationary phase-voltage alpha/beta feedback."
     }
   ],
   "requirements": [

@@ -1,8 +1,8 @@
-# 三相并网跟网型变流器（GFL）
+# 三相变流器：并网 GFL 与离网稳压 Level 6
 
 [English](README.md) | **简体中文**
 
-本工程实现三相两电平跟网型并网变流器控制，控制主体位于 `src`，目前包含 F280039C IRIS、LaunchXL-F280049C、PC 仿真和 STM32G431 四个平台。IRIS 与 F280049C 是已完成硬件调通的平台；PC 仿真用于软件验证，STM32G431 仍应按增量调试流程完成实机验证。
+本工程以三相两电平跟网型并网变流器为基础，并在 PC 仿真平台增加 `BUILD_LEVEL=6` 离网稳压控制。控制主体位于 `src`，目前包含 F280039C IRIS、LaunchXL-F280049C、PC 仿真和 STM32G431 四个平台。IRIS 与 F280049C 的原有 Level 1～5 保持不变；Level 6 目前用于 `resload` 模型的软件验证，未经实机验证不得直接下发硬件。
 
 ## 两层 SDPE 配置
 
@@ -40,7 +40,7 @@ IRIS 和 LaunchXL-F280049C 平台均在 SDPE 中选择以下功率硬件：
 |---|---:|---:|---|
 | F280039C IRIS Node | 3 | 20 kHz | 已调通，保持原默认值 |
 | LaunchXL-F280049C | 1 | 10 kHz | 已调通，保持原默认值 |
-| PC simulate | 2 | 20 kHz | 可编译仿真 |
+| PC simulate | 6 | 20 kHz | Level 6 离网稳压开发分支 |
 | STM32G431 | 1 | 10 kHz | 待实机增量验证 |
 
 ## 增量调试级别
@@ -52,6 +52,7 @@ IRIS 和 LaunchXL-F280049C 平台均在 SDPE 中选择以下功率硬件：
 3. PLL 并网与正/负序电流闭环。
 4. 在级别 3 的基础上启用解耦、主动阻尼和超前补偿。
 5. 完整功率闭环：P/Q 外环生成 dq 电流给定，内层电流环继续按 PWM 频率执行。
+6. 离网输出电压闭环：内部角度发生器、αβ-QPR 电压环、估算电感电流环和 SPWM，仅配合 `DP_STD_MDL_DCAC_3ph_2level_resload.slx` 使用。
 
 严禁在未完成前一级保护与波形检查时直接切换到更高等级。启用 `SPECIFY_ENABLE_ADC_CALIBRATE` 时，必须保证被校准的功率输入处于已知零状态；并网带电输入下不应进行零偏校准。
 
@@ -74,6 +75,56 @@ Q = vq*id - vd*iq
 
 在 PLL 锁定且 `vq ≈ 0` 时，正有功对应正 `id`，正无功对应负 `iq`。Q 控制器已按这一约定修正反馈方向。P/Q 外环使用独立分频器运行，电流给定采用圆形幅值限制，并对 PI 积分器执行限幅回算。默认给定、增益、外环频率和电流上限均由公共 SDPE 页面管理，也可通过 Datalink 在线观察或修改 `pq_ctrl.pq_set`、`pq_ctrl.pq_meas`。
 
+## Level 6 离网稳压控制
+
+Level 6 不使用 PLL，也不连接无限电网。控制链位于 `src/offgrid_voltage_ctrl.h`：
+
+```text
+线电压 RMS/频率指令 -> 平衡 αβ 电压参考 -> αβ-QPR 电压环
+                                         -> 负载电流前馈
+                                         -> C*dv/dt 电容电流估算
+                                         -> 估算电感电流 QPR 环
+                                         -> 电压前馈 + 主动阻尼 -> SPWM
+```
+
+当前 `resload` 模型的 ADC 总线只有 `IDC、VDC、Uab、Ubc、IA、IB、IC`，没有独立桥侧电感电流。因此控制器使用
+
+```text
+iL_est = iLoad + C * dvC/dt
+```
+
+估算电感电流，不需要手工修改 `.slx` 二进制文件。`Uab/Ubc` 必须配合 `GFL_VOLTAGE_SAMPLE_PHASE_MODE=(1)`，由控制器重构 αβ 相电压；仿真接口中的 `IDC/VDC` 顺序也已修正。
+
+电压命令暂按三相线电压有效值定义：
+
+- 范围：24～36 V；
+- 步进：0.5 V；
+- 默认：30 V；
+- 软启动斜率：100 V/s。
+
+频率范围为 20～100 Hz，步进 1 Hz，默认 50 Hz。改变频率时只更新相位增量和 QPR 系数，不清零当前相位。运行时接口为：
+
+```c
+ctl_set_level6_voltage_rms(30.5f);  // 线电压 RMS，自动限幅和量化
+ctl_set_level6_frequency_hz(60.0f); // 自动限幅和量化，保持相位连续
+```
+
+若竞赛最终将 24～36 V 定义为相电压有效值，必须修改参考换算和直流母线电压校核，不能直接沿用当前线电压定义。
+
+Level 6 的 Simulink 监视通道为：
+
+| 通道 | 内容 |
+|---:|---|
+| 1/2 | α 轴电压参考 / 测量 |
+| 3/4 | α 轴估算电感电流参考 / 测量 |
+| 5/6 | αβ 调制度 |
+| 7/8 | 归一化电压指令 / 频率指令 |
+| 9/10 | α 轴电容电流参考 / 估算 |
+| 11/12 | β 轴电压参考 / 测量 |
+| 13/14 | β 轴估算电感电流参考 / 测量 |
+
+三桥臂三线制只能控制 αβ 线电压，不能独立控制零序电压。严重不对称四线负载若要求三个相电压分别对中性点稳压，需要第四桥臂或可控直流中点。
+
 ## 编译与生成顺序
 
 推荐修改参数后的顺序：
@@ -83,13 +134,13 @@ Q = vq*id - vd*iq
 3. 在目标平台 `sdpe_mgr` 运行平台 `sdpe_generate.bat`。
 4. 再由 CCS、Keil 或 Visual Studio 编译目标工程。
 
-PC 仿真工程已用 Visual Studio 2022 的 `Debug|x64` 配置完成编译验证。构建时若不需要自动恢复 vcpkg，可传入 `VcpkgEnableManifest=false`。
+Level 6 已通过 GCC/Clang 兼容的语法检查和控制器数值冒烟测试；最终闭环增益、THD 与负载突变性能仍必须在 MATLAB/Simulink 中验证。Windows 下使用 Visual Studio 2022 的 `Debug|x64` 配置构建，若不需要自动恢复 vcpkg，可传入 `VcpkgEnableManifest=false`。
 
 ## 目录结构
 
 ```text
 pgs_inv_GFL_inverter/
-├─ src/                         公共控制实现与公共生成头文件
+├─ src/                         公共控制实现、Level 6 控制器与生成头文件
 ├─ sdpe_general/                公共 SDPE requirement 与管理脚本
 └─ project/
    ├─ f280039c_Iris_node/

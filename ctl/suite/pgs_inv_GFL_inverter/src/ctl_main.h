@@ -22,6 +22,8 @@
 #include <ctl/component/digital_power/inv/inv_hcm.h>
 #include <ctl/component/digital_power/inv/inv_neg_ctrl.h>
 
+#include "offgrid_voltage_ctrl.h"
+
 #include <ctl/component/interface/spwm_modulator.h>
 
 #include <ctl/framework/cia402_state_machine.h>
@@ -46,6 +48,8 @@ extern gfl_inv_ctrl_t inv_ctrl;
 extern gfl_pq_ctrl_t pq_ctrl;
 extern inv_neg_ctrl_init_t gfl_neg_init;
 extern inv_neg_ctrl_t neg_current_ctrl;
+extern offgrid_voltage_ctrl_init_t offgrid_voltage_init;
+extern offgrid_voltage_ctrl_t offgrid_voltage_ctrl;
 
 // Input channel
 
@@ -63,6 +67,10 @@ extern adc_bias_calibrator_t adc_calibrator;
 extern volatile fast_gt flag_enable_adc_calibrator;
 extern volatile fast_gt index_adc_calibrator;
 extern uint32_t pq_loop_tick;
+
+// BUILD_LEVEL 6 runtime commands. Voltage is line-to-line RMS.
+void ctl_set_level6_voltage_rms(parameter_gt line_voltage_rms_v);
+void ctl_set_level6_frequency_hz(parameter_gt frequency_hz);
 
 // User commands
 
@@ -94,8 +102,12 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
     {
         // run controller body
         ctl_step_gfl_inv_ctrl(&inv_ctrl);
-        ctl_step_neg_inv_ctrl(&neg_current_ctrl);
 
+#if BUILD_LEVEL >= 3 && BUILD_LEVEL <= 5
+        ctl_step_neg_inv_ctrl(&neg_current_ctrl);
+#endif
+
+#if BUILD_LEVEL == 5
         // Run the P/Q outer loop at its own lower rate. The current loop keeps
         // executing every ISR and consumes the most recent current reference.
         ++pq_loop_tick;
@@ -110,11 +122,22 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                                         pq_ctrl.idq_set_out.dat[phase_q]);
             }
         }
+#endif // BUILD_LEVEL == 5
 
+#if BUILD_LEVEL == 6
+        // Stand-alone voltage source: bypass PLL, negative-sequence and P/Q
+        // paths, then send the stationary-frame voltage controller directly
+        // to the SPWM modulator.
+        ctl_step_offgrid_voltage_ctrl(&offgrid_voltage_ctrl, &inv_ctrl, inv_ctrl.flag_enable_system);
+        spwm.vab0_out.dat[phase_alpha] = offgrid_voltage_ctrl.modulation_ab.dat[phase_alpha];
+        spwm.vab0_out.dat[phase_beta] = offgrid_voltage_ctrl.modulation_ab.dat[phase_beta];
+        spwm.vab0_out.dat[phase_0] = 0;
+#else
         // mix all output
         spwm.vab0_out.dat[phase_A] = inv_ctrl.vab0_out.dat[phase_A] + neg_current_ctrl.vab_out.dat[phase_A];
         spwm.vab0_out.dat[phase_B] = inv_ctrl.vab0_out.dat[phase_B] + neg_current_ctrl.vab_out.dat[phase_B];
         spwm.vab0_out.dat[phase_0] = inv_ctrl.vab0_out.dat[phase_0];
+#endif // BUILD_LEVEL == 6
 
         // modulation
 #if defined USING_NPC_MODULATOR
