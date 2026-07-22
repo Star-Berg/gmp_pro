@@ -84,7 +84,7 @@ extern "C"
 /**
  * @brief DC-bus voltage base.
  */
-#define CTRL_DCBUS_VOLTAGE (80.0f)
+#define CTRL_DCBUS_VOLTAGE (55.0f)
 
 /**
  * @brief SVPWM phase-voltage base.

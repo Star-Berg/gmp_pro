@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-21';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-22';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -44,10 +44,10 @@ GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
 
 %% Requirement bindings
 % Nominal grid phase-voltage magnitude in controller per unit.
-GFL_GRID_VOLTAGE_PU = 0.4949;
+GFL_GRID_VOLTAGE_PU = 0.7200;
 
 % Regulated DC-bus voltage target in volts.
-GFL_DCBUS_VOLTAGE_REF_V = 80.0;
+GFL_DCBUS_VOLTAGE_REF_V = 55.0;
 
 % DC-bus voltage-loop execution frequency in hertz.
 GFL_DCBUS_LOOP_FREQUENCY_HZ = 200.0;
@@ -98,7 +98,7 @@ GFL_OPEN_LOOP_VQ_PU = 0.6;
 CTRL_SPLL_EPSILON = float2ctrl(0.005);
 
 % Default active-power reference. Positive power exports energy to the grid.
-GFL_ACTIVE_POWER_REF_PU = -0.03;
+GFL_ACTIVE_POWER_REF_PU = -0.05;
 
 % Default reactive-power reference using Q = vq*id - vd*iq.
 GFL_REACTIVE_POWER_REF_PU = 0.0;

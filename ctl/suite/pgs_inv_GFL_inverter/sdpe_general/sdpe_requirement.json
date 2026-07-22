@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-21",
+  "updated_at": "2026-07-22",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -93,7 +93,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.4949"
+        "float": "0.7200"
       },
       "description": "Nominal grid phase-voltage magnitude in controller per unit."
     },
@@ -103,7 +103,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "80.0"
+        "float": "55.0"
       },
       "description": "Regulated DC-bus voltage target in volts."
     },

@@ -111,7 +111,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "80.0"
+        "float": "55.0"
       },
       "description": "DC-bus voltage base."
     },

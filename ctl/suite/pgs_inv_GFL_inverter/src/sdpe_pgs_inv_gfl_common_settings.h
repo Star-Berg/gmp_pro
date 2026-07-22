@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-21"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-22"
 
 //=================================================================================================
 /**
@@ -89,12 +89,12 @@ extern "C"
 /**
  * @brief Nominal grid phase-voltage magnitude in controller per unit.
  */
-#define GFL_GRID_VOLTAGE_PU (0.4949f)
+#define GFL_GRID_VOLTAGE_PU (0.7200f)
 
 /**
  * @brief Regulated DC-bus voltage target in volts.
  */
-#define GFL_DCBUS_VOLTAGE_REF_V (80.0f)
+#define GFL_DCBUS_VOLTAGE_REF_V (55.0f)
 
 /**
  * @brief DC-bus voltage-loop execution frequency in hertz.
