@@ -19,14 +19,16 @@ Vdc1_ref(55 V) - Vdc1
         -> 三相 PWM
 ```
 
-外层 `src/ctl_main.c` 已包含上述母线环。本次不修改该文件，只对 PC 仿真提供 55 V 标定覆盖。
+外层 `src/ctl_main.c` 已包含上述母线环。本次不修改控制算法，只通过正式 SDPE 参数提供 55 V 标定和参考值。
 
 ## 文件变更
 
 | 文件 | 类型 | 内容 |
 |---|---|---|
-| `xplt/sim_control_overrides.h` | 新增 | PC 仿真专用 55 V 母线基值、55 V 参考和 0.7200 pu 电网电压 |
-| `xplt/xplt.peripheral.h` | 1 行修改 | 在生成的 SDPE 设置完整加载后引入仿真覆盖 |
+| `sdpe_general/sdpe_requirement.json` | 修改 | 公共 SDPE 参数统一为 55 V 母线参考、0.7200 pu 电网电压 |
+| `sdpe_mgr/sdpe_requirement.json` | 修改 | PC 仿真 SDPE 母线标幺基值统一为 55 V |
+| `xplt/xplt.peripheral.h` | 1 行删除 | 移除仿真专用覆盖头，只加载 SDPE 生成设置 |
+| `xplt/sim_control_overrides.h` | 删除 | 不再在 SDPE 之后二次覆盖参数 |
 | `run_gfl_cosim.m` | 新增 | 后台启动 EXE、运行模型、异常或结束时关闭进程，不保存模型 |
 | `run_gfl_validation.m` | 新增 | 临时启用 Scope 日志，计算指标并保存 PNG/CSV/MAT |
 | `test_gfl_cosim_setup.m` | 新增 | 检查文件、标定、BUCK 固定占空比和 DC 通道映射 |

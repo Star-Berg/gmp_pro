@@ -6,7 +6,6 @@ end
 function testRequiredFilesExist(testCase)
 simDir = fileparts(mfilename('fullpath'));
 required = {
-    'xplt/sim_control_overrides.h'
     'run_gfl_cosim.m'
     'run_gfl_validation.m'
     'VALIDATION_CHANGES.md'
@@ -28,16 +27,19 @@ verifyNotEmpty(testCase, regexp(source, ...
     'udc_src\s*=\s*simulink_rx_buffer\.adc_result\[INV_ADC_ID_VDC\]', 'once'));
 end
 
-function testSimulationOverrides(testCase)
+function testSdpeSimulationSettings(testCase)
 simDir = fileparts(mfilename('fullpath'));
-source = fileread(fullfile(simDir, 'xplt', 'sim_control_overrides.h'));
+verifyFalse(testCase, isfile(fullfile(simDir, 'xplt', 'sim_control_overrides.h')));
 
-verifyNotEmpty(testCase, regexp(source, ...
-    '#define\s+CTRL_DCBUS_VOLTAGE\s+\(55\.0f\)', 'once'));
-verifyNotEmpty(testCase, regexp(source, ...
-    '#define\s+GFL_DCBUS_VOLTAGE_REF_V\s+\(55\.0f\)', 'once'));
-verifyNotEmpty(testCase, regexp(source, ...
-    '#define\s+GFL_GRID_VOLTAGE_PU\s+\(0\.7200f\)', 'once'));
+commonRequirement = fileread(fullfile(simDir, '..', '..', 'sdpe_general', 'sdpe_requirement.json'));
+simulateRequirement = fileread(fullfile(simDir, 'sdpe_mgr', 'sdpe_requirement.json'));
+
+verifyNotEmpty(testCase, regexp(commonRequirement, ...
+    '"macro"\s*:\s*"GFL_DCBUS_VOLTAGE_REF_V"[\s\S]*?"float"\s*:\s*"55\.0"', 'once'));
+verifyNotEmpty(testCase, regexp(commonRequirement, ...
+    '"macro"\s*:\s*"GFL_GRID_VOLTAGE_PU"[\s\S]*?"float"\s*:\s*"0\.7200"', 'once'));
+verifyNotEmpty(testCase, regexp(simulateRequirement, ...
+    '"macro"\s*:\s*"CTRL_DCBUS_VOLTAGE"[\s\S]*?"float"\s*:\s*"55\.0"', 'once'));
 end
 
 function testBuckDutyIsFixedAtPoint45(testCase)

@@ -67,7 +67,6 @@ slprj/
 *.autosave
 *.bak
 vcpkg_installed/
-validation_results/
 
 # Miscellaneous generated files
 __pycache__/
