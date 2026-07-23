@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-22"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-23"
 
 //=================================================================================================
 /**
@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
  */
-#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (30.0f)
+#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (36.0f)
 
 /**
  * @brief Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
@@ -199,7 +199,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6 default stand-alone output frequency.
  */
-#define GFL_LEVEL6_OUTPUT_FREQUENCY_HZ (25.0f)
+#define GFL_LEVEL6_OUTPUT_FREQUENCY_HZ (50.0f)
 
 /**
  * @brief Minimum Level 6 output-frequency command.
@@ -229,17 +229,17 @@ extern "C"
 /**
  * @brief Proportional design bandwidth for the Level 6 estimated-inductor-current QPR loop.
  */
-#define GFL_LEVEL6_CURRENT_LOOP_BW_HZ (400.0f)
+#define GFL_LEVEL6_CURRENT_LOOP_BW_HZ (600.0f)
 
 /**
  * @brief Resonant gain from voltage error PU to estimated inductor-current reference PU.
  */
-#define GFL_LEVEL6_VOLTAGE_QPR_KR (0.40f)
+#define GFL_LEVEL6_VOLTAGE_QPR_KR (1.00f)
 
 /**
  * @brief Resonant gain from estimated inductor-current error PU to SPWM modulation index.
  */
-#define GFL_LEVEL6_CURRENT_QPR_KR (0.15f)
+#define GFL_LEVEL6_CURRENT_QPR_KR (0.80f)
 
 /**
  * @brief Half-width of the Level 6 quasi-resonant terms around the commanded frequency.

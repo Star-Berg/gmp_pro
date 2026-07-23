@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-22';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-23';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -98,7 +98,7 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
 % BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
-GFL_LEVEL6_OUTPUT_LINE_RMS_V = 24.0;
+GFL_LEVEL6_OUTPUT_LINE_RMS_V = 36.0;
 
 % Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
 GFL_LEVEL6_VOLTAGE_MIN_RMS_V = 24.0;
@@ -131,7 +131,7 @@ GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ = 80.0;
 GFL_LEVEL6_CURRENT_LOOP_BW_HZ = 600.0;
 
 % Resonant gain from voltage error PU to estimated inductor-current reference PU.
-GFL_LEVEL6_VOLTAGE_QPR_KR = 0.80;
+GFL_LEVEL6_VOLTAGE_QPR_KR = 1.00;
 
 % Resonant gain from estimated inductor-current error PU to SPWM modulation index.
 GFL_LEVEL6_CURRENT_QPR_KR = 0.80;
