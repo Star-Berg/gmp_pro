@@ -98,7 +98,7 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
 % BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
-GFL_LEVEL6_OUTPUT_LINE_RMS_V = 36.0;
+GFL_LEVEL6_OUTPUT_LINE_RMS_V = 32.0;
 
 % Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
 GFL_LEVEL6_VOLTAGE_MIN_RMS_V = 24.0;

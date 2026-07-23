@@ -275,7 +275,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "36.0"
+        "float": "32.0"
       },
       "description": "BUILD_LEVEL 6 default line-to-line RMS voltage command in volts."
     },

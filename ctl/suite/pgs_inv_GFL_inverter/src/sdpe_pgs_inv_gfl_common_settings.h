@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
  */
-#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (36.0f)
+#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (32.0f)
 
 /**
  * @brief Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
