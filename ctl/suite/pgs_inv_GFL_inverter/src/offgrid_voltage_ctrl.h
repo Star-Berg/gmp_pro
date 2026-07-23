@@ -8,7 +8,9 @@
  *
  * Control chain:
  *
- *   balanced alpha/beta voltage reference
+ *   line-voltage RMS command
+ *     -> slow RMS amplitude correction
+ *     -> balanced alpha/beta voltage reference
  *     -> alpha/beta QPR voltage loop
  *     -> load-current + capacitor-current feed-forward
  *     -> estimated inductor-current reference
@@ -27,6 +29,36 @@
 
 #include <ctl/component/digital_power/inv/gfl_core.h>
 #include <ctl/component/intrinsic/discrete/proportional_resonant.h>
+
+/*
+ * Experimental slow RMS-amplitude loop defaults.
+ *
+ * These local fallbacks intentionally keep the first trial independent from
+ * SDPE regeneration. They may be promoted into SDPE after Simulink tuning.
+ */
+#ifndef GFL_LEVEL6_ENABLE_RMS_AMPLITUDE_LOOP
+#define GFL_LEVEL6_ENABLE_RMS_AMPLITUDE_LOOP (1)
+#endif
+
+#ifndef GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ
+#define GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ (10.0f)
+#endif
+
+#ifndef GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S
+#define GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S (1.0f)
+#endif
+
+#ifndef GFL_LEVEL6_RMS_GAIN_MIN
+#define GFL_LEVEL6_RMS_GAIN_MIN (0.95f)
+#endif
+
+#ifndef GFL_LEVEL6_RMS_GAIN_MAX
+#define GFL_LEVEL6_RMS_GAIN_MAX (1.05f)
+#endif
+
+#ifndef GFL_LEVEL6_RMS_SETTLE_TIME_S
+#define GFL_LEVEL6_RMS_SETTLE_TIME_S (0.30f)
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -65,6 +97,14 @@ typedef struct _tag_offgrid_voltage_ctrl
     parameter_gt frequency_cmd_hz;
     parameter_gt frequency_active_hz;
 
+    /*
+     * Slow RMS amplitude-loop monitoring.
+     * rms_amplitude_gain multiplies the internal sinusoidal voltage reference.
+     */
+    parameter_gt line_voltage_rms_meas_v;
+    parameter_gt rms_amplitude_gain;
+    parameter_gt rms_amplitude_error_pu;
+
     /* Reference angle is per-unit: 1.0 == 2*pi. */
     ctrl_gt angle_pu;
     ctl_vector2_t phasor;
@@ -102,6 +142,14 @@ typedef struct _tag_offgrid_voltage_ctrl
     ctrl_gt active_damping_gain;
     ctrl_gt current_limit_pu;
     ctrl_gt modulation_limit_pu;
+
+    /* RMS estimator and slow integral-loop state. */
+    ctrl_gt rms_voltage_sq_lpf_pu;
+    ctrl_gt rms_filter_alpha;
+    ctrl_gt rms_integrator_step;
+    uint32_t rms_settle_counter;
+    uint32_t rms_settle_count_limit;
+    fast_gt rms_loop_active;
 
     fast_gt flag_was_enabled;
 } offgrid_voltage_ctrl_t;
@@ -143,6 +191,84 @@ GMP_STATIC_INLINE void ctl_offgrid_limit_vector(ctl_vector2_t* vector, ctrl_gt l
         vector->dat[phase_alpha] = ctl_mul(vector->dat[phase_alpha], scale);
         vector->dat[phase_beta] = ctl_mul(vector->dat[phase_beta], scale);
     }
+}
+
+/**
+ * Estimate line-to-line RMS voltage from the alpha/beta feedback vector.
+ *
+ * For the amplitude-invariant Clarke transform:
+ * V_LL,rms = sqrt(3/2) * Vbase * sqrt(v_alpha^2 + v_beta^2).
+ * A low-pass filter prevents PWM ripple and harmonics from driving the slow
+ * amplitude integrator.
+ */
+GMP_STATIC_INLINE void ctl_step_offgrid_rms_estimator(offgrid_voltage_ctrl_t* ctrl,
+                                                       const gfl_inv_ctrl_t* core)
+{
+    ctrl_gt magnitude_sq =
+        ctl_mul(core->vab0.dat[phase_alpha], core->vab0.dat[phase_alpha]) +
+        ctl_mul(core->vab0.dat[phase_beta], core->vab0.dat[phase_beta]);
+
+    ctrl->rms_voltage_sq_lpf_pu +=
+        ctl_mul(ctrl->rms_filter_alpha, magnitude_sq - ctrl->rms_voltage_sq_lpf_pu);
+
+    if (ctrl->rms_voltage_sq_lpf_pu < float2ctrl(0.0f))
+        ctrl->rms_voltage_sq_lpf_pu = float2ctrl(0.0f);
+
+    ctrl->line_voltage_rms_meas_v =
+        1.224744871391589f * ctrl->voltage_base *
+        ctrl2float(ctl_sqrt(ctrl->rms_voltage_sq_lpf_pu));
+}
+
+/**
+ * Slowly trim the internal voltage-reference amplitude after soft start.
+ *
+ * The integrator is held at unity while the command is slewing, then delayed
+ * to let the QPR loops settle.  The narrow gain range prevents the slow loop
+ * from hiding sensor faults or inner-loop saturation.
+ */
+GMP_STATIC_INLINE void ctl_step_offgrid_rms_amplitude_loop(offgrid_voltage_ctrl_t* ctrl)
+{
+#if GFL_LEVEL6_ENABLE_RMS_AMPLITUDE_LOOP
+    parameter_gt command_error_v =
+        ctrl->line_voltage_rms_cmd_v - ctrl->line_voltage_rms_active_v;
+    parameter_gt slew_tolerance_v =
+        ctrl2float(ctrl->voltage_slew_step_v) + 0.0001f;
+
+    if (command_error_v > slew_tolerance_v || command_error_v < -slew_tolerance_v ||
+        ctrl->line_voltage_rms_active_v < 1.0f)
+    {
+        ctrl->rms_settle_counter = 0;
+        ctrl->rms_loop_active = 0;
+        ctrl->rms_amplitude_gain = 1.0f;
+        ctrl->rms_amplitude_error_pu = 0.0f;
+        return;
+    }
+
+    if (ctrl->rms_settle_counter < ctrl->rms_settle_count_limit)
+    {
+        ++ctrl->rms_settle_counter;
+        ctrl->rms_loop_active = 0;
+        ctrl->rms_amplitude_error_pu = 0.0f;
+        return;
+    }
+
+    ctrl->rms_loop_active = 1;
+    ctrl->rms_amplitude_error_pu =
+        (ctrl->line_voltage_rms_active_v - ctrl->line_voltage_rms_meas_v) /
+        ctrl->line_voltage_rms_active_v;
+
+    ctrl->rms_amplitude_gain +=
+        ctrl2float(ctrl->rms_integrator_step) * ctrl->rms_amplitude_error_pu;
+    ctrl->rms_amplitude_gain =
+        ctl_offgrid_clamp_parameter(ctrl->rms_amplitude_gain,
+                                    GFL_LEVEL6_RMS_GAIN_MIN,
+                                    GFL_LEVEL6_RMS_GAIN_MAX);
+#else
+    ctrl->rms_settle_counter = 0;
+    ctrl->rms_loop_active = 0;
+    ctrl->rms_amplitude_gain = 1.0f;
+    ctrl->rms_amplitude_error_pu = 0.0f;
+#endif
 }
 
 /** Update both voltage- and current-loop resonant coefficients without clearing state. */
@@ -196,6 +322,13 @@ GMP_STATIC_INLINE void ctl_clear_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ct
     }
 
     ctrl->line_voltage_rms_active_v = 0.0f;
+    ctrl->line_voltage_rms_meas_v = 0.0f;
+    ctrl->rms_amplitude_gain = 1.0f;
+    ctrl->rms_amplitude_error_pu = 0.0f;
+    ctrl->rms_voltage_sq_lpf_pu = float2ctrl(0.0f);
+    ctrl->rms_settle_counter = 0;
+    ctrl->rms_loop_active = 0;
+
     ctrl->angle_pu = float2ctrl(0.0f);
     ctl_set_phasor_via_angle(ctrl->angle_pu, &ctrl->phasor);
 
@@ -216,6 +349,7 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
 {
     parameter_gt voltage_kp;
     parameter_gt current_kp;
+    parameter_gt rms_filter_alpha;
     int axis;
 
     gmp_base_assert(ctrl);
@@ -259,6 +393,20 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl->current_limit_pu = float2ctrl(init->current_limit_pu);
     ctrl->modulation_limit_pu = float2ctrl(init->modulation_limit_pu);
 
+    /*
+     * First-order low-pass coefficient using alpha ~= 2*pi*fc/fs.  The
+     * cutoff is intentionally much lower than the QPR voltage-loop bandwidth.
+     */
+    rms_filter_alpha =
+        CTL_PARAM_CONST_2PI * GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ / init->fs;
+    rms_filter_alpha =
+        ctl_offgrid_clamp_parameter(rms_filter_alpha, 0.0f, 1.0f);
+    ctrl->rms_filter_alpha = float2ctrl(rms_filter_alpha);
+    ctrl->rms_integrator_step =
+        float2ctrl(GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S / init->fs);
+    ctrl->rms_settle_count_limit =
+        (uint32_t)(GFL_LEVEL6_RMS_SETTLE_TIME_S * init->fs);
+
     ctrl->line_voltage_rms_cmd_v = init->default_line_voltage_rms_v;
     ctrl->frequency_cmd_hz = init->default_frequency_hz;
     ctrl->frequency_active_hz = init->default_frequency_hz;
@@ -277,6 +425,7 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl_gt voltage_correction;
     ctrl_gt current_correction;
     ctrl_gt delta_voltage;
+    parameter_gt corrected_line_voltage_rms_v;
     parameter_gt quantized_command;
     int axis;
 
@@ -325,14 +474,27 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
             ctrl->line_voltage_rms_active_v = ctrl->line_voltage_rms_cmd_v;
     }
 
+    /*
+     * Estimate output RMS every ISR and activate the correction only after the
+     * commanded soft-start ramp has settled.
+     */
+    ctl_step_offgrid_rms_estimator(ctrl, core);
+    ctl_step_offgrid_rms_amplitude_loop(ctrl);
+
     /* Keep phase continuous when the frequency command changes. */
     ctrl->angle_pu += ctrl->angle_step_pu;
     if (ctrl->angle_pu >= float2ctrl(1.0f))
         ctrl->angle_pu -= float2ctrl(1.0f);
     ctl_set_phasor_via_angle(ctrl->angle_pu, &ctrl->phasor);
 
-    /* V_phase,peak = sqrt(2/3) * V_line,rms. */
-    voltage_ref_peak_pu = float2ctrl(0.816496580927726f * ctrl->line_voltage_rms_active_v /
+    /*
+     * V_phase,peak = sqrt(2/3) * V_line,rms.
+     * The slow gain trims only reference amplitude; QPR waveform regulation is
+     * otherwise unchanged.
+     */
+    corrected_line_voltage_rms_v =
+        ctrl->line_voltage_rms_active_v * ctrl->rms_amplitude_gain;
+    voltage_ref_peak_pu = float2ctrl(0.816496580927726f * corrected_line_voltage_rms_v /
                                      ctrl->voltage_base);
     ctrl->voltage_ref_ab.dat[phase_alpha] = ctl_mul(voltage_ref_peak_pu, ctrl->phasor.dat[phasor_cos]);
     ctrl->voltage_ref_ab.dat[phase_beta] = ctl_mul(voltage_ref_peak_pu, ctrl->phasor.dat[phasor_sin]);
