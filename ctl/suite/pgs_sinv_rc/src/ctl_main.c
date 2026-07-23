@@ -30,6 +30,7 @@ static ctrl_gt fdrc_buffer[FDRC_ARRAY_SIZE];
 
 // Output channel
 single_phase_H_modulation_t hpwm;
+sinv_buck_ctrl_t buck_ctrl;
 
 // Protection module
 ctl_sinv_protect_t protection;
@@ -106,6 +107,7 @@ void ctl_init(void)
     //
     ctl_init_single_phase_H_modulation(&hpwm, CTRL_PWM_CMP_MAX + 1, CTRL_PWM_DEADBAND_CMP,
                                        float2ctrl(CTRL_CURRENT_DB_PU));
+    ctl_init_sinv_buck(&buck_ctrl);
     //hpwm.flag_enable_dbcomp = 1; // 开启死区补偿
 
     //
@@ -337,6 +339,107 @@ void clear_all_controllers(void)
     ctl_clear_sinv_ref_gen(&ref_gen);
     ctl_clear_sinv_outer_loop(&outer_loop);
     ctl_clear_single_phase_H_modulation(&hpwm);
+    ctl_clear_sinv_buck(&buck_ctrl);
+}
+
+void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck)
+{
+    ctl_init_pid(&buck->voltage_pid, SINV_BUCK_VOLTAGE_LOOP_KP, SINV_BUCK_VOLTAGE_LOOP_KI, 0.0f,
+                 SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ);
+    ctl_set_pid_limit(&buck->voltage_pid, float2ctrl(SINV_BUCK_CURRENT_LIMIT_A / CTRL_CURRENT_BASE),
+                      float2ctrl(0.0f));
+    ctl_set_pid_int_limit(&buck->voltage_pid, float2ctrl(SINV_BUCK_CURRENT_LIMIT_A / CTRL_CURRENT_BASE),
+                          float2ctrl(0.0f));
+
+    ctl_init_pid(&buck->current_pid, SINV_BUCK_CURRENT_LOOP_KP, SINV_BUCK_CURRENT_LOOP_KI, 0.0f,
+                 CONTROLLER_FREQUENCY);
+    ctl_set_pid_limit(&buck->current_pid, float2ctrl(SINV_BUCK_DUTY_TRIM_LIMIT),
+                      float2ctrl(-SINV_BUCK_DUTY_TRIM_LIMIT));
+    ctl_set_pid_int_limit(&buck->current_pid, float2ctrl(SINV_BUCK_DUTY_TRIM_LIMIT),
+                          float2ctrl(-SINV_BUCK_DUTY_TRIM_LIMIT));
+
+    buck->v_ref = float2ctrl(SINV_BUCK_OUTPUT_REF_V / CTRL_VOLTAGE_BASE);
+    buck->duty_step = float2ctrl(SINV_BUCK_DUTY_SLEW_PU_S / CONTROLLER_FREQUENCY);
+    buck->startup_delay_count = (uint32_t)((float)SINV_BUCK_START_DELAY_MS * (float)CONTROLLER_FREQUENCY / 1000.0f);
+    ctl_clear_sinv_buck(buck);
+}
+
+void ctl_clear_sinv_buck(sinv_buck_ctrl_t* buck)
+{
+    ctl_clear_pid(&buck->voltage_pid);
+    ctl_clear_pid(&buck->current_pid);
+    buck->i_ref = float2ctrl(0.0f);
+    buck->v_in_ff = float2ctrl(0.0f);
+    buck->duty_ff = float2ctrl(0.0f);
+    buck->duty_trim = float2ctrl(0.0f);
+    buck->duty_cmd = float2ctrl(0.0f);
+    buck->duty = float2ctrl(0.0f);
+    buck->duty_soft_limit = float2ctrl(0.0f);
+    buck->startup_counter = 0U;
+    buck->voltage_loop_counter = 0U;
+    buck->pwm_cmp = 0U;
+    buck->flag_enable = 0;
+}
+
+pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, ctrl_gt i_l, fast_gt enable)
+{
+    if (!enable)
+    {
+        ctl_clear_sinv_buck(buck);
+        return 0U;
+    }
+
+    if (buck->startup_counter < buck->startup_delay_count)
+    {
+        buck->startup_counter++;
+        buck->pwm_cmp = 0U;
+        return 0U;
+    }
+
+    buck->flag_enable = 1;
+    buck->duty_soft_limit += buck->duty_step;
+    if (buck->duty_soft_limit > float2ctrl(SINV_BUCK_DUTY_MAX))
+        buck->duty_soft_limit = float2ctrl(SINV_BUCK_DUTY_MAX);
+
+    const uint32_t voltage_loop_div =
+        (uint32_t)((float)CONTROLLER_FREQUENCY / (float)SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ);
+    if ((buck->voltage_loop_counter == 0U) || (voltage_loop_div <= 1U))
+    {
+        buck->i_ref = ctl_step_pid_par(&buck->voltage_pid, buck->v_ref - v_out);
+    }
+    buck->voltage_loop_counter++;
+    if ((voltage_loop_div > 1U) && (buck->voltage_loop_counter >= voltage_loop_div))
+        buck->voltage_loop_counter = 0U;
+
+    ctrl_gt v_in_safe = v_in;
+    if (v_in_safe < float2ctrl(1.0f / CTRL_VOLTAGE_BASE))
+        v_in_safe = float2ctrl(1.0f / CTRL_VOLTAGE_BASE);
+
+    if (buck->v_in_ff <= float2ctrl(0.0f))
+        buck->v_in_ff = v_in_safe;
+    else
+        buck->v_in_ff += ctl_mul(float2ctrl(SINV_BUCK_VIN_FF_LPF_ALPHA), v_in_safe - buck->v_in_ff);
+
+    ctrl_gt duty_nominal = ctl_div(buck->v_ref, float2ctrl(CTRL_DCBUS_VOLTAGE / CTRL_VOLTAGE_BASE));
+    duty_nominal = ctl_sat(duty_nominal, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+
+    ctrl_gt duty_vin_ff = ctl_div(buck->v_ref, buck->v_in_ff);
+    duty_vin_ff = ctl_sat(duty_vin_ff, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+
+    buck->duty_ff = duty_nominal + ctl_mul(float2ctrl(SINV_BUCK_DUTY_FF_GAIN), duty_vin_ff - duty_nominal);
+    buck->duty_ff = ctl_sat(buck->duty_ff, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+
+    buck->duty_trim = ctl_step_pid_par(&buck->current_pid, buck->i_ref - i_l);
+    buck->duty_cmd = buck->duty_ff + buck->duty_trim;
+
+    ctrl_gt duty_upper = buck->duty_ff + float2ctrl(SINV_BUCK_DUTY_FF_MARGIN);
+    duty_upper = ctl_sat(duty_upper, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+    if (duty_upper > buck->duty_soft_limit)
+        duty_upper = buck->duty_soft_limit;
+
+    buck->duty = ctl_sat(buck->duty_cmd, duty_upper, float2ctrl(SINV_BUCK_DUTY_MIN));
+    buck->pwm_cmp = pwm_sat(ctrl2float(buck->duty) * (float)(CTRL_PWM_CMP_MAX + 1), CTRL_PWM_CMP_MAX + 1, 0);
+    return buck->pwm_cmp;
 }
 
 void ctl_enable_pwm(void)

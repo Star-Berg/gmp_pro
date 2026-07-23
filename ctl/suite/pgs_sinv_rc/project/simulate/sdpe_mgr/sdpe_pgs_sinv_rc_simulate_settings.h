@@ -24,7 +24,7 @@ extern "C"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_ID "pgs_sinv_rc_simulate"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-15"
+#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-23"
 
 //=================================================================================================
 /**
@@ -95,12 +95,12 @@ extern "C"
 /**
  * @brief Rated and nominal DC-bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (60.0f)
+#define CTRL_DCBUS_VOLTAGE (80.0f)
 
 /**
  * @brief Nominal grid/load RMS voltage.
  */
-#define CTRL_GRID_VOLTAGE_RMS (24.0f)
+#define CTRL_GRID_VOLTAGE_RMS (36.0f)
 
 /**
  * @brief Rated RMS AC current.
@@ -110,7 +110,7 @@ extern "C"
 /**
  * @brief Peak voltage PU base.
  */
-#define CTRL_VOLTAGE_BASE (34.0f)
+#define CTRL_VOLTAGE_BASE (50.91f)
 
 /**
  * @brief Peak current PU base.
@@ -138,19 +138,29 @@ extern "C"
 #define SINV_FILTER_CAP_ESR_OHM (0.10f)
 
 /**
- * @brief DC-link capacitance.
- */
-#define SINV_DC_CAPACITANCE_F (2200e-6f)
-
-/**
  * @brief Resistive load for levels 1 and 2.
  */
 #define SINV_RLOAD_OHM (12.0f)
 
 /**
- * @brief DC-side load for level 5. At 60 V this draws 120 W, within the configured converter current rating.
+ * @brief DC-side load for level 5.
  */
 #define SINV_RECTIFIER_RLOAD_OHM (30.0f)
+
+/**
+ * @brief DC-link capacitance.
+ */
+#define SINV_DC_CAPACITANCE_F (2200e-6f)
+
+/**
+ * @brief Generic half-bridge module DC voltage sensor sensitivity in V/V, used by DC bus and Buck voltage channels.
+ */
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02705f)
+
+/**
+ * @brief DC bus voltage ADC bias.
+ */
+#define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
  * @brief AC voltage sensor sensitivity in V/V.
@@ -173,19 +183,24 @@ extern "C"
 #define CTRL_AC_CURRENT_BIAS (1.65f)
 
 /**
- * @brief DC bus voltage sensor sensitivity in V/V.
+ * @brief Plant MOSFET on resistance.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.040f)
+#define SINV_MODEL_MOSFET_RON (4.6e-3f)
 
 /**
- * @brief DC bus voltage ADC bias.
+ * @brief Body-diode on resistance.
  */
-#define CTRL_DC_VOLTAGE_BIAS (0.0f)
+#define SINV_MODEL_DIODE_RON (0.01f)
 
 /**
- * @brief DC bus overvoltage threshold.
+ * @brief Body-diode forward voltage.
  */
-#define CTRL_PROT_VBUS_MAX (90.0f)
+#define SINV_MODEL_DIODE_VF (0.5f)
+
+/**
+ * @brief DC bus overvoltage threshold for simulation startup transients.
+ */
+#define CTRL_PROT_VBUS_MAX (100.0f)
 
 /**
  * @brief Fast AC peak-current threshold.
@@ -211,21 +226,6 @@ extern "C"
  * @brief ADC calibration timeout.
  */
 #define TIMEOUT_ADC_CALIB_MS (3000)
-
-/**
- * @brief Plant MOSFET on resistance.
- */
-#define SINV_MODEL_MOSFET_RON (4.6e-3f)
-
-/**
- * @brief Body-diode on resistance.
- */
-#define SINV_MODEL_DIODE_RON (0.01f)
-
-/**
- * @brief Body-diode forward voltage.
- */
-#define SINV_MODEL_DIODE_VF (0.5f)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)

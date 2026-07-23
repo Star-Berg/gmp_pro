@@ -26,6 +26,11 @@ adc_channel_t adc_i_ac;
 // DC Bus Voltage Feedback
 adc_channel_t adc_v_bus;
 
+// Buck-stage feedbacks
+adc_channel_t adc_i_buck;
+adc_channel_t adc_v_buck_in;
+adc_channel_t adc_v_buck_out;
+
 // dlog DSA objects
 //basic_trigger_t trigger;
 
@@ -82,6 +87,21 @@ void setup_peripheral(void)
                          // ADC bias
                          ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
                          // ADC resolution, IQN
+                         12, 24);
+
+    ctl_init_adc_channel(&adc_i_buck,
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_AC_CURRENT_SENSITIVITY, CTRL_CURRENT_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_AC_CURRENT_BIAS),
+                         12, 24);
+
+    ctl_init_adc_channel(&adc_v_buck_in,
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_SENSITIVITY, CTRL_VOLTAGE_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
+                         12, 24);
+
+    ctl_init_adc_channel(&adc_v_buck_out,
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_SENSITIVITY, CTRL_VOLTAGE_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
                          12, 24);
 
     // ---------------------------------------------------------

@@ -23,7 +23,7 @@ extern "C"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_ID "pgs_sinv_rc_common"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-15"
+#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-23"
 
 //=================================================================================================
 /**
@@ -56,9 +56,9 @@ extern "C"
  */
 
 /**
- * @brief Nominal grid frequency in Hz.
+ * @brief Minimum voltage magnitude used by the P/Q reference generator.
  */
-#define CTRL_GRID_FREQUENCY (50.0f)
+#define CTRL_GRID_VMIN_PU (0.1f)
 
 /**
  * @brief SOGI PLL proportional gain.
@@ -89,11 +89,6 @@ extern "C"
  * @brief Peak current command limit in PU.
  */
 #define CTRL_CURRENT_LIMIT_PU (0.9f)
-
-/**
- * @brief Minimum voltage magnitude used by the P/Q reference generator.
- */
-#define CTRL_GRID_VMIN_PU (0.1f)
 
 /**
  * @brief Active-power command slew limit in PU/s.
@@ -151,26 +146,6 @@ extern "C"
 #define SINV_LEVEL1_VOLTAGE_REF_PU (0.35f)
 
 /**
- * @brief BUILD_LEVEL 2 peak current command with a resistive load.
- */
-#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.20f)
-
-/**
- * @brief BUILD_LEVEL 3 signed grid active-power command; positive exports power.
- */
-#define SINV_LEVEL3_ACTIVE_POWER_REF_PU (0.10f)
-
-/**
- * @brief BUILD_LEVEL 3 grid reactive-power command.
- */
-#define SINV_LEVEL3_REACTIVE_POWER_REF_PU (0.0f)
-
-/**
- * @brief BUILD_LEVEL 4 measured active-power closed-loop target.
- */
-#define SINV_LEVEL4_ACTIVE_POWER_REF_PU (0.15f)
-
-/**
  * @brief Active-power outer-loop proportional gain.
  */
 #define SINV_POWER_LOOP_KP (0.6f)
@@ -179,11 +154,6 @@ extern "C"
  * @brief Active-power outer-loop integral gain per second.
  */
 #define SINV_POWER_LOOP_KI (8.0f)
-
-/**
- * @brief BUILD_LEVEL 5 physical DC bus voltage target.
- */
-#define SINV_DC_BUS_REF_V (60.0f)
 
 /**
  * @brief DC-bus outer-loop proportional gain.
@@ -206,9 +176,119 @@ extern "C"
 #define SINV_OUTER_LOOP_FREQUENCY_HZ (1000.0f)
 
 /**
+ * @brief Buck voltage-loop execution frequency.
+ */
+#define SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ (1000.0f)
+
+/**
+ * @brief Buck voltage-loop proportional gain.
+ */
+#define SINV_BUCK_VOLTAGE_LOOP_KP (0.35f)
+
+/**
+ * @brief Buck voltage-loop integral gain per second.
+ */
+#define SINV_BUCK_VOLTAGE_LOOP_KI (30.0f)
+
+/**
+ * @brief Buck current-loop proportional gain.
+ */
+#define SINV_BUCK_CURRENT_LOOP_KP (0.20f)
+
+/**
+ * @brief Buck current-loop integral gain per second.
+ */
+#define SINV_BUCK_CURRENT_LOOP_KI (500.0f)
+
+/**
+ * @brief BUILD_LEVEL 2 peak current command with a resistive load.
+ */
+#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.20f)
+
+/**
+ * @brief BUILD_LEVEL 3 signed grid active-power command; positive exports power.
+ */
+#define SINV_LEVEL3_ACTIVE_POWER_REF_PU (0.10f)
+
+/**
+ * @brief BUILD_LEVEL 3 grid reactive-power command.
+ */
+#define SINV_LEVEL3_REACTIVE_POWER_REF_PU (0.0f)
+
+/**
+ * @brief BUILD_LEVEL 4 measured active-power closed-loop target.
+ */
+#define SINV_LEVEL4_ACTIVE_POWER_REF_PU (0.15f)
+
+/**
+ * @brief BUILD_LEVEL 5 physical DC bus voltage target.
+ */
+#define SINV_DC_BUS_REF_V (80.0f)
+
+/**
+ * @brief Buck output voltage target.
+ */
+#define SINV_BUCK_OUTPUT_REF_V (60.0f)
+
+/**
+ * @brief Buck inductor-current command limit in ampere.
+ */
+#define SINV_BUCK_CURRENT_LIMIT_A (5.0f)
+
+/**
  * @brief Minimum operation-enabled transition delay.
  */
 #define SINV_CIA402_OPERATION_ENABLE_DELAY_MS (100)
+
+/**
+ * @brief Minimum DC bus voltage before Buck soft-start is allowed.
+ */
+#define SINV_BUCK_START_VBUS_MIN_V (55.0f)
+
+/**
+ * @brief Delay after the Buck start condition is met before PWM compare ramps.
+ */
+#define SINV_BUCK_START_DELAY_MS (100)
+
+/**
+ * @brief Maximum Buck duty compare-command slew rate in PU per second.
+ */
+#define SINV_BUCK_DUTY_SLEW_PU_S (2.0f)
+
+/**
+ * @brief Buck duty-cycle lower clamp.
+ */
+#define SINV_BUCK_DUTY_MIN (0.0f)
+
+/**
+ * @brief Buck duty-cycle upper clamp.
+ */
+#define SINV_BUCK_DUTY_MAX (1.0f)
+
+/**
+ * @brief Maximum Buck current-loop duty correction around input-voltage feedforward.
+ */
+#define SINV_BUCK_DUTY_TRIM_LIMIT (0.03f)
+
+/**
+ * @brief Extra duty headroom above Buck voltage feedforward during startup and transients.
+ */
+#define SINV_BUCK_DUTY_FF_MARGIN (0.02f)
+
+/**
+ * @brief First-order low-pass coefficient for Buck input-voltage feedforward.
+ */
+#define SINV_BUCK_VIN_FF_LPF_ALPHA (0.006f)
+
+/**
+ * @brief Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward.
+ */
+#define SINV_BUCK_DUTY_FF_GAIN (0.35f)
+
+/**
+ * @brief Nominal grid frequency in Hz.
+ */
+#define CTRL_GRID_FREQUENCY (50.0f)
 
 // User project tail code
 // SDPE extension point: add before_footer code in the Project Requirement Code page if needed.

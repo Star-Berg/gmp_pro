@@ -12,7 +12,7 @@ PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-15';
+PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-23';
 
 %% SIL Runtime
 % Automatically request CiA402 ENABLE_OPERATION in the simulation executable.
@@ -49,16 +49,16 @@ CTRL_ADC_RESOLUTION = 12;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % Rated and nominal DC-bus voltage.
-CTRL_DCBUS_VOLTAGE = 60.0;
+CTRL_DCBUS_VOLTAGE = 80.0;
 
 % Nominal grid/load RMS voltage.
-CTRL_GRID_VOLTAGE_RMS = 24.0;
+CTRL_GRID_VOLTAGE_RMS = 36.0;
 
 % Rated RMS AC current.
 CTRL_RATED_CURRENT_RMS = 10.0;
 
 % Peak voltage PU base.
-CTRL_VOLTAGE_BASE = 34.0;
+CTRL_VOLTAGE_BASE = 50.91;
 
 % Peak current PU base.
 CTRL_CURRENT_BASE = 14.14;
@@ -75,14 +75,20 @@ SINV_FILTER_CAPACITANCE_F = 22e-6;
 % Filter capacitor ESR.
 SINV_FILTER_CAP_ESR_OHM = 0.10;
 
-% DC-link capacitance.
-SINV_DC_CAPACITANCE_F = 2200e-6;
-
 % Resistive load for levels 1 and 2.
 SINV_RLOAD_OHM = 12.0;
 
-% DC-side load for level 5. At 60 V this draws 120 W, within the configured converter current rating.
+% DC-side load for level 5.
 SINV_RECTIFIER_RLOAD_OHM = 30.0;
+
+% DC-link capacitance.
+SINV_DC_CAPACITANCE_F = 2200e-6;
+
+% Generic half-bridge module DC voltage sensor sensitivity in V/V, used by DC bus and Buck voltage channels.
+CTRL_DC_VOLTAGE_SENSITIVITY = 0.02705;
+
+% DC bus voltage ADC bias.
+CTRL_DC_VOLTAGE_BIAS = 0.0;
 
 % AC voltage sensor sensitivity in V/V.
 CTRL_AC_VOLTAGE_SENSITIVITY = 0.020;
@@ -96,14 +102,17 @@ CTRL_AC_CURRENT_SENSITIVITY = 0.150;
 % AC current ADC bias.
 CTRL_AC_CURRENT_BIAS = 1.65;
 
-% DC bus voltage sensor sensitivity in V/V.
-CTRL_DC_VOLTAGE_SENSITIVITY = 0.040;
+% Plant MOSFET on resistance.
+SINV_MODEL_MOSFET_RON = 4.6e-3;
 
-% DC bus voltage ADC bias.
-CTRL_DC_VOLTAGE_BIAS = 0.0;
+% Body-diode on resistance.
+SINV_MODEL_DIODE_RON = 0.01;
 
-% DC bus overvoltage threshold.
-CTRL_PROT_VBUS_MAX = 90.0;
+% Body-diode forward voltage.
+SINV_MODEL_DIODE_VF = 0.5;
+
+% DC bus overvoltage threshold for simulation startup transients.
+CTRL_PROT_VBUS_MAX = 100.0;
 
 % Fast AC peak-current threshold.
 CTRL_PROT_IAC_PEAK_MAX = 18.0;
@@ -119,15 +128,6 @@ CTRL_DCBUS_READY_MAX = 90.0;
 
 % ADC calibration timeout.
 TIMEOUT_ADC_CALIB_MS = 3000;
-
-% Plant MOSFET on resistance.
-SINV_MODEL_MOSFET_RON = 4.6e-3;
-
-% Body-diode on resistance.
-SINV_MODEL_DIODE_RON = 0.01;
-
-% Body-diode forward voltage.
-SINV_MODEL_DIODE_VF = 0.5;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)
