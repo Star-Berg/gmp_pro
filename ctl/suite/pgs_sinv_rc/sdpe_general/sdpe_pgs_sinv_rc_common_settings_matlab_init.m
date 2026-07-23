@@ -12,7 +12,7 @@ PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-15';
+PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-23';
 
 %% Control Features
 % Enable delayed insertion of the frequency-adaptive repetitive controller.
@@ -26,8 +26,8 @@ SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
 CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 
 %% Requirement bindings
-% Nominal grid frequency in Hz.
-CTRL_GRID_FREQUENCY = 50.0;
+% Minimum voltage magnitude used by the P/Q reference generator.
+CTRL_GRID_VMIN_PU = 0.1;
 
 % SOGI PLL proportional gain.
 CTRL_PLL_KP = 10.0;
@@ -46,9 +46,6 @@ CTRL_PQ_LPF_FC = 200.0;
 
 % Peak current command limit in PU.
 CTRL_CURRENT_LIMIT_PU = 0.9;
-
-% Minimum voltage magnitude used by the P/Q reference generator.
-CTRL_GRID_VMIN_PU = 0.1;
 
 % Active-power command slew limit in PU/s.
 CTRL_P_SLEW_PU_S = 5.0;
@@ -83,26 +80,11 @@ SINV_FDRC_FREEZE_ERROR_PU = 0.05;
 % BUILD_LEVEL 1 sinusoidal H-bridge voltage amplitude.
 SINV_LEVEL1_VOLTAGE_REF_PU = 0.35;
 
-% BUILD_LEVEL 2 peak current command with a resistive load.
-SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.20;
-
-% BUILD_LEVEL 3 signed grid active-power command; positive exports power.
-SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.10;
-
-% BUILD_LEVEL 3 grid reactive-power command.
-SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;
-
-% BUILD_LEVEL 4 measured active-power closed-loop target.
-SINV_LEVEL4_ACTIVE_POWER_REF_PU = 0.15;
-
 % Active-power outer-loop proportional gain.
 SINV_POWER_LOOP_KP = 0.6;
 
 % Active-power outer-loop integral gain per second.
 SINV_POWER_LOOP_KI = 8.0;
-
-% BUILD_LEVEL 5 physical DC bus voltage target.
-SINV_DC_BUS_REF_V = 60.0;
 
 % DC-bus outer-loop proportional gain.
 SINV_DC_BUS_LOOP_KP = 0.8;
@@ -116,8 +98,74 @@ SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.65;
 % Power and DC-bus outer-loop execution frequency.
 SINV_OUTER_LOOP_FREQUENCY_HZ = 1000.0;
 
+% Buck voltage-loop execution frequency.
+SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ = 1000.0;
+
+% Buck voltage-loop proportional gain.
+SINV_BUCK_VOLTAGE_LOOP_KP = 0.35;
+
+% Buck voltage-loop integral gain per second.
+SINV_BUCK_VOLTAGE_LOOP_KI = 30.0;
+
+% Buck current-loop proportional gain.
+SINV_BUCK_CURRENT_LOOP_KP = 0.20;
+
+% Buck current-loop integral gain per second.
+SINV_BUCK_CURRENT_LOOP_KI = 500.0;
+
+% BUILD_LEVEL 2 peak current command with a resistive load.
+SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.20;
+
+% BUILD_LEVEL 3 signed grid active-power command; positive exports power.
+SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.10;
+
+% BUILD_LEVEL 3 grid reactive-power command.
+SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;
+
+% BUILD_LEVEL 4 measured active-power closed-loop target.
+SINV_LEVEL4_ACTIVE_POWER_REF_PU = 0.15;
+
+% BUILD_LEVEL 5 physical DC bus voltage target.
+SINV_DC_BUS_REF_V = 80.0;
+
+% Buck output voltage target.
+SINV_BUCK_OUTPUT_REF_V = 60.0;
+
+% Buck inductor-current command limit in ampere.
+SINV_BUCK_CURRENT_LIMIT_A = 5.0;
+
 % Minimum operation-enabled transition delay.
 SINV_CIA402_OPERATION_ENABLE_DELAY_MS = 100;
+
+% Minimum DC bus voltage before Buck soft-start is allowed.
+SINV_BUCK_START_VBUS_MIN_V = 55.0;
+
+% Delay after the Buck start condition is met before PWM compare ramps.
+SINV_BUCK_START_DELAY_MS = 100;
+
+% Maximum Buck duty compare-command slew rate in PU per second.
+SINV_BUCK_DUTY_SLEW_PU_S = 2.0;
+
+% Buck duty-cycle lower clamp.
+SINV_BUCK_DUTY_MIN = 0.0;
+
+% Buck duty-cycle upper clamp.
+SINV_BUCK_DUTY_MAX = 1.0;
+
+% Maximum Buck current-loop duty correction around input-voltage feedforward.
+SINV_BUCK_DUTY_TRIM_LIMIT = 0.03;
+
+% Extra duty headroom above Buck voltage feedforward during startup and transients.
+SINV_BUCK_DUTY_FF_MARGIN = 0.02;
+
+% First-order low-pass coefficient for Buck input-voltage feedforward.
+SINV_BUCK_VIN_FF_LPF_ALPHA = 0.006;
+
+% Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward.
+SINV_BUCK_DUTY_FF_GAIN = 0.35;
+
+% Nominal grid frequency in Hz.
+CTRL_GRID_FREQUENCY = 50.0;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

@@ -382,6 +382,134 @@
       "description": "Current polarity deadband for PWM dead-time compensation."
     },
     {
+      "role": "buck_output_ref",
+      "macro": "SINV_BUCK_OUTPUT_REF_V",
+      "binding": {
+        "float": "48.0"
+      },
+      "description": "Buck output voltage target."
+    },
+    {
+      "role": "buck_start_vbus_min",
+      "macro": "SINV_BUCK_START_VBUS_MIN_V",
+      "binding": {
+        "float": "68.0"
+      },
+      "description": "Minimum DC bus voltage before Buck soft-start is allowed."
+    },
+    {
+      "role": "buck_start_delay",
+      "macro": "SINV_BUCK_START_DELAY_MS",
+      "binding": {
+        "number": "200"
+      },
+      "description": "Delay after the Buck start condition is met before PWM compare ramps."
+    },
+    {
+      "role": "buck_duty_slew",
+      "macro": "SINV_BUCK_DUTY_SLEW_PU_S",
+      "binding": {
+        "float": "2.0"
+      },
+      "description": "Maximum Buck duty compare-command slew rate in PU per second."
+    },
+    {
+      "role": "buck_duty_min",
+      "macro": "SINV_BUCK_DUTY_MIN",
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "Buck duty-cycle lower clamp."
+    },
+    {
+      "role": "buck_duty_max",
+      "macro": "SINV_BUCK_DUTY_MAX",
+      "binding": {
+        "float": "0.90"
+      },
+      "description": "Buck duty-cycle upper clamp."
+    },
+    {
+      "role": "buck_duty_trim_limit",
+      "macro": "SINV_BUCK_DUTY_TRIM_LIMIT",
+      "binding": {
+        "float": "0.03"
+      },
+      "description": "Maximum Buck current-loop duty correction around input-voltage feedforward."
+    },
+    {
+      "role": "buck_duty_ff_margin",
+      "macro": "SINV_BUCK_DUTY_FF_MARGIN",
+      "binding": {
+        "float": "0.02"
+      },
+      "description": "Extra duty headroom above Buck voltage feedforward during startup and transients."
+    },
+    {
+      "role": "buck_vin_ff_lpf_alpha",
+      "macro": "SINV_BUCK_VIN_FF_LPF_ALPHA",
+      "binding": {
+        "float": "0.006"
+      },
+      "description": "First-order low-pass coefficient for Buck input-voltage feedforward."
+    },
+    {
+      "role": "buck_duty_ff_gain",
+      "macro": "SINV_BUCK_DUTY_FF_GAIN",
+      "binding": {
+        "float": "0.35"
+      },
+      "description": "Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward."
+    },
+    {
+      "role": "buck_current_limit",
+      "macro": "SINV_BUCK_CURRENT_LIMIT_A",
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Buck inductor-current command limit in ampere."
+    },
+    {
+      "role": "buck_voltage_loop_frequency",
+      "macro": "SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ",
+      "binding": {
+        "float": "1000.0"
+      },
+      "description": "Buck voltage-loop execution frequency."
+    },
+    {
+      "role": "buck_voltage_loop_kp",
+      "macro": "SINV_BUCK_VOLTAGE_LOOP_KP",
+      "binding": {
+        "float": "0.35"
+      },
+      "description": "Buck voltage-loop proportional gain."
+    },
+    {
+      "role": "buck_voltage_loop_ki",
+      "macro": "SINV_BUCK_VOLTAGE_LOOP_KI",
+      "binding": {
+        "float": "30.0"
+      },
+      "description": "Buck voltage-loop integral gain per second."
+    },
+    {
+      "role": "buck_current_loop_kp",
+      "macro": "SINV_BUCK_CURRENT_LOOP_KP",
+      "binding": {
+        "float": "0.20"
+      },
+      "description": "Buck current-loop proportional gain."
+    },
+    {
+      "role": "buck_current_loop_ki",
+      "macro": "SINV_BUCK_CURRENT_LOOP_KI",
+      "binding": {
+        "float": "500.0"
+      },
+      "description": "Buck current-loop integral gain per second."
+    },
+    {
       "role": "fdrc_min_frequency",
       "macro": "CTRL_FDRC_MIN_FREQ",
       "binding": {

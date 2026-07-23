@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_sinv_rc projects.",
   "suite": "pgs_sinv_rc",
   "version": "1.0.0",
-  "updated_at": "2026-07-15",
+  "updated_at": "2026-07-23",
   "output_header": "sdpe_pgs_sinv_rc_common_settings.h",
   "hardware": [],
   "feature_macros": [
@@ -13,6 +13,7 @@
       "group": "Control Features",
       "macro": "SINV_ENABLE_REPETITIVE_CONTROL",
       "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Enable delayed insertion of the frequency-adaptive repetitive controller."
     },
@@ -20,6 +21,7 @@
       "group": "Control Features",
       "macro": "SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD",
       "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Enable grid-voltage feedforward for closed-current-loop build levels."
     },
@@ -27,6 +29,7 @@
       "group": "Runtime",
       "macro": "CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH",
       "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence."
     }
@@ -34,16 +37,20 @@
   "option_macros": [],
   "requirements": [
     {
-      "role": "grid_frequency",
-      "macro": "CTRL_GRID_FREQUENCY",
+      "role": "grid_min",
+      "macro": "CTRL_GRID_VMIN_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
-        "float": "50.0"
+        "float": "0.1"
       },
-      "description": "Nominal grid frequency in Hz."
+      "description": "Minimum voltage magnitude used by the P/Q reference generator."
     },
     {
       "role": "pll_kp",
       "macro": "CTRL_PLL_KP",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "10.0"
       },
@@ -52,6 +59,8 @@
     {
       "role": "pll_ti",
       "macro": "CTRL_PLL_TI",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.02"
       },
@@ -60,6 +69,8 @@
     {
       "role": "pll_lpf",
       "macro": "CTRL_PLL_LPF_FC",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "20.0"
       },
@@ -68,6 +79,8 @@
     {
       "role": "pll_epsilon",
       "macro": "CTRL_SPLL_EPSILON",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.005"
       },
@@ -76,6 +89,8 @@
     {
       "role": "pq_lpf",
       "macro": "CTRL_PQ_LPF_FC",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "200.0"
       },
@@ -84,22 +99,18 @@
     {
       "role": "current_limit",
       "macro": "CTRL_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.9"
       },
       "description": "Peak current command limit in PU."
     },
     {
-      "role": "grid_min",
-      "macro": "CTRL_GRID_VMIN_PU",
-      "binding": {
-        "float": "0.1"
-      },
-      "description": "Minimum voltage magnitude used by the P/Q reference generator."
-    },
-    {
       "role": "p_slew",
       "macro": "CTRL_P_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "5.0"
       },
@@ -108,6 +119,8 @@
     {
       "role": "q_slew",
       "macro": "CTRL_Q_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "5.0"
       },
@@ -116,6 +129,8 @@
     {
       "role": "current_deadband",
       "macro": "CTRL_CURRENT_DB_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.01"
       },
@@ -124,6 +139,8 @@
     {
       "role": "current_bandwidth",
       "macro": "SINV_CURRENT_LOOP_BANDWIDTH_HZ",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "600.0"
       },
@@ -132,6 +149,8 @@
     {
       "role": "fdrc_min_frequency",
       "macro": "CTRL_FDRC_MIN_FREQ",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "45.0"
       },
@@ -140,6 +159,8 @@
     {
       "role": "fdrc_delay",
       "macro": "SINV_FDRC_ENABLE_DELAY_MS",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "300"
       },
@@ -148,6 +169,8 @@
     {
       "role": "fdrc_gain",
       "macro": "SINV_FDRC_LEARNING_GAIN",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.10"
       },
@@ -156,6 +179,8 @@
     {
       "role": "fdrc_filter",
       "macro": "SINV_FDRC_Q_FILTER_HZ",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "1000.0"
       },
@@ -164,6 +189,8 @@
     {
       "role": "fdrc_lead",
       "macro": "SINV_FDRC_LEAD_STEPS",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "3.0"
       },
@@ -172,6 +199,8 @@
     {
       "role": "fdrc_error",
       "macro": "SINV_FDRC_FREEZE_ERROR_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.05"
       },
@@ -180,46 +209,18 @@
     {
       "role": "openloop_voltage",
       "macro": "SINV_LEVEL1_VOLTAGE_REF_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.35"
       },
       "description": "BUILD_LEVEL 1 sinusoidal H-bridge voltage amplitude."
     },
     {
-      "role": "level2_current",
-      "macro": "SINV_LEVEL2_CURRENT_REF_PEAK_PU",
-      "binding": {
-        "float": "0.20"
-      },
-      "description": "BUILD_LEVEL 2 peak current command with a resistive load."
-    },
-    {
-      "role": "level3_power",
-      "macro": "SINV_LEVEL3_ACTIVE_POWER_REF_PU",
-      "binding": {
-        "float": "0.10"
-      },
-      "description": "BUILD_LEVEL 3 signed grid active-power command; positive exports power."
-    },
-    {
-      "role": "level3_reactive",
-      "macro": "SINV_LEVEL3_REACTIVE_POWER_REF_PU",
-      "binding": {
-        "float": "0.0"
-      },
-      "description": "BUILD_LEVEL 3 grid reactive-power command."
-    },
-    {
-      "role": "level4_power",
-      "macro": "SINV_LEVEL4_ACTIVE_POWER_REF_PU",
-      "binding": {
-        "float": "0.15"
-      },
-      "description": "BUILD_LEVEL 4 measured active-power closed-loop target."
-    },
-    {
       "role": "power_kp",
       "macro": "SINV_POWER_LOOP_KP",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.6"
       },
@@ -228,22 +229,18 @@
     {
       "role": "power_ki",
       "macro": "SINV_POWER_LOOP_KI",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "8.0"
       },
       "description": "Active-power outer-loop integral gain per second."
     },
     {
-      "role": "bus_ref",
-      "macro": "SINV_DC_BUS_REF_V",
-      "binding": {
-        "float": "60.0"
-      },
-      "description": "BUILD_LEVEL 5 physical DC bus voltage target."
-    },
-    {
       "role": "bus_kp",
       "macro": "SINV_DC_BUS_LOOP_KP",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.8"
       },
@@ -252,6 +249,8 @@
     {
       "role": "bus_ki",
       "macro": "SINV_DC_BUS_LOOP_KI",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "12.0"
       },
@@ -260,6 +259,8 @@
     {
       "role": "outer_limit",
       "macro": "SINV_OUTER_LOOP_POWER_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "0.65"
       },
@@ -268,18 +269,242 @@
     {
       "role": "outer_frequency",
       "macro": "SINV_OUTER_LOOP_FREQUENCY_HZ",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "float": "1000.0"
       },
       "description": "Power and DC-bus outer-loop execution frequency."
     },
     {
+      "role": "buck_voltage_loop_frequency",
+      "macro": "SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1000.0"
+      },
+      "description": "Buck voltage-loop execution frequency."
+    },
+    {
+      "role": "buck_voltage_loop_kp",
+      "macro": "SINV_BUCK_VOLTAGE_LOOP_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.35"
+      },
+      "description": "Buck voltage-loop proportional gain."
+    },
+    {
+      "role": "buck_voltage_loop_ki",
+      "macro": "SINV_BUCK_VOLTAGE_LOOP_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "30.0"
+      },
+      "description": "Buck voltage-loop integral gain per second."
+    },
+    {
+      "role": "buck_current_loop_kp",
+      "macro": "SINV_BUCK_CURRENT_LOOP_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.20"
+      },
+      "description": "Buck current-loop proportional gain."
+    },
+    {
+      "role": "buck_current_loop_ki",
+      "macro": "SINV_BUCK_CURRENT_LOOP_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "500.0"
+      },
+      "description": "Buck current-loop integral gain per second."
+    },
+    {
+      "role": "level2_current",
+      "macro": "SINV_LEVEL2_CURRENT_REF_PEAK_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.20"
+      },
+      "description": "BUILD_LEVEL 2 peak current command with a resistive load."
+    },
+    {
+      "role": "level3_power",
+      "macro": "SINV_LEVEL3_ACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.10"
+      },
+      "description": "BUILD_LEVEL 3 signed grid active-power command; positive exports power."
+    },
+    {
+      "role": "level3_reactive",
+      "macro": "SINV_LEVEL3_REACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "BUILD_LEVEL 3 grid reactive-power command."
+    },
+    {
+      "role": "level4_power",
+      "macro": "SINV_LEVEL4_ACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.15"
+      },
+      "description": "BUILD_LEVEL 4 measured active-power closed-loop target."
+    },
+    {
+      "role": "bus_ref",
+      "macro": "SINV_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "80.0"
+      },
+      "description": "BUILD_LEVEL 5 physical DC bus voltage target."
+    },
+    {
+      "role": "buck_output_ref",
+      "macro": "SINV_BUCK_OUTPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "60.0"
+      },
+      "description": "Buck output voltage target."
+    },
+    {
+      "role": "buck_current_limit",
+      "macro": "SINV_BUCK_CURRENT_LIMIT_A",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Buck inductor-current command limit in ampere."
+    },
+    {
       "role": "startup_delay",
       "macro": "SINV_CIA402_OPERATION_ENABLE_DELAY_MS",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "100"
       },
       "description": "Minimum operation-enabled transition delay."
+    },
+    {
+      "role": "buck_start_vbus_min",
+      "macro": "SINV_BUCK_START_VBUS_MIN_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "55.0"
+      },
+      "description": "Minimum DC bus voltage before Buck soft-start is allowed."
+    },
+    {
+      "role": "buck_start_delay",
+      "macro": "SINV_BUCK_START_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "100"
+      },
+      "description": "Delay after the Buck start condition is met before PWM compare ramps."
+    },
+    {
+      "role": "buck_duty_slew",
+      "macro": "SINV_BUCK_DUTY_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "2.0"
+      },
+      "description": "Maximum Buck duty compare-command slew rate in PU per second."
+    },
+    {
+      "role": "buck_duty_min",
+      "macro": "SINV_BUCK_DUTY_MIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "Buck duty-cycle lower clamp."
+    },
+    {
+      "role": "buck_duty_max",
+      "macro": "SINV_BUCK_DUTY_MAX",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.0"
+      },
+      "description": "Buck duty-cycle upper clamp."
+    },
+    {
+      "role": "buck_duty_trim_limit",
+      "macro": "SINV_BUCK_DUTY_TRIM_LIMIT",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.03"
+      },
+      "description": "Maximum Buck current-loop duty correction around input-voltage feedforward."
+    },
+    {
+      "role": "buck_duty_ff_margin",
+      "macro": "SINV_BUCK_DUTY_FF_MARGIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.02"
+      },
+      "description": "Extra duty headroom above Buck voltage feedforward during startup and transients."
+    },
+    {
+      "role": "buck_vin_ff_lpf_alpha",
+      "macro": "SINV_BUCK_VIN_FF_LPF_ALPHA",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.006"
+      },
+      "description": "First-order low-pass coefficient for Buck input-voltage feedforward."
+    },
+    {
+      "role": "buck_duty_ff_gain",
+      "macro": "SINV_BUCK_DUTY_FF_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.35"
+      },
+      "description": "Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward."
+    },
+    {
+      "role": "grid_frequency",
+      "macro": "CTRL_GRID_FREQUENCY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "50.0"
+      },
+      "description": "Nominal grid frequency in Hz."
     }
   ],
   "requirement_groups": [
@@ -314,7 +539,12 @@
         "bus_kp",
         "bus_ki",
         "outer_limit",
-        "outer_frequency"
+        "outer_frequency",
+        "buck_voltage_loop_frequency",
+        "buck_voltage_loop_kp",
+        "buck_voltage_loop_ki",
+        "buck_current_loop_kp",
+        "buck_current_loop_ki"
       ]
     },
     {
@@ -324,13 +554,24 @@
         "level3_power",
         "level3_reactive",
         "level4_power",
-        "bus_ref"
+        "bus_ref",
+        "buck_output_ref",
+        "buck_current_limit"
       ]
     },
     {
       "name": "Runtime Parameters",
       "requirements": [
-        "startup_delay"
+        "startup_delay",
+        "buck_start_vbus_min",
+        "buck_start_delay",
+        "buck_duty_slew",
+        "buck_duty_min",
+        "buck_duty_max",
+        "buck_duty_trim_limit",
+        "buck_duty_ff_margin",
+        "buck_vin_ff_lpf_alpha",
+        "buck_duty_ff_gain"
       ]
     },
     {

@@ -29,6 +29,7 @@
 #include <ctl/component/digital_power/sinv/sms_pq.h>
 #include <ctl/component/digital_power/sinv/spll_sogi.h>
 #include <ctl/component/interface/hpwm_modulator.h>
+#include <ctl/component/intrinsic/continuous/continuous_pid.h>
 #include <ctl/component/intrinsic/discrete/signal_generator.h>
 
 #ifdef __cplusplus
@@ -54,9 +55,34 @@ extern ctl_ramp_generator_t rg;
 extern adc_channel_t adc_v_grid;
 extern adc_channel_t adc_i_ac;
 extern adc_channel_t adc_v_bus;
+extern adc_channel_t adc_i_buck;
+extern adc_channel_t adc_v_buck_in;
+extern adc_channel_t adc_v_buck_out;
 
 // Output channel
 extern single_phase_H_modulation_t hpwm;
+
+typedef struct _tag_sinv_buck_ctrl
+{
+    ctl_pid_t voltage_pid;
+    ctl_pid_t current_pid;
+    ctrl_gt v_ref;
+    ctrl_gt i_ref;
+    ctrl_gt v_in_ff;
+    ctrl_gt duty_ff;
+    ctrl_gt duty_trim;
+    ctrl_gt duty_cmd;
+    ctrl_gt duty;
+    ctrl_gt duty_soft_limit;
+    ctrl_gt duty_step;
+    uint32_t startup_delay_count;
+    uint32_t startup_counter;
+    uint32_t voltage_loop_counter;
+    pwm_gt pwm_cmp;
+    fast_gt flag_enable;
+} sinv_buck_ctrl_t;
+
+extern sinv_buck_ctrl_t buck_ctrl;
 
 // Protection module
 extern ctl_sinv_protect_t protection;
@@ -83,6 +109,9 @@ fast_gt ctl_exec_dc_voltage_ready(void);
 fast_gt ctl_check_pll_locked(void);
 fast_gt ctl_check_compliance(void);
 fast_gt ctl_fault_recover_routine(void);
+void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck);
+void ctl_clear_sinv_buck(sinv_buck_ctrl_t* buck);
+pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, ctrl_gt i_l, fast_gt enable);
 
 //=================================================================================================
 // Background Controller Tasks
@@ -179,13 +208,16 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
 #else
             ctl_step_single_phase_H_modulation(&hpwm, rc_core.v_out_ref, adc_i_ac.control_port.value);
 #endif // BUILD_LEVEL
-
-
         }
         else
         {
             ctl_clear_single_phase_H_modulation(&hpwm);
         }
+
+        ctl_step_sinv_buck(&buck_ctrl, adc_v_bus.control_port.value,
+                           adc_v_buck_out.control_port.value, adc_i_buck.control_port.value,
+                           cia402_sm.state_word.bits.operation_enabled &&
+                               (adc_v_bus.control_port.value >= float2ctrl(SINV_BUCK_START_VBUS_MIN_V / CTRL_VOLTAGE_BASE)));
 
     }
 }

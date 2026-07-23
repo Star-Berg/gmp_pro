@@ -198,9 +198,9 @@ extern "C"
 #define SINV_MODEL_DIODE_VF (0.5f)
 
 /**
- * @brief DC bus overvoltage threshold for simulation startup transients.
+ * @brief DC bus overvoltage threshold.
  */
-#define CTRL_PROT_VBUS_MAX (100.0f)
+#define CTRL_PROT_VBUS_MAX (90.0f)
 
 /**
  * @brief Fast AC peak-current threshold.

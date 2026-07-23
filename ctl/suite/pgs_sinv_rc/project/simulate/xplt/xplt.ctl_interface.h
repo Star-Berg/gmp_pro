@@ -10,7 +10,10 @@ typedef enum _tag_sinv_adc_index_items {
     SINV_ADC_ID_IAC = 0,
     SINV_ADC_ID_VBUS = 2,
     SINV_ADC_ID_VAC = 4,
-    SINV_ADC_SENSOR_NUMBER = 6
+    SINV_ADC_ID_BUCK_IL = 6,
+    SINV_ADC_ID_BUCK_VIN = 7,
+    SINV_ADC_ID_BUCK_VOUT = 8,
+    SINV_ADC_SENSOR_NUMBER = 9
 } sinv_adc_index_items;
 extern fast_gt g_sinv_sim_enable_pending;
 
@@ -19,12 +22,16 @@ GMP_STATIC_INLINE void ctl_input_callback(void)
     ctl_step_adc_channel(&adc_v_bus, simulink_rx_buffer.adc_result[SINV_ADC_ID_VBUS]);
     ctl_step_adc_channel(&adc_v_grid, simulink_rx_buffer.adc_result[SINV_ADC_ID_VAC]);
     ctl_step_adc_channel(&adc_i_ac, simulink_rx_buffer.adc_result[SINV_ADC_ID_IAC]);
+    ctl_step_adc_channel(&adc_i_buck, simulink_rx_buffer.adc_result[SINV_ADC_ID_BUCK_IL]);
+    ctl_step_adc_channel(&adc_v_buck_in, simulink_rx_buffer.adc_result[SINV_ADC_ID_BUCK_VIN]);
+    ctl_step_adc_channel(&adc_v_buck_out, simulink_rx_buffer.adc_result[SINV_ADC_ID_BUCK_VOUT]);
 }
 
 GMP_STATIC_INLINE void ctl_output_callback(void)
 {
     simulink_tx_buffer.pwm_cmp[0] = ctl_get_single_phase_modulation_L_phase(&hpwm);
     simulink_tx_buffer.pwm_cmp[1] = ctl_get_single_phase_modulation_N_phase(&hpwm);
+    simulink_tx_buffer.pwm_cmp[2] = buck_ctrl.pwm_cmp;
     simulink_tx_buffer.monitor[0] = ctrl2float(adc_v_grid.control_port.value) * CTRL_VOLTAGE_BASE;
     simulink_tx_buffer.monitor[1] = ctrl2float(adc_i_ac.control_port.value) * CTRL_CURRENT_BASE;
     simulink_tx_buffer.monitor[2] = ctrl2float(adc_v_bus.control_port.value) * CTRL_VOLTAGE_BASE;
@@ -33,10 +40,10 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     simulink_tx_buffer.monitor[5] = ctrl2float(pll.frequency) * CTRL_GRID_FREQUENCY;
     simulink_tx_buffer.monitor[6] = ctrl2float(pq_meter.active_power_p);
     simulink_tx_buffer.monitor[7] = ctrl2float(pq_meter.reactive_power_q);
-    simulink_tx_buffer.monitor[8] = ctrl2float(rc_core.current_error);
-    simulink_tx_buffer.monitor[9] = ctrl2float(rc_core.u_qpr);
-    simulink_tx_buffer.monitor[10] = ctrl2float(rc_core.u_fdrc);
-    simulink_tx_buffer.monitor[11] = (double)rc_core.flag_enable_fdrc;
+    simulink_tx_buffer.monitor[8] = ctrl2float(adc_v_buck_out.control_port.value) * CTRL_VOLTAGE_BASE;
+    simulink_tx_buffer.monitor[9] = ctrl2float(adc_i_buck.control_port.value) * CTRL_CURRENT_BASE;
+    simulink_tx_buffer.monitor[10] = ctrl2float(buck_ctrl.duty);
+    simulink_tx_buffer.monitor[11] = (double)buck_ctrl.flag_enable;
     simulink_tx_buffer.monitor[12] = (double)cia402_sm.current_state;
     simulink_tx_buffer.monitor[13] = (double)cia402_sm.current_cmd;
     simulink_tx_buffer.monitor[14] = (double)protection.active_errors;

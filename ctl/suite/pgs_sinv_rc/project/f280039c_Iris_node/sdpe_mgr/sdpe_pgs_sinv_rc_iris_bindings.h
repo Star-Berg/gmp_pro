@@ -313,6 +313,86 @@ extern "C"
 #define CTRL_CURRENT_DB_PU (0.01f)
 
 /**
+ * @brief Buck output voltage target.
+ */
+#define SINV_BUCK_OUTPUT_REF_V (48.0f)
+
+/**
+ * @brief Minimum DC bus voltage before Buck soft-start is allowed.
+ */
+#define SINV_BUCK_START_VBUS_MIN_V (68.0f)
+
+/**
+ * @brief Delay after the Buck start condition is met before PWM compare ramps.
+ */
+#define SINV_BUCK_START_DELAY_MS (200)
+
+/**
+ * @brief Maximum Buck duty compare-command slew rate in PU per second.
+ */
+#define SINV_BUCK_DUTY_SLEW_PU_S (2.0f)
+
+/**
+ * @brief Buck duty-cycle lower clamp.
+ */
+#define SINV_BUCK_DUTY_MIN (0.0f)
+
+/**
+ * @brief Buck duty-cycle upper clamp.
+ */
+#define SINV_BUCK_DUTY_MAX (0.90f)
+
+/**
+ * @brief Maximum Buck current-loop duty correction around input-voltage feedforward.
+ */
+#define SINV_BUCK_DUTY_TRIM_LIMIT (0.03f)
+
+/**
+ * @brief Extra duty headroom above Buck voltage feedforward during startup and transients.
+ */
+#define SINV_BUCK_DUTY_FF_MARGIN (0.02f)
+
+/**
+ * @brief First-order low-pass coefficient for Buck input-voltage feedforward.
+ */
+#define SINV_BUCK_VIN_FF_LPF_ALPHA (0.006f)
+
+/**
+ * @brief Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward.
+ */
+#define SINV_BUCK_DUTY_FF_GAIN (0.35f)
+
+/**
+ * @brief Buck inductor-current command limit in ampere.
+ */
+#define SINV_BUCK_CURRENT_LIMIT_A (5.0f)
+
+/**
+ * @brief Buck voltage-loop execution frequency.
+ */
+#define SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ (1000.0f)
+
+/**
+ * @brief Buck voltage-loop proportional gain.
+ */
+#define SINV_BUCK_VOLTAGE_LOOP_KP (0.35f)
+
+/**
+ * @brief Buck voltage-loop integral gain per second.
+ */
+#define SINV_BUCK_VOLTAGE_LOOP_KI (30.0f)
+
+/**
+ * @brief Buck current-loop proportional gain.
+ */
+#define SINV_BUCK_CURRENT_LOOP_KP (0.20f)
+
+/**
+ * @brief Buck current-loop integral gain per second.
+ */
+#define SINV_BUCK_CURRENT_LOOP_KI (500.0f)
+
+/**
  * @brief Minimum fundamental frequency tracked by the repetitive controller in Hz.
  */
 #define CTRL_FDRC_MIN_FREQ (45.0f)
