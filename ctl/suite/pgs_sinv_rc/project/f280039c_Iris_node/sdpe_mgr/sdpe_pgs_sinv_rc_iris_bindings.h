@@ -28,7 +28,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-15"
+#define SDPE_PROJECT_UPDATED_AT "2026-07-23"
 
 //=================================================================================================
 /**
@@ -198,11 +198,6 @@ extern "C"
  */
 
 /**
- * @brief Startup delay in ms.
- */
-#define CTRL_STARTUP_DELAY (100)
-
-/**
  * @brief Controller ISR frequency.
  */
 #define CONTROLLER_FREQUENCY (20e3)
@@ -253,11 +248,6 @@ extern "C"
 #define CTRL_CURRENT_BASE (14.14f)
 
 /**
- * @brief Nominal AC grid/fundamental frequency in Hz.
- */
-#define CTRL_GRID_FREQUENCY (50.0f)
-
-/**
  * @brief Total AC-side filter/grid inductance in H.
  */
 #define CTRL_AC_INDUCTANCE (0.003f)
@@ -266,6 +256,76 @@ extern "C"
  * @brief Total AC-side series resistance in Ohm.
  */
 #define CTRL_AC_RESISTANCE (0.1f)
+
+/**
+ * @brief DC bus voltage sensing gain from the LVFB inverter voltage sensor.
+ */
+#define CTRL_DC_VOLTAGE_SENSITIVITY GMP_LVFB_VOLTAGE_SENSITIVITY
+
+/**
+ * @brief DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
+ */
+#define CTRL_DC_VOLTAGE_BIAS GMP_LVFB_VOLTAGE_BIAS_V
+
+/**
+ * @brief AC voltage sensing gain from the grid LC filter voltage sense path.
+ */
+#define CTRL_AC_VOLTAGE_SENSITIVITY HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN
+
+/**
+ * @brief AC voltage sensing ADC bias from the grid LC filter.
+ */
+#define CTRL_AC_VOLTAGE_BIAS HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V
+
+/**
+ * @brief AC current sensing sensitivity from the LVFB inverter current sensor.
+ */
+#define CTRL_AC_CURRENT_SENSITIVITY GMP_LVFB_CURRENT_SENSITIVITY
+
+/**
+ * @brief AC current sensing ADC bias from the LVFB inverter current sensor.
+ */
+#define CTRL_AC_CURRENT_BIAS GMP_LVFB_CURRENT_BIAS_V
+
+/**
+ * @brief Minimum PLL voltage magnitude used by P/Q reference division.
+ */
+#define CTRL_GRID_VMIN_PU (0.1f)
+
+/**
+ * @brief Maximum hardware DC bus voltage from the LVFB inverter board.
+ */
+#define CTRL_MAX_HW_VOLTAGE GMP_LVFB_VBUS_MAX_V
+
+/**
+ * @brief Maximum continuous RMS hardware current from the LVFB inverter board.
+ */
+#define CTRL_MAX_HW_CURRENT GMP_LVFB_CURRENT_MAX_RMS_A
+
+/**
+ * @brief Project DC bus over-voltage protection threshold.
+ */
+#define CTRL_PROT_VBUS_MAX (100.0f)
+
+/**
+ * @brief Fast AC peak-current trip threshold in A.
+ */
+#define CTRL_PROT_IAC_PEAK_MAX (CTRL_MAX_HW_CURRENT * 0.9f * 1.41421356f)
+
+/**
+ * @brief Maximum unsaturated modulation command before controller-divergence trip.
+ */
+#define CTRL_PROT_VCTRL_MAX_PU (1.5f)
+
+/**
+ * @brief Minimum physical DC-bus voltage accepted by the startup state machine.
+ */
+#define CTRL_DCBUS_READY_MIN (CTRL_DCBUS_VOLTAGE * 0.8f)
+
+/**
+ * @brief Maximum physical DC-bus voltage accepted by the startup state machine.
+ */
+#define CTRL_DCBUS_READY_MAX (CTRL_PROT_VBUS_MAX)
 
 /**
  * @brief Single-phase PLL proportional gain.
@@ -293,11 +353,6 @@ extern "C"
 #define CTRL_CURRENT_LIMIT_PU (1.5f)
 
 /**
- * @brief Minimum PLL voltage magnitude used by P/Q reference division.
- */
-#define CTRL_GRID_VMIN_PU (0.1f)
-
-/**
  * @brief Active-power command slew limit in PU/s.
  */
 #define CTRL_P_SLEW_PU_S (10.0f)
@@ -308,14 +363,59 @@ extern "C"
 #define CTRL_Q_SLEW_PU_S (20.0f)
 
 /**
+ * @brief BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
+ */
+#define SINV_POWER_FACTOR_REF (1.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+ */
+#define SINV_POWER_FACTOR_Q_SIGN (1.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
+ */
+#define SINV_POWER_FACTOR_Q_GAIN (1.0f)
+
+/**
  * @brief Current polarity deadband for PWM dead-time compensation.
  */
 #define CTRL_CURRENT_DB_PU (0.01f)
 
 /**
+ * @brief Minimum fundamental frequency tracked by the repetitive controller in Hz.
+ */
+#define CTRL_FDRC_MIN_FREQ (45.0f)
+
+/**
+ * @brief ADC calibration timeout in ms.
+ */
+#define TIMEOUT_ADC_CALIB_MS (3000)
+
+/**
+ * @brief SPLL close-loop convergence criterion.
+ */
+#define CTRL_SPLL_EPSILON ((float2ctrl(0.005)))
+
+/**
+ * @brief Startup delay in ms.
+ */
+#define CTRL_STARTUP_DELAY (100)
+
+/**
+ * @brief Nominal AC grid/fundamental frequency in Hz.
+ */
+#define CTRL_GRID_FREQUENCY (50.0f)
+
+/**
  * @brief Buck output voltage target.
  */
 #define SINV_BUCK_OUTPUT_REF_V (48.0f)
+
+/**
+ * @brief Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the main Buck output soft-start parameter; SINV_BUCK_DUTY_SLEW_PU_S only limits PWM duty-command jumps.
+ */
+#define SINV_BUCK_VREF_SLEW_V_S (120.0f)
 
 /**
  * @brief Minimum DC bus voltage before Buck soft-start is allowed.
@@ -391,86 +491,6 @@ extern "C"
  * @brief Buck current-loop integral gain per second.
  */
 #define SINV_BUCK_CURRENT_LOOP_KI (500.0f)
-
-/**
- * @brief Minimum fundamental frequency tracked by the repetitive controller in Hz.
- */
-#define CTRL_FDRC_MIN_FREQ (45.0f)
-
-/**
- * @brief AC voltage sensing gain from the grid LC filter voltage sense path.
- */
-#define CTRL_AC_VOLTAGE_SENSITIVITY HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN
-
-/**
- * @brief AC voltage sensing ADC bias from the grid LC filter.
- */
-#define CTRL_AC_VOLTAGE_BIAS HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V
-
-/**
- * @brief AC current sensing sensitivity from the LVFB inverter current sensor.
- */
-#define CTRL_AC_CURRENT_SENSITIVITY GMP_LVFB_CURRENT_SENSITIVITY
-
-/**
- * @brief AC current sensing ADC bias from the LVFB inverter current sensor.
- */
-#define CTRL_AC_CURRENT_BIAS GMP_LVFB_CURRENT_BIAS_V
-
-/**
- * @brief DC bus voltage sensing gain from the LVFB inverter voltage sensor.
- */
-#define CTRL_DC_VOLTAGE_SENSITIVITY GMP_LVFB_VOLTAGE_SENSITIVITY
-
-/**
- * @brief DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
- */
-#define CTRL_DC_VOLTAGE_BIAS GMP_LVFB_VOLTAGE_BIAS_V
-
-/**
- * @brief Maximum hardware DC bus voltage from the LVFB inverter board.
- */
-#define CTRL_MAX_HW_VOLTAGE GMP_LVFB_VBUS_MAX_V
-
-/**
- * @brief Maximum continuous RMS hardware current from the LVFB inverter board.
- */
-#define CTRL_MAX_HW_CURRENT GMP_LVFB_CURRENT_MAX_RMS_A
-
-/**
- * @brief Project DC bus over-voltage protection threshold.
- */
-#define CTRL_PROT_VBUS_MAX (100.0f)
-
-/**
- * @brief Fast AC peak-current trip threshold in A.
- */
-#define CTRL_PROT_IAC_PEAK_MAX (CTRL_MAX_HW_CURRENT * 0.9f * 1.41421356f)
-
-/**
- * @brief Maximum unsaturated modulation command before controller-divergence trip.
- */
-#define CTRL_PROT_VCTRL_MAX_PU (1.5f)
-
-/**
- * @brief Minimum physical DC-bus voltage accepted by the startup state machine.
- */
-#define CTRL_DCBUS_READY_MIN (CTRL_DCBUS_VOLTAGE * 0.8f)
-
-/**
- * @brief Maximum physical DC-bus voltage accepted by the startup state machine.
- */
-#define CTRL_DCBUS_READY_MAX (CTRL_PROT_VBUS_MAX)
-
-/**
- * @brief ADC calibration timeout in ms.
- */
-#define TIMEOUT_ADC_CALIB_MS (3000)
-
-/**
- * @brief SPLL close-loop convergence criterion.
- */
-#define CTRL_SPLL_EPSILON ((float2ctrl(0.005)))
 
 // User project tail code
 /* Compatibility with framework revisions that use the historical misspelling. */

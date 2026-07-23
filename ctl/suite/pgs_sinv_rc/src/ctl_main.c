@@ -358,7 +358,8 @@ void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck)
     ctl_set_pid_int_limit(&buck->current_pid, float2ctrl(SINV_BUCK_DUTY_TRIM_LIMIT),
                           float2ctrl(-SINV_BUCK_DUTY_TRIM_LIMIT));
 
-    buck->v_ref = float2ctrl(SINV_BUCK_OUTPUT_REF_V / CTRL_VOLTAGE_BASE);
+    buck->v_ref_target = float2ctrl(SINV_BUCK_OUTPUT_REF_V / CTRL_VOLTAGE_BASE);
+    buck->v_ref_step = float2ctrl(SINV_BUCK_VREF_SLEW_V_S / CTRL_VOLTAGE_BASE / CONTROLLER_FREQUENCY);
     buck->duty_step = float2ctrl(SINV_BUCK_DUTY_SLEW_PU_S / CONTROLLER_FREQUENCY);
     buck->startup_delay_count = (uint32_t)((float)SINV_BUCK_START_DELAY_MS * (float)CONTROLLER_FREQUENCY / 1000.0f);
     ctl_clear_sinv_buck(buck);
@@ -368,6 +369,7 @@ void ctl_clear_sinv_buck(sinv_buck_ctrl_t* buck)
 {
     ctl_clear_pid(&buck->voltage_pid);
     ctl_clear_pid(&buck->current_pid);
+    buck->v_ref = float2ctrl(0.0f);
     buck->i_ref = float2ctrl(0.0f);
     buck->v_in_ff = float2ctrl(0.0f);
     buck->duty_ff = float2ctrl(0.0f);
@@ -397,6 +399,10 @@ pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, c
     }
 
     buck->flag_enable = 1;
+    buck->v_ref += buck->v_ref_step;
+    if (buck->v_ref > buck->v_ref_target)
+        buck->v_ref = buck->v_ref_target;
+
     buck->duty_soft_limit += buck->duty_step;
     if (buck->duty_soft_limit > float2ctrl(SINV_BUCK_DUTY_MAX))
         buck->duty_soft_limit = float2ctrl(SINV_BUCK_DUTY_MAX);

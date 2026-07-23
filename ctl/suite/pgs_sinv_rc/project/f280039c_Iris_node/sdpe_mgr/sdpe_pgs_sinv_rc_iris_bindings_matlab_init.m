@@ -13,7 +13,7 @@ SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 SDPE_PROJECT_VERSION = '0.2.0';
 
-SDPE_PROJECT_UPDATED_AT = '2026-07-15';
+SDPE_PROJECT_UPDATED_AT = '2026-07-23';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -423,9 +423,6 @@ INV_VBUS_RESULT_BASE = 'ADC_CH3_RESULT_BASE';
 INV_VBUS = 'ADC_CH3';
 
 %% Requirement bindings
-% Startup delay in ms.
-CTRL_STARTUP_DELAY = 100;
-
 % Controller ISR frequency.
 CONTROLLER_FREQUENCY = 20e3;
 
@@ -456,14 +453,53 @@ CTRL_VOLTAGE_BASE = 34.0;
 % Current per-unit base, using peak value.
 CTRL_CURRENT_BASE = 14.14;
 
-% Nominal AC grid/fundamental frequency in Hz.
-CTRL_GRID_FREQUENCY = 50.0;
-
 % Total AC-side filter/grid inductance in H.
 CTRL_AC_INDUCTANCE = 0.003;
 
 % Total AC-side series resistance in Ohm.
 CTRL_AC_RESISTANCE = 0.1;
+
+% DC bus voltage sensing gain from the LVFB inverter voltage sensor.
+CTRL_DC_VOLTAGE_SENSITIVITY = GMP_LVFB_VOLTAGE_SENSITIVITY;
+
+% DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
+CTRL_DC_VOLTAGE_BIAS = GMP_LVFB_VOLTAGE_BIAS_V;
+
+% AC voltage sensing gain from the grid LC filter voltage sense path.
+CTRL_AC_VOLTAGE_SENSITIVITY = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN;
+
+% AC voltage sensing ADC bias from the grid LC filter.
+CTRL_AC_VOLTAGE_BIAS = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V;
+
+% AC current sensing sensitivity from the LVFB inverter current sensor.
+CTRL_AC_CURRENT_SENSITIVITY = GMP_LVFB_CURRENT_SENSITIVITY;
+
+% AC current sensing ADC bias from the LVFB inverter current sensor.
+CTRL_AC_CURRENT_BIAS = GMP_LVFB_CURRENT_BIAS_V;
+
+% Minimum PLL voltage magnitude used by P/Q reference division.
+CTRL_GRID_VMIN_PU = 0.1;
+
+% Maximum hardware DC bus voltage from the LVFB inverter board.
+CTRL_MAX_HW_VOLTAGE = GMP_LVFB_VBUS_MAX_V;
+
+% Maximum continuous RMS hardware current from the LVFB inverter board.
+CTRL_MAX_HW_CURRENT = GMP_LVFB_CURRENT_MAX_RMS_A;
+
+% Project DC bus over-voltage protection threshold.
+CTRL_PROT_VBUS_MAX = 100.0;
+
+% Fast AC peak-current trip threshold in A.
+CTRL_PROT_IAC_PEAK_MAX = CTRL_MAX_HW_CURRENT * 0.9 * 1.41421356;
+
+% Maximum unsaturated modulation command before controller-divergence trip.
+CTRL_PROT_VCTRL_MAX_PU = 1.5;
+
+% Minimum physical DC-bus voltage accepted by the startup state machine.
+CTRL_DCBUS_READY_MIN = CTRL_DCBUS_VOLTAGE * 0.8;
+
+% Maximum physical DC-bus voltage accepted by the startup state machine.
+CTRL_DCBUS_READY_MAX = CTRL_PROT_VBUS_MAX;
 
 % Single-phase PLL proportional gain.
 CTRL_PLL_KP = 10.0;
@@ -480,20 +516,44 @@ CTRL_PQ_LPF_FC = 200.0;
 % Peak current-reference limit in per unit.
 CTRL_CURRENT_LIMIT_PU = 1.5;
 
-% Minimum PLL voltage magnitude used by P/Q reference division.
-CTRL_GRID_VMIN_PU = 0.1;
-
 % Active-power command slew limit in PU/s.
 CTRL_P_SLEW_PU_S = 10.0;
 
 % Reactive-power command slew limit in PU/s.
 CTRL_Q_SLEW_PU_S = 20.0;
 
+% BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
+SINV_POWER_FACTOR_REF = 1.0;
+
+% BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+SINV_POWER_FACTOR_Q_SIGN = 1.0;
+
+% BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
+SINV_POWER_FACTOR_Q_GAIN = 1.0;
+
 % Current polarity deadband for PWM dead-time compensation.
 CTRL_CURRENT_DB_PU = 0.01;
 
+% Minimum fundamental frequency tracked by the repetitive controller in Hz.
+CTRL_FDRC_MIN_FREQ = 45.0;
+
+% ADC calibration timeout in ms.
+TIMEOUT_ADC_CALIB_MS = 3000;
+
+% SPLL close-loop convergence criterion.
+CTRL_SPLL_EPSILON = float2ctrl(0.005);
+
+% Startup delay in ms.
+CTRL_STARTUP_DELAY = 100;
+
+% Nominal AC grid/fundamental frequency in Hz.
+CTRL_GRID_FREQUENCY = 50.0;
+
 % Buck output voltage target.
 SINV_BUCK_OUTPUT_REF_V = 48.0;
+
+% Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the main Buck output soft-start parameter; SINV_BUCK_DUTY_SLEW_PU_S only limits PWM duty-command jumps.
+SINV_BUCK_VREF_SLEW_V_S = 120.0;
 
 % Minimum DC bus voltage before Buck soft-start is allowed.
 SINV_BUCK_START_VBUS_MIN_V = 68.0;
@@ -539,54 +599,6 @@ SINV_BUCK_CURRENT_LOOP_KP = 0.20;
 
 % Buck current-loop integral gain per second.
 SINV_BUCK_CURRENT_LOOP_KI = 500.0;
-
-% Minimum fundamental frequency tracked by the repetitive controller in Hz.
-CTRL_FDRC_MIN_FREQ = 45.0;
-
-% AC voltage sensing gain from the grid LC filter voltage sense path.
-CTRL_AC_VOLTAGE_SENSITIVITY = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN;
-
-% AC voltage sensing ADC bias from the grid LC filter.
-CTRL_AC_VOLTAGE_BIAS = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V;
-
-% AC current sensing sensitivity from the LVFB inverter current sensor.
-CTRL_AC_CURRENT_SENSITIVITY = GMP_LVFB_CURRENT_SENSITIVITY;
-
-% AC current sensing ADC bias from the LVFB inverter current sensor.
-CTRL_AC_CURRENT_BIAS = GMP_LVFB_CURRENT_BIAS_V;
-
-% DC bus voltage sensing gain from the LVFB inverter voltage sensor.
-CTRL_DC_VOLTAGE_SENSITIVITY = GMP_LVFB_VOLTAGE_SENSITIVITY;
-
-% DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
-CTRL_DC_VOLTAGE_BIAS = GMP_LVFB_VOLTAGE_BIAS_V;
-
-% Maximum hardware DC bus voltage from the LVFB inverter board.
-CTRL_MAX_HW_VOLTAGE = GMP_LVFB_VBUS_MAX_V;
-
-% Maximum continuous RMS hardware current from the LVFB inverter board.
-CTRL_MAX_HW_CURRENT = GMP_LVFB_CURRENT_MAX_RMS_A;
-
-% Project DC bus over-voltage protection threshold.
-CTRL_PROT_VBUS_MAX = 100.0;
-
-% Fast AC peak-current trip threshold in A.
-CTRL_PROT_IAC_PEAK_MAX = CTRL_MAX_HW_CURRENT * 0.9 * 1.41421356;
-
-% Maximum unsaturated modulation command before controller-divergence trip.
-CTRL_PROT_VCTRL_MAX_PU = 1.5;
-
-% Minimum physical DC-bus voltage accepted by the startup state machine.
-CTRL_DCBUS_READY_MIN = CTRL_DCBUS_VOLTAGE * 0.8;
-
-% Maximum physical DC-bus voltage accepted by the startup state machine.
-CTRL_DCBUS_READY_MAX = CTRL_PROT_VBUS_MAX;
-
-% ADC calibration timeout in ms.
-TIMEOUT_ADC_CALIB_MS = 3000;
-
-% SPLL close-loop convergence criterion.
-CTRL_SPLL_EPSILON = float2ctrl(0.005);
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

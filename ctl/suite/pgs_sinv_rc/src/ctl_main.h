@@ -67,6 +67,8 @@ typedef struct _tag_sinv_buck_ctrl
     ctl_pid_t voltage_pid;
     ctl_pid_t current_pid;
     ctrl_gt v_ref;
+    ctrl_gt v_ref_target;
+    ctrl_gt v_ref_step;
     ctrl_gt i_ref;
     ctrl_gt v_in_ff;
     ctrl_gt duty_ff;
@@ -112,6 +114,21 @@ fast_gt ctl_fault_recover_routine(void);
 void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck);
 void ctl_clear_sinv_buck(sinv_buck_ctrl_t* buck);
 pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, ctrl_gt i_l, fast_gt enable);
+
+GMP_STATIC_INLINE ctrl_gt ctl_calc_sinv_q_ref_from_pf(ctrl_gt p_ref)
+{
+    ctrl_gt pf_ref = float2ctrl(SINV_POWER_FACTOR_REF);
+    pf_ref = ctl_sat(pf_ref, float2ctrl(1.0f), float2ctrl(0.1f));
+
+    ctrl_gt sin_phi_sq = float2ctrl(1.0f) - ctl_mul(pf_ref, pf_ref);
+    if (sin_phi_sq < float2ctrl(0.0f))
+        sin_phi_sq = float2ctrl(0.0f);
+
+    ctrl_gt tan_phi = ctl_div(ctl_sqrt(sin_phi_sq), pf_ref);
+    ctrl_gt q_sign = (SINV_POWER_FACTOR_Q_SIGN >= 0.0f) ? float2ctrl(1.0f) : float2ctrl(-1.0f);
+
+    return ctl_mul(ctl_mul(ctl_mul(p_ref, tan_phi), q_sign), float2ctrl(SINV_POWER_FACTOR_Q_GAIN));
+}
 
 //=================================================================================================
 // Background Controller Tasks
@@ -164,10 +181,11 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                 ctl_step_sinv_power_loop(&outer_loop, g_p_ref_user, pq_meter.active_power_p),
                 g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #elif BUILD_LEVEL == 5
+            ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
+                adc_v_bus.control_port.value, float2ctrl(-1.0f));
             ctl_step_sinv_ref_gen_pq(&ref_gen,
-                ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
-                    adc_v_bus.control_port.value, float2ctrl(-1.0f)),
-                float2ctrl(0.0f), ctl_abs(pll.v_mag), &pll.phasor);
+                p_ref, ctl_calc_sinv_q_ref_from_pf(p_ref),
+                ctl_abs(pll.v_mag), &pll.phasor);
 #endif
         }
         else
