@@ -52,26 +52,6 @@ extern "C"
 
 //=================================================================================================
 /**
- * @brief Control Features.
- */
-
-/**
- * @brief Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence.
- */
-#define CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH
-
-/**
- * @brief Enable delayed insertion of the frequency-adaptive repetitive controller.
- */
-#define SINV_ENABLE_REPETITIVE_CONTROL
-
-/**
- * @brief Enable grid-voltage feedforward for closed-current-loop build levels.
- */
-#define SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD
-
-//=================================================================================================
-/**
  * @brief Diagnostics and Simulation.
  */
 
@@ -91,15 +71,13 @@ extern "C"
  */
 
 /**
- * @brief Single-phase converter commissioning build level, aligned with the simulation controller branches.
- *        BUILD_LEVEL 1: open-loop H-bridge modulation for resistive-load validation.
- *        BUILD_LEVEL 2: sinusoidal current command for resistive-load current-loop validation.
- *        BUILD_LEVEL 3: grid current loop with signed P/Q command.
- *        BUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.
- *        BUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command.
- *        Options: (1), (2), (3), (4), (5)
+ * @brief Single-phase inverter incremental debug build level.
+ *        BUILD_LEVEL 1: modulator and resistive-load validation.
+ *        BUILD_LEVEL 2: voltage closed-loop validation.
+ *        BUILD_LEVEL 3: current-loop and full controller validation.
+ *        Options: (1), (2), (3)
  */
-#define BUILD_LEVEL (5)
+#define BUILD_LEVEL (1)
 
 //=================================================================================================
 /**
@@ -128,12 +106,6 @@ extern "C"
  *        Options: IRIS_EPWM1_BASE, IRIS_EPWM2_BASE, IRIS_EPWM3_BASE, IRIS_EPWM4_BASE, IRIS_EPWM5_BASE, IRIS_EPWM6_BASE
  */
 #define PHASE_N_BASE IRIS_EPWM4_BASE
-
-/**
- * @brief PWM base for the Buck half-bridge. This channel outputs buck_ctrl.pwm_cmp; leave the gate-drive wiring disconnected when the Buck stage is not installed.
- *        Options: IRIS_EPWM1_BASE, IRIS_EPWM2_BASE, IRIS_EPWM3_BASE, IRIS_EPWM4_BASE, IRIS_EPWM5_BASE, IRIS_EPWM6_BASE
- */
-#define BUCK_PWM_BASE IRIS_EPWM5_BASE
 
 //=================================================================================================
 /**
@@ -219,40 +191,6 @@ extern "C"
  *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
  */
 #define INV_VBUS ADC_CH3
-
-//=================================================================================================
-/**
- * @brief Buck Current Sensing.
- */
-
-/**
- * @brief Buck inductor-current ADC result register base, measured by the lower LVFB half-bridge current sensor.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define BUCK_IL_RESULT_BASE ADC_CH5_RESULT_BASE
-
-/**
- * @brief Buck inductor-current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define BUCK_IL ADC_CH5
-
-//=================================================================================================
-/**
- * @brief Buck Output Voltage Sensing.
- */
-
-/**
- * @brief Buck output-voltage ADC result register base. Use an external voltage measurement board; do not use the lower half-bridge DC bus sensor for this signal.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define BUCK_VOUT_RESULT_BASE ADC_CH4_RESULT_BASE
-
-/**
- * @brief Buck output-voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define BUCK_VOUT ADC_CH4
 
 //=================================================================================================
 /**
@@ -350,26 +288,6 @@ extern "C"
 #define CTRL_AC_CURRENT_BIAS GMP_LVFB_CURRENT_BIAS_V
 
 /**
- * @brief Buck inductor-current sensing sensitivity from the lower LVFB half-bridge B5A current sensor.
- */
-#define CTRL_BUCK_CURRENT_SENSITIVITY GMP_LVFB_CURRENT_SENSITIVITY
-
-/**
- * @brief Buck inductor-current ADC bias from the lower LVFB half-bridge B5A current sensor.
- */
-#define CTRL_BUCK_CURRENT_BIAS GMP_LVFB_CURRENT_BIAS_V
-
-/**
- * @brief Buck output-voltage sensing gain from the external QuadSensorDocker voltage measurement board. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because the lower half-bridge voltage sensor measures its own DC bus, not Vo_buck.
- */
-#define CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY (0.020f)
-
-/**
- * @brief Buck output-voltage ADC bias from the external QuadSensorDocker voltage measurement board.
- */
-#define CTRL_BUCK_OUTPUT_VOLTAGE_BIAS (1.62f)
-
-/**
  * @brief Minimum PLL voltage magnitude used by P/Q reference division.
  */
 #define CTRL_GRID_VMIN_PU (0.1f)
@@ -465,74 +383,9 @@ extern "C"
 #define CTRL_CURRENT_DB_PU (0.01f)
 
 /**
- * @brief QPR current-loop crossover target in Hz.
- */
-#define SINV_CURRENT_LOOP_BANDWIDTH_HZ (600.0f)
-
-/**
  * @brief Minimum fundamental frequency tracked by the repetitive controller in Hz.
  */
 #define CTRL_FDRC_MIN_FREQ (45.0f)
-
-/**
- * @brief Settling time before repetitive control starts learning.
- */
-#define SINV_FDRC_ENABLE_DELAY_MS (300)
-
-/**
- * @brief Frequency-adaptive repetitive-control learning gain.
- */
-#define SINV_FDRC_LEARNING_GAIN (0.10f)
-
-/**
- * @brief Frequency-adaptive repetitive-control robustness-filter cutoff frequency.
- */
-#define SINV_FDRC_Q_FILTER_HZ (1000.0f)
-
-/**
- * @brief Frequency-adaptive repetitive-control plant-delay compensation in controller samples.
- */
-#define SINV_FDRC_LEAD_STEPS (3.0f)
-
-/**
- * @brief Current-error threshold above which repetitive-control learning is frozen.
- */
-#define SINV_FDRC_FREEZE_ERROR_PU (0.05f)
-
-/**
- * @brief BUILD_LEVEL 1 sinusoidal H-bridge voltage amplitude.
- */
-#define SINV_LEVEL1_VOLTAGE_REF_PU (0.35f)
-
-/**
- * @brief Active-power outer-loop proportional gain.
- */
-#define SINV_POWER_LOOP_KP (0.6f)
-
-/**
- * @brief Active-power outer-loop integral gain per second.
- */
-#define SINV_POWER_LOOP_KI (8.0f)
-
-/**
- * @brief DC-bus outer-loop proportional gain.
- */
-#define SINV_DC_BUS_LOOP_KP (0.8f)
-
-/**
- * @brief DC-bus outer-loop integral gain per second.
- */
-#define SINV_DC_BUS_LOOP_KI (12.0f)
-
-/**
- * @brief Symmetric outer-loop active-power command limit.
- */
-#define SINV_OUTER_LOOP_POWER_LIMIT_PU (0.65f)
-
-/**
- * @brief Power and DC-bus outer-loop execution frequency.
- */
-#define SINV_OUTER_LOOP_FREQUENCY_HZ (1000.0f)
 
 /**
  * @brief ADC calibration timeout in ms.
@@ -550,11 +403,6 @@ extern "C"
 #define CTRL_STARTUP_DELAY (100)
 
 /**
- * @brief Minimum operation-enabled transition delay used by the CiA402 startup sequence.
- */
-#define SINV_CIA402_OPERATION_ENABLE_DELAY_MS (100)
-
-/**
  * @brief Nominal AC grid/fundamental frequency in Hz.
  */
 #define CTRL_GRID_FREQUENCY (50.0f)
@@ -565,31 +413,6 @@ extern "C"
 #define SINV_BUCK_OUTPUT_REF_V (48.0f)
 
 /**
- * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
- */
-#define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
-
-/**
- * @brief BUILD_LEVEL 2 peak current command with a resistive load.
- */
-#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.20f)
-
-/**
- * @brief BUILD_LEVEL 3 signed grid active-power command; positive exports power.
- */
-#define SINV_LEVEL3_ACTIVE_POWER_REF_PU (0.10f)
-
-/**
- * @brief BUILD_LEVEL 3 grid reactive-power command.
- */
-#define SINV_LEVEL3_REACTIVE_POWER_REF_PU (0.0f)
-
-/**
- * @brief BUILD_LEVEL 4 measured active-power closed-loop target.
- */
-#define SINV_LEVEL4_ACTIVE_POWER_REF_PU (0.15f)
-
-/**
  * @brief Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.
  */
 #define SINV_BUCK_VREF_SLEW_V_S (120.0f)
@@ -597,12 +420,12 @@ extern "C"
 /**
  * @brief Minimum DC bus voltage before Buck soft-start is allowed.
  */
-#define SINV_BUCK_START_VBUS_MIN_V (55.0f)
+#define SINV_BUCK_START_VBUS_MIN_V (68.0f)
 
 /**
  * @brief Delay after the Buck start condition is met before PWM compare ramps.
  */
-#define SINV_BUCK_START_DELAY_MS 100
+#define SINV_BUCK_START_DELAY_MS 200
 
 /**
  * @brief Buck duty-cycle lower clamp.
@@ -637,7 +460,7 @@ extern "C"
 /**
  * @brief Buck inductor-current command limit in ampere.
  */
-#define SINV_BUCK_CURRENT_LIMIT_A (5.0f)
+#define SINV_BUCK_CURRENT_LIMIT_A (10.0f)
 
 /**
  * @brief Buck voltage-loop execution frequency.

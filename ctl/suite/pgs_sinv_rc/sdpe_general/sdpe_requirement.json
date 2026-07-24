@@ -417,6 +417,16 @@
       "description": "Buck output voltage target."
     },
     {
+      "role": "buck_vref_slew",
+      "macro": "SINV_BUCK_VREF_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "120.0"
+      },
+      "description": "Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter."
+    },
+    {
       "role": "buck_current_limit",
       "macro": "SINV_BUCK_CURRENT_LIMIT_A",
       "enabled": true,
@@ -455,16 +465,6 @@
         "number": "100"
       },
       "description": "Delay after the Buck start condition is met before PWM compare ramps."
-    },
-    {
-      "role": "buck_duty_slew",
-      "macro": "SINV_BUCK_DUTY_SLEW_PU_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "2.0"
-      },
-      "description": "Maximum Buck duty compare-command slew rate in PU per second."
     },
     {
       "role": "buck_duty_min",
@@ -589,6 +589,7 @@
         "power_factor_q_sign",
         "power_factor_q_gain",
         "buck_output_ref",
+        "buck_vref_slew",
         "buck_current_limit"
       ]
     },
@@ -598,7 +599,6 @@
         "startup_delay",
         "buck_start_vbus_min",
         "buck_start_delay",
-        "buck_duty_slew",
         "buck_duty_min",
         "buck_duty_max",
         "buck_duty_trim_limit",

@@ -69,14 +69,13 @@ typedef struct _tag_sinv_buck_ctrl
     ctrl_gt v_ref;
     ctrl_gt v_ref_target;
     ctrl_gt v_ref_step;
+    ctrl_gt v_out_lpf;
     ctrl_gt i_ref;
     ctrl_gt v_in_ff;
     ctrl_gt duty_ff;
     ctrl_gt duty_trim;
     ctrl_gt duty_cmd;
     ctrl_gt duty;
-    ctrl_gt duty_soft_limit;
-    ctrl_gt duty_step;
     uint32_t startup_delay_count;
     uint32_t startup_counter;
     uint32_t voltage_loop_counter;

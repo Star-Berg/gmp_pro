@@ -246,6 +246,11 @@ extern "C"
 #define SINV_BUCK_OUTPUT_REF_V (60.0f)
 
 /**
+ * @brief Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.
+ */
+#define SINV_BUCK_VREF_SLEW_V_S (120.0f)
+
+/**
  * @brief Buck inductor-current command limit in ampere.
  */
 #define SINV_BUCK_CURRENT_LIMIT_A (5.0f)
@@ -264,11 +269,6 @@ extern "C"
  * @brief Delay after the Buck start condition is met before PWM compare ramps.
  */
 #define SINV_BUCK_START_DELAY_MS (100)
-
-/**
- * @brief Maximum Buck duty compare-command slew rate in PU per second.
- */
-#define SINV_BUCK_DUTY_SLEW_PU_S (2.0f)
 
 /**
  * @brief Buck duty-cycle lower clamp.

@@ -4,7 +4,7 @@
   "description": "Single-phase inverter project requirement prepared from xplt/ctrl_settings.h.\nThis requirement introduces the GMP LVFB 150V 2-phase inverter board as the switching stage and the GMP Harmonia 3-phase LC filter as the grid filter. IRIS F280039C is included as the peripheral option provider.",
   "suite": "pgs_sinv_rc",
   "version": "0.2.0",
-  "updated_at": "2026-07-23",
+  "updated_at": "2026-07-24",
   "output_header": "sdpe_pgs_sinv_rc_iris_bindings.h",
   "hardware": [
     {
@@ -39,6 +39,30 @@
       "description": "Enable ADC calibration."
     },
     {
+      "group": "Control Features",
+      "macro": "CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH",
+      "enabled": true,
+      "weak": false,
+      "value": "",
+      "description": "Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence."
+    },
+    {
+      "group": "Control Features",
+      "macro": "SINV_ENABLE_REPETITIVE_CONTROL",
+      "enabled": true,
+      "weak": false,
+      "value": "",
+      "description": "Enable delayed insertion of the frequency-adaptive repetitive controller."
+    },
+    {
+      "group": "Control Features",
+      "macro": "SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD",
+      "enabled": true,
+      "weak": false,
+      "value": "",
+      "description": "Enable grid-voltage feedforward for closed-current-loop build levels."
+    },
+    {
       "group": "Diagnostics and Simulation",
       "macro": "ENABLE_GMP_DL_PIL_SIM",
       "enabled": false,
@@ -61,14 +85,16 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(1)",
+      "value": "(5)",
       "options_preset": "",
       "options": [
         "(1)",
         "(2)",
-        "(3)"
+        "(3)",
+        "(4)",
+        "(5)"
       ],
-      "description": "Single-phase inverter incremental debug build level.\nBUILD_LEVEL 1: modulator and resistive-load validation.\nBUILD_LEVEL 2: voltage closed-loop validation.\nBUILD_LEVEL 3: current-loop and full controller validation."
+      "description": "Single-phase converter commissioning build level, aligned with the simulation controller branches.\nBUILD_LEVEL 1: open-loop H-bridge modulation for resistive-load validation.\nBUILD_LEVEL 2: sinusoidal current command for resistive-load current-loop validation.\nBUILD_LEVEL 3: grid current loop with signed P/Q command.\nBUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.\nBUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command."
     },
     {
       "group": "PWM Modulator",
@@ -102,6 +128,16 @@
       "options_preset": "iris_f280039c_node.IRIS_EPWM",
       "options": [],
       "description": "PWM base for inverter phase N."
+    },
+    {
+      "group": "PWM Channel Mapping",
+      "macro": "BUCK_PWM_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_EPWM5_BASE",
+      "options_preset": "iris_f280039c_node.IRIS_EPWM",
+      "options": [],
+      "description": "PWM base for the Buck half-bridge. This channel outputs buck_ctrl.pwm_cmp; leave the gate-drive wiring disconnected when the Buck stage is not installed."
     },
     {
       "group": "Gate Driver GPIO",
@@ -212,6 +248,46 @@
       "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
       "options": [],
       "description": "DC bus voltage ADC channel."
+    },
+    {
+      "group": "Buck Current Sensing",
+      "macro": "BUCK_IL_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH5_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [],
+      "description": "Buck inductor-current ADC result register base, measured by the lower LVFB half-bridge current sensor."
+    },
+    {
+      "group": "Buck Current Sensing",
+      "macro": "BUCK_IL",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH5",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [],
+      "description": "Buck inductor-current ADC channel."
+    },
+    {
+      "group": "Buck Output Voltage Sensing",
+      "macro": "BUCK_VOUT_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH4_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [],
+      "description": "Buck output-voltage ADC result register base. Use an external voltage measurement board; do not use the lower half-bridge DC bus sensor for this signal."
+    },
+    {
+      "group": "Buck Output Voltage Sensing",
+      "macro": "BUCK_VOUT",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH4",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [],
+      "description": "Buck output-voltage ADC channel."
     }
   ],
   "requirements": [
@@ -396,6 +472,46 @@
       "description": "AC current sensing ADC bias from the LVFB inverter current sensor."
     },
     {
+      "role": "buck_current_sensitivity",
+      "macro": "CTRL_BUCK_CURRENT_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "export": "gmp_lvfb_150_2ph_v2.current_sensitivity"
+      },
+      "description": "Buck inductor-current sensing sensitivity from the lower LVFB half-bridge B5A current sensor."
+    },
+    {
+      "role": "buck_current_bias",
+      "macro": "CTRL_BUCK_CURRENT_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "export": "gmp_lvfb_150_2ph_v2.current_bias_v"
+      },
+      "description": "Buck inductor-current ADC bias from the lower LVFB half-bridge B5A current sensor."
+    },
+    {
+      "role": "buck_output_voltage_sensitivity",
+      "macro": "CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.020"
+      },
+      "description": "Buck output-voltage sensing gain from the external QuadSensorDocker voltage measurement board. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because the lower half-bridge voltage sensor measures its own DC bus, not Vo_buck."
+    },
+    {
+      "role": "buck_output_voltage_bias",
+      "macro": "CTRL_BUCK_OUTPUT_VOLTAGE_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.62"
+      },
+      "description": "Buck output-voltage ADC bias from the external QuadSensorDocker voltage measurement board."
+    },
+    {
       "role": "grid_vmin_pu",
       "macro": "CTRL_GRID_VMIN_PU",
       "enabled": true,
@@ -571,7 +687,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.0"
+        "float": "1.06"
       },
       "description": "BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction."
     },
@@ -586,6 +702,16 @@
       "description": "Current polarity deadband for PWM dead-time compensation."
     },
     {
+      "role": "current_loop_bandwidth",
+      "macro": "SINV_CURRENT_LOOP_BANDWIDTH_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "600.0"
+      },
+      "description": "QPR current-loop crossover target in Hz."
+    },
+    {
       "role": "fdrc_min_frequency",
       "macro": "CTRL_FDRC_MIN_FREQ",
       "enabled": true,
@@ -594,6 +720,126 @@
         "float": "45.0"
       },
       "description": "Minimum fundamental frequency tracked by the repetitive controller in Hz."
+    },
+    {
+      "role": "fdrc_delay",
+      "macro": "SINV_FDRC_ENABLE_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "300"
+      },
+      "description": "Settling time before repetitive control starts learning."
+    },
+    {
+      "role": "fdrc_gain",
+      "macro": "SINV_FDRC_LEARNING_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.10"
+      },
+      "description": "Frequency-adaptive repetitive-control learning gain."
+    },
+    {
+      "role": "fdrc_filter",
+      "macro": "SINV_FDRC_Q_FILTER_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1000.0"
+      },
+      "description": "Frequency-adaptive repetitive-control robustness-filter cutoff frequency."
+    },
+    {
+      "role": "fdrc_lead",
+      "macro": "SINV_FDRC_LEAD_STEPS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "3.0"
+      },
+      "description": "Frequency-adaptive repetitive-control plant-delay compensation in controller samples."
+    },
+    {
+      "role": "fdrc_error",
+      "macro": "SINV_FDRC_FREEZE_ERROR_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.05"
+      },
+      "description": "Current-error threshold above which repetitive-control learning is frozen."
+    },
+    {
+      "role": "openloop_voltage",
+      "macro": "SINV_LEVEL1_VOLTAGE_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.35"
+      },
+      "description": "BUILD_LEVEL 1 sinusoidal H-bridge voltage amplitude."
+    },
+    {
+      "role": "power_loop_kp",
+      "macro": "SINV_POWER_LOOP_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.6"
+      },
+      "description": "Active-power outer-loop proportional gain."
+    },
+    {
+      "role": "power_loop_ki",
+      "macro": "SINV_POWER_LOOP_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "8.0"
+      },
+      "description": "Active-power outer-loop integral gain per second."
+    },
+    {
+      "role": "bus_kp",
+      "macro": "SINV_DC_BUS_LOOP_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.8"
+      },
+      "description": "DC-bus outer-loop proportional gain."
+    },
+    {
+      "role": "bus_ki",
+      "macro": "SINV_DC_BUS_LOOP_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "12.0"
+      },
+      "description": "DC-bus outer-loop integral gain per second."
+    },
+    {
+      "role": "outer_limit",
+      "macro": "SINV_OUTER_LOOP_POWER_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.65"
+      },
+      "description": "Symmetric outer-loop active-power command limit."
+    },
+    {
+      "role": "outer_frequency",
+      "macro": "SINV_OUTER_LOOP_FREQUENCY_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1000.0"
+      },
+      "description": "Power and DC-bus outer-loop execution frequency."
     },
     {
       "role": "adc_calibration_timeout",
@@ -626,6 +872,16 @@
       "description": "Startup delay in ms."
     },
     {
+      "role": "operation_enable_delay",
+      "macro": "SINV_CIA402_OPERATION_ENABLE_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "100"
+      },
+      "description": "Minimum operation-enabled transition delay used by the CiA402 startup sequence."
+    },
+    {
       "role": "grid_frequency",
       "macro": "CTRL_GRID_FREQUENCY",
       "enabled": true,
@@ -646,6 +902,56 @@
       "description": "Buck output voltage target."
     },
     {
+      "role": "bus_ref",
+      "macro": "SINV_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "expr": "CTRL_DCBUS_VOLTAGE"
+      },
+      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting."
+    },
+    {
+      "role": "level2_current",
+      "macro": "SINV_LEVEL2_CURRENT_REF_PEAK_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.20"
+      },
+      "description": "BUILD_LEVEL 2 peak current command with a resistive load."
+    },
+    {
+      "role": "level3_power",
+      "macro": "SINV_LEVEL3_ACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.10"
+      },
+      "description": "BUILD_LEVEL 3 signed grid active-power command; positive exports power."
+    },
+    {
+      "role": "level3_reactive",
+      "macro": "SINV_LEVEL3_REACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "BUILD_LEVEL 3 grid reactive-power command."
+    },
+    {
+      "role": "level4_power",
+      "macro": "SINV_LEVEL4_ACTIVE_POWER_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.15"
+      },
+      "description": "BUILD_LEVEL 4 measured active-power closed-loop target."
+    },
+    {
       "role": "buck_vref_slew",
       "macro": "SINV_BUCK_VREF_SLEW_V_S",
       "enabled": true,
@@ -653,7 +959,7 @@
       "binding": {
         "float": "120.0"
       },
-      "description": "Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the main Buck output soft-start parameter; SINV_BUCK_DUTY_SLEW_PU_S only limits PWM duty-command jumps."
+      "description": "Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter."
     },
     {
       "role": "buck_start_vbus_min",
@@ -661,7 +967,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "68.0"
+        "float": "55.0"
       },
       "description": "Minimum DC bus voltage before Buck soft-start is allowed."
     },
@@ -671,19 +977,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "number": "200"
+        "expr": "100"
       },
       "description": "Delay after the Buck start condition is met before PWM compare ramps."
-    },
-    {
-      "role": "buck_duty_slew",
-      "macro": "SINV_BUCK_DUTY_SLEW_PU_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "2.0"
-      },
-      "description": "Maximum Buck duty compare-command slew rate in PU per second."
     },
     {
       "role": "buck_duty_min",
@@ -701,7 +997,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.90"
+        "float": "1.0"
       },
       "description": "Buck duty-cycle upper clamp."
     },
@@ -741,7 +1037,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.35"
+        "float": "0.15"
       },
       "description": "Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward."
     },
@@ -761,7 +1057,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1000.0"
+        "float": "200.0"
       },
       "description": "Buck voltage-loop execution frequency."
     },
@@ -771,7 +1067,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.35"
+        "float": "0.1"
       },
       "description": "Buck voltage-loop proportional gain."
     },
@@ -781,7 +1077,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "30.0"
+        "float": "15.0"
       },
       "description": "Buck voltage-loop integral gain per second."
     },
@@ -856,6 +1152,20 @@
       ]
     },
     {
+      "name": "Buck Current Sensor",
+      "requirements": [
+        "buck_current_sensitivity",
+        "buck_current_bias"
+      ]
+    },
+    {
+      "name": "Buck Output Voltage Sensor",
+      "requirements": [
+        "buck_output_voltage_sensitivity",
+        "buck_output_voltage_bias"
+      ]
+    },
+    {
       "name": "Protection Parameters",
       "requirements": [
         "grid_vmin_pu",
@@ -882,7 +1192,20 @@
         "power_factor_q_sign",
         "power_factor_q_gain",
         "current_deadband_pu",
+        "current_loop_bandwidth",
         "fdrc_min_frequency",
+        "fdrc_delay",
+        "fdrc_gain",
+        "fdrc_filter",
+        "fdrc_lead",
+        "fdrc_error",
+        "openloop_voltage",
+        "power_loop_kp",
+        "power_loop_ki",
+        "bus_kp",
+        "bus_ki",
+        "outer_limit",
+        "outer_frequency",
         "adc_calibration_timeout",
         "spll_epsilon"
       ]
@@ -890,7 +1213,8 @@
     {
       "name": "Runtime Parameters",
       "requirements": [
-        "startup_delay"
+        "startup_delay",
+        "operation_enable_delay"
       ]
     },
     {
@@ -903,10 +1227,14 @@
       "name": "Ungrouped",
       "requirements": [
         "buck_output_ref",
+        "bus_ref",
+        "level2_current",
+        "level3_power",
+        "level3_reactive",
+        "level4_power",
         "buck_vref_slew",
         "buck_start_vbus_min",
         "buck_start_delay",
-        "buck_duty_slew",
         "buck_duty_min",
         "buck_duty_max",
         "buck_duty_trim_limit",

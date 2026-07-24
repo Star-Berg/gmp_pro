@@ -360,7 +360,6 @@ void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck)
 
     buck->v_ref_target = float2ctrl(SINV_BUCK_OUTPUT_REF_V / CTRL_VOLTAGE_BASE);
     buck->v_ref_step = float2ctrl(SINV_BUCK_VREF_SLEW_V_S / CTRL_VOLTAGE_BASE / CONTROLLER_FREQUENCY);
-    buck->duty_step = float2ctrl(SINV_BUCK_DUTY_SLEW_PU_S / CONTROLLER_FREQUENCY);
     buck->startup_delay_count = (uint32_t)((float)SINV_BUCK_START_DELAY_MS * (float)CONTROLLER_FREQUENCY / 1000.0f);
     ctl_clear_sinv_buck(buck);
 }
@@ -370,13 +369,13 @@ void ctl_clear_sinv_buck(sinv_buck_ctrl_t* buck)
     ctl_clear_pid(&buck->voltage_pid);
     ctl_clear_pid(&buck->current_pid);
     buck->v_ref = float2ctrl(0.0f);
+    buck->v_out_lpf = float2ctrl(0.0f);
     buck->i_ref = float2ctrl(0.0f);
     buck->v_in_ff = float2ctrl(0.0f);
     buck->duty_ff = float2ctrl(0.0f);
     buck->duty_trim = float2ctrl(0.0f);
     buck->duty_cmd = float2ctrl(0.0f);
     buck->duty = float2ctrl(0.0f);
-    buck->duty_soft_limit = float2ctrl(0.0f);
     buck->startup_counter = 0U;
     buck->voltage_loop_counter = 0U;
     buck->pwm_cmp = 0U;
@@ -398,20 +397,27 @@ pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, c
         return 0U;
     }
 
-    buck->flag_enable = 1;
+    /* Buck 输出电压采样存在开关纹波/采样碎纹；这里用固定软件低通，
+       只给电压外环使用，不作为 SDPE 参数暴露，避免再引入一项调参量。 */
+    if (!buck->flag_enable)
+    {
+        buck->v_out_lpf = v_out;
+        buck->flag_enable = 1;
+    }
+    else
+    {
+        buck->v_out_lpf += ctl_mul(float2ctrl(0.02f), v_out - buck->v_out_lpf);
+    }
+
     buck->v_ref += buck->v_ref_step;
     if (buck->v_ref > buck->v_ref_target)
         buck->v_ref = buck->v_ref_target;
-
-    buck->duty_soft_limit += buck->duty_step;
-    if (buck->duty_soft_limit > float2ctrl(SINV_BUCK_DUTY_MAX))
-        buck->duty_soft_limit = float2ctrl(SINV_BUCK_DUTY_MAX);
 
     const uint32_t voltage_loop_div =
         (uint32_t)((float)CONTROLLER_FREQUENCY / (float)SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ);
     if ((buck->voltage_loop_counter == 0U) || (voltage_loop_div <= 1U))
     {
-        buck->i_ref = ctl_step_pid_par(&buck->voltage_pid, buck->v_ref - v_out);
+        buck->i_ref = ctl_step_pid_par(&buck->voltage_pid, buck->v_ref - buck->v_out_lpf);
     }
     buck->voltage_loop_counter++;
     if ((voltage_loop_div > 1U) && (buck->voltage_loop_counter >= voltage_loop_div))
@@ -440,8 +446,6 @@ pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, c
 
     ctrl_gt duty_upper = buck->duty_ff + float2ctrl(SINV_BUCK_DUTY_FF_MARGIN);
     duty_upper = ctl_sat(duty_upper, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
-    if (duty_upper > buck->duty_soft_limit)
-        duty_upper = buck->duty_soft_limit;
 
     buck->duty = ctl_sat(buck->duty_cmd, duty_upper, float2ctrl(SINV_BUCK_DUTY_MIN));
     buck->pwm_cmp = pwm_sat(ctrl2float(buck->duty) * (float)(CTRL_PWM_CMP_MAX + 1), CTRL_PWM_CMP_MAX + 1, 0);

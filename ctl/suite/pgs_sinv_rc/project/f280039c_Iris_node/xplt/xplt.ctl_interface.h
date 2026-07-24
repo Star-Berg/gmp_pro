@@ -34,6 +34,8 @@ GMP_STATIC_INLINE void ctl_input_callback(void)
     ctl_step_adc_channel(&adc_v_grid, ADC_readResult(INV_VAC_RESULT_BASE, INV_VAC));
     ctl_step_adc_channel(&adc_i_ac, ADC_readResult(INV_IAC_RESULT_BASE, INV_IAC));
     ctl_step_adc_channel(&adc_v_bus, ADC_readResult(INV_VBUS_RESULT_BASE, INV_VBUS));
+    ctl_step_adc_channel(&adc_i_buck, ADC_readResult(BUCK_IL_RESULT_BASE, BUCK_IL));
+    ctl_step_adc_channel(&adc_v_buck_out, ADC_readResult(BUCK_VOUT_RESULT_BASE, BUCK_VOUT));
 }
 
 // Output Callback
@@ -42,6 +44,7 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     // Write ePWM peripheral CMP for H-Bridge (Phase L and Phase N)
     EPWM_setCounterCompareValue(PHASE_L_BASE, EPWM_COUNTER_COMPARE_A, ctl_get_single_phase_modulation_L_phase(&hpwm));
     EPWM_setCounterCompareValue(PHASE_N_BASE, EPWM_COUNTER_COMPARE_A, ctl_get_single_phase_modulation_N_phase(&hpwm));
+    EPWM_setCounterCompareValue(BUCK_PWM_BASE, EPWM_COUNTER_COMPARE_A, buck_ctrl.pwm_cmp);
 
     // DAC Monitor Port (Offset by 2048 for bipolar signals on a 12-bit DAC)
 #if BUILD_LEVEL == 1
@@ -65,10 +68,12 @@ GMP_STATIC_INLINE void ctl_fast_enable_output(void)
                                 ctl_get_single_phase_modulation_L_phase(&hpwm));
     EPWM_setCounterCompareValue(PHASE_N_BASE, EPWM_COUNTER_COMPARE_A,
                                 ctl_get_single_phase_modulation_N_phase(&hpwm));
+    EPWM_setCounterCompareValue(BUCK_PWM_BASE, EPWM_COUNTER_COMPARE_A, buck_ctrl.pwm_cmp);
 
     // Clear any Trip Zone (TZ) flag for Phase L and Phase N
     EPWM_clearTripZoneFlag(PHASE_L_BASE, EPWM_TZ_FORCE_EVENT_OST);
     EPWM_clearTripZoneFlag(PHASE_N_BASE, EPWM_TZ_FORCE_EVENT_OST);
+    EPWM_clearTripZoneFlag(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
 
     // Hardware PWM gate driver enable
     GPIO_WritePin(PWM_ENABLE_PORT, 1);
@@ -85,6 +90,7 @@ GMP_STATIC_INLINE void ctl_fast_disable_output(void)
     // Force Trip Zone (TZ) event to hardware-block PWM outputs immediately
     EPWM_forceTripZoneEvent(PHASE_L_BASE, EPWM_TZ_FORCE_EVENT_OST);
     EPWM_forceTripZoneEvent(PHASE_N_BASE, EPWM_TZ_FORCE_EVENT_OST);
+    EPWM_forceTripZoneEvent(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
 
     // Hardware PWM gate driver disable
     GPIO_WritePin(PWM_ENABLE_PORT, 0);
