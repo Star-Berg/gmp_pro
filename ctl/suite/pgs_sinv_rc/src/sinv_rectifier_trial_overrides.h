@@ -30,6 +30,12 @@
 #endif
 #define SINV_DC_BUS_LOOP_KI (2.0f)
 
+/*
+ * First-order feedback filter coefficient, updated at the 1 kHz outer-loop rate.
+ * alpha=0.06 corresponds to approximately 10 Hz and attenuates the 100 Hz bus ripple.
+ */
+#define SINV_DC_BUS_FEEDBACK_LPF_ALPHA (0.06f)
+
 #if !defined(SPECIFY_PC_ENVIRONMENT)
 /*
  * Hardware-only safety limits for the TMCS1133B5A (150 mV/A, about +/-11 A
