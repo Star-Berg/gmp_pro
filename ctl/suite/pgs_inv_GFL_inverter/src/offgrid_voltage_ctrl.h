@@ -14,7 +14,7 @@
  *     -> estimated inductor-current reference
  *     -> alpha/beta QPR current loop
  *     -> capacitor-voltage feed-forward + active damping
- *     -> DC-bus feed-forward normalization
+ *     -> rate-limited DC-bus feed-forward normalization
  *     -> SPWM modulation command
  *
  * Both stationary axes use the same resonant frequency, so positive- and
@@ -53,6 +53,11 @@
 
 #ifndef GFL_LEVEL6_DCBUS_GAIN_MAX
 #define GFL_LEVEL6_DCBUS_GAIN_MAX (1.50f)
+#endif
+
+/* Maximum change of the feed-forward multiplier per second. */
+#ifndef GFL_LEVEL6_DCBUS_GAIN_SLEW_PER_S
+#define GFL_LEVEL6_DCBUS_GAIN_SLEW_PER_S (5.0f)
 #endif
 
 #ifdef __cplusplus
@@ -95,7 +100,9 @@ typedef struct _tag_offgrid_voltage_ctrl
     /* DC-bus feed-forward monitoring values, in physical volts and ratio. */
     parameter_gt dc_bus_voltage_nominal_v;
     parameter_gt dc_bus_voltage_meas_v;
+    parameter_gt dc_bus_feedforward_target_gain;
     parameter_gt dc_bus_feedforward_gain;
+    parameter_gt dc_bus_gain_slew_step;
 
     /* Reference angle is per-unit: 1.0 == 2*pi. */
     ctrl_gt angle_pu;
@@ -229,6 +236,7 @@ GMP_STATIC_INLINE void ctl_clear_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ct
 
     ctrl->line_voltage_rms_active_v = 0.0f;
     ctrl->dc_bus_voltage_meas_v = ctrl->dc_bus_voltage_nominal_v;
+    ctrl->dc_bus_feedforward_target_gain = 1.0f;
     ctrl->dc_bus_feedforward_gain = 1.0f;
     ctrl->angle_pu = float2ctrl(0.0f);
     ctl_set_phasor_via_angle(ctrl->angle_pu, &ctrl->phasor);
@@ -267,6 +275,7 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl->current_qpr_kr = init->current_qpr_kr;
     ctrl->qpr_bandwidth_hz = init->qpr_bandwidth_hz;
     ctrl->dc_bus_voltage_nominal_v = init->dc_bus_voltage;
+    ctrl->dc_bus_gain_slew_step = GFL_LEVEL6_DCBUS_GAIN_SLEW_PER_S / init->fs;
 
     /*
      * Voltage loop: voltage-pu -> current-pu.
@@ -314,6 +323,7 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl_gt delta_voltage;
     ctrl_gt dc_bus_gain_ctrl;
     parameter_gt quantized_command;
+    parameter_gt dc_bus_gain_delta;
     int axis;
 
     gmp_base_assert(ctrl);
@@ -364,8 +374,7 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     /*
      * The GFL core filters the decoded DC-bus ADC value in per unit.  Convert
      * it back to volts and calculate nominal/measured feed-forward.  Invalid
-     * measurements fall back to unity rather than causing a divide-by-zero or
-     * a large modulation step.
+     * measurements command a smooth return to unity rather than a jump.
      */
 #if GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD
     ctrl->dc_bus_voltage_meas_v =
@@ -374,21 +383,36 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     if (ctrl->dc_bus_voltage_meas_v >= GFL_LEVEL6_DCBUS_VALID_MIN_V &&
         ctrl->dc_bus_voltage_meas_v <= GFL_LEVEL6_DCBUS_VALID_MAX_V)
     {
-        ctrl->dc_bus_feedforward_gain =
+        ctrl->dc_bus_feedforward_target_gain =
             ctrl->dc_bus_voltage_nominal_v / ctrl->dc_bus_voltage_meas_v;
-        ctrl->dc_bus_feedforward_gain =
-            ctl_offgrid_clamp_parameter(ctrl->dc_bus_feedforward_gain,
+        ctrl->dc_bus_feedforward_target_gain =
+            ctl_offgrid_clamp_parameter(ctrl->dc_bus_feedforward_target_gain,
                                         GFL_LEVEL6_DCBUS_GAIN_MIN,
                                         GFL_LEVEL6_DCBUS_GAIN_MAX);
     }
     else
     {
-        ctrl->dc_bus_feedforward_gain = 1.0f;
+        ctrl->dc_bus_feedforward_target_gain = 1.0f;
     }
 #else
     ctrl->dc_bus_voltage_meas_v = ctrl->dc_bus_voltage_nominal_v;
-    ctrl->dc_bus_feedforward_gain = 1.0f;
+    ctrl->dc_bus_feedforward_target_gain = 1.0f;
 #endif
+
+    /*
+     * Rate-limit the compensation multiplier so an 80 V -> 70 V bus step does
+     * not instantly apply the full 14.3 percent modulation change to the LC
+     * filter.  At the default 5 /s limit, the transition takes about 29 ms.
+     */
+    dc_bus_gain_delta =
+        ctrl->dc_bus_feedforward_target_gain - ctrl->dc_bus_feedforward_gain;
+    if (dc_bus_gain_delta > ctrl->dc_bus_gain_slew_step)
+        ctrl->dc_bus_feedforward_gain += ctrl->dc_bus_gain_slew_step;
+    else if (dc_bus_gain_delta < -ctrl->dc_bus_gain_slew_step)
+        ctrl->dc_bus_feedforward_gain -= ctrl->dc_bus_gain_slew_step;
+    else
+        ctrl->dc_bus_feedforward_gain = ctrl->dc_bus_feedforward_target_gain;
+
     dc_bus_gain_ctrl = float2ctrl(ctrl->dc_bus_feedforward_gain);
 
     /* Keep phase continuous when the frequency command changes. */
@@ -436,9 +460,8 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
 
     /*
      * Current-loop output is first calculated for nominal DC bus.  Multiplying
-     * the complete modulation vector by Vdc_nominal/Vdc_measured preserves the
-     * applied bridge voltage when the bus changes.  Output-voltage feedback is
-     * still handled independently by the QPR loops above.
+     * the complete modulation vector by the rate-limited Vdc ratio preserves
+     * the applied bridge voltage without a hard feed-forward step.
      */
     for (axis = 0; axis < 2; ++axis)
     {
