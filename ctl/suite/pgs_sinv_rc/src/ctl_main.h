@@ -13,6 +13,7 @@
 #define _FILE_CTL_MAIN_H_
 
 #include <xplt.peripheral.h>
+#include "sinv_rectifier_trial_overrides.h"
 
 #include <core/pm/function_scheduler.h>
 
