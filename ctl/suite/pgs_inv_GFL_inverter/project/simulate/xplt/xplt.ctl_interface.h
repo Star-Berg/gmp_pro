@@ -98,12 +98,19 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     simulink_tx_buffer.monitor[4] = offgrid_voltage_ctrl.modulation_ab.dat[phase_alpha];
     simulink_tx_buffer.monitor[5] = offgrid_voltage_ctrl.modulation_ab.dat[phase_beta];
 
-    simulink_tx_buffer.monitor[6] =
-        offgrid_voltage_ctrl.line_voltage_rms_active_v / GFL_LEVEL6_VOLTAGE_MAX_RMS_V;
-    simulink_tx_buffer.monitor[7] = offgrid_voltage_ctrl.frequency_cmd_hz / GFL_LEVEL6_FREQUENCY_MAX_HZ;
-
-    simulink_tx_buffer.monitor[8] = offgrid_voltage_ctrl.capacitor_current_ref_ab.dat[phase_alpha];
-    simulink_tx_buffer.monitor[9] = offgrid_voltage_ctrl.capacitor_current_est_ab.dat[phase_alpha];
+    // DC-bus feed-forward diagnostics.
+    // CH7: measured DC bus, scaled so 80 V -> 0.80 and 70 V -> 0.70.
+    simulink_tx_buffer.monitor[6] = offgrid_voltage_ctrl.dc_bus_voltage_meas_v / 100.0f;
+    // CH8: instantaneous target Vdc_nominal / Vdc_measured.
+    simulink_tx_buffer.monitor[7] = offgrid_voltage_ctrl.dc_bus_feedforward_target_gain;
+    // CH9: rate-limited gain actually applied to the modulation vector.
+    simulink_tx_buffer.monitor[8] = offgrid_voltage_ctrl.dc_bus_feedforward_gain;
+    // CH10: alpha-beta modulation-vector magnitude; compare against the 0.95 limit.
+    simulink_tx_buffer.monitor[9] = ctrl2float(ctl_sqrt(
+        ctl_mul(offgrid_voltage_ctrl.modulation_ab.dat[phase_alpha],
+                offgrid_voltage_ctrl.modulation_ab.dat[phase_alpha]) +
+        ctl_mul(offgrid_voltage_ctrl.modulation_ab.dat[phase_beta],
+                offgrid_voltage_ctrl.modulation_ab.dat[phase_beta])));
 
     simulink_tx_buffer.monitor[10] = offgrid_voltage_ctrl.voltage_ref_ab.dat[phase_beta];
     simulink_tx_buffer.monitor[11] = inv_ctrl.vab0.dat[phase_beta];
