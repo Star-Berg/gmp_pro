@@ -14,6 +14,7 @@
  *     -> estimated inductor-current reference
  *     -> alpha/beta QPR current loop
  *     -> capacitor-voltage feed-forward + active damping
+ *     -> DC-bus feed-forward normalization
  *     -> SPWM modulation command
  *
  * Both stationary axes use the same resonant frequency, so positive- and
@@ -28,12 +29,30 @@
 #include <ctl/component/digital_power/inv/gfl_core.h>
 #include <ctl/component/intrinsic/discrete/proportional_resonant.h>
 
-/*
- * Fixed reference-amplitude calibration.  Simulation SDPE overrides this
- * fallback; hardware projects retain unity gain unless explicitly configured.
- */
+/* Fixed reference-amplitude calibration. */
 #ifndef GFL_LEVEL6_VOLTAGE_REFERENCE_GAIN
 #define GFL_LEVEL6_VOLTAGE_REFERENCE_GAIN (1.0f)
+#endif
+
+/* Experimental measured DC-bus feed-forward normalization. */
+#ifndef GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD
+#define GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD (1)
+#endif
+
+#ifndef GFL_LEVEL6_DCBUS_VALID_MIN_V
+#define GFL_LEVEL6_DCBUS_VALID_MIN_V (50.0f)
+#endif
+
+#ifndef GFL_LEVEL6_DCBUS_VALID_MAX_V
+#define GFL_LEVEL6_DCBUS_VALID_MAX_V (100.0f)
+#endif
+
+#ifndef GFL_LEVEL6_DCBUS_GAIN_MIN
+#define GFL_LEVEL6_DCBUS_GAIN_MIN (0.75f)
+#endif
+
+#ifndef GFL_LEVEL6_DCBUS_GAIN_MAX
+#define GFL_LEVEL6_DCBUS_GAIN_MAX (1.50f)
 #endif
 
 #ifdef __cplusplus
@@ -72,6 +91,11 @@ typedef struct _tag_offgrid_voltage_ctrl
     parameter_gt line_voltage_rms_active_v;
     parameter_gt frequency_cmd_hz;
     parameter_gt frequency_active_hz;
+
+    /* DC-bus feed-forward monitoring values, in physical volts and ratio. */
+    parameter_gt dc_bus_voltage_nominal_v;
+    parameter_gt dc_bus_voltage_meas_v;
+    parameter_gt dc_bus_feedforward_gain;
 
     /* Reference angle is per-unit: 1.0 == 2*pi. */
     ctrl_gt angle_pu;
@@ -204,6 +228,8 @@ GMP_STATIC_INLINE void ctl_clear_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ct
     }
 
     ctrl->line_voltage_rms_active_v = 0.0f;
+    ctrl->dc_bus_voltage_meas_v = ctrl->dc_bus_voltage_nominal_v;
+    ctrl->dc_bus_feedforward_gain = 1.0f;
     ctrl->angle_pu = float2ctrl(0.0f);
     ctl_set_phasor_via_angle(ctrl->angle_pu, &ctrl->phasor);
 
@@ -240,10 +266,11 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl->voltage_qpr_kr = init->voltage_qpr_kr;
     ctrl->current_qpr_kr = init->current_qpr_kr;
     ctrl->qpr_bandwidth_hz = init->qpr_bandwidth_hz;
+    ctrl->dc_bus_voltage_nominal_v = init->dc_bus_voltage;
 
     /*
      * Voltage loop: voltage-pu -> current-pu.
-     * Current loop: current-pu -> SPWM modulation index.
+     * Current loop: current-pu -> SPWM modulation index at nominal DC bus.
      */
     voltage_kp = init->filter_capacitance * CTL_PARAM_CONST_2PI * init->voltage_loop_bw_hz *
                  init->voltage_base / init->current_base;
@@ -285,6 +312,7 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl_gt voltage_correction;
     ctrl_gt current_correction;
     ctrl_gt delta_voltage;
+    ctrl_gt dc_bus_gain_ctrl;
     parameter_gt quantized_command;
     int axis;
 
@@ -333,17 +361,43 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
             ctrl->line_voltage_rms_active_v = ctrl->line_voltage_rms_cmd_v;
     }
 
+    /*
+     * The GFL core filters the decoded DC-bus ADC value in per unit.  Convert
+     * it back to volts and calculate nominal/measured feed-forward.  Invalid
+     * measurements fall back to unity rather than causing a divide-by-zero or
+     * a large modulation step.
+     */
+#if GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD
+    ctrl->dc_bus_voltage_meas_v =
+        ctrl2float(core->filter_udc.out) * ctrl->voltage_base;
+
+    if (ctrl->dc_bus_voltage_meas_v >= GFL_LEVEL6_DCBUS_VALID_MIN_V &&
+        ctrl->dc_bus_voltage_meas_v <= GFL_LEVEL6_DCBUS_VALID_MAX_V)
+    {
+        ctrl->dc_bus_feedforward_gain =
+            ctrl->dc_bus_voltage_nominal_v / ctrl->dc_bus_voltage_meas_v;
+        ctrl->dc_bus_feedforward_gain =
+            ctl_offgrid_clamp_parameter(ctrl->dc_bus_feedforward_gain,
+                                        GFL_LEVEL6_DCBUS_GAIN_MIN,
+                                        GFL_LEVEL6_DCBUS_GAIN_MAX);
+    }
+    else
+    {
+        ctrl->dc_bus_feedforward_gain = 1.0f;
+    }
+#else
+    ctrl->dc_bus_voltage_meas_v = ctrl->dc_bus_voltage_nominal_v;
+    ctrl->dc_bus_feedforward_gain = 1.0f;
+#endif
+    dc_bus_gain_ctrl = float2ctrl(ctrl->dc_bus_feedforward_gain);
+
     /* Keep phase continuous when the frequency command changes. */
     ctrl->angle_pu += ctrl->angle_step_pu;
     if (ctrl->angle_pu >= float2ctrl(1.0f))
         ctrl->angle_pu -= float2ctrl(1.0f);
     ctl_set_phasor_via_angle(ctrl->angle_pu, &ctrl->phasor);
 
-    /*
-     * V_phase,peak = sqrt(2/3) * V_line,rms.  A fixed SDPE calibration
-     * multiplier compensates the repeatable plant and sampling gain error
-     * without introducing another dynamic loop.
-     */
+    /* V_phase,peak = sqrt(2/3) * V_line,rms. */
     voltage_ref_peak_pu =
         float2ctrl(0.816496580927726f * ctrl->line_voltage_rms_active_v *
                    GFL_LEVEL6_VOLTAGE_REFERENCE_GAIN / ctrl->voltage_base);
@@ -381,8 +435,10 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctl_offgrid_limit_vector(&ctrl->inductor_current_ref_ab, ctrl->current_limit_pu);
 
     /*
-     * Current loop output is modulation index.  Measured capacitor voltage is
-     * fed forward and capacitor-current feedback supplies virtual damping.
+     * Current-loop output is first calculated for nominal DC bus.  Multiplying
+     * the complete modulation vector by Vdc_nominal/Vdc_measured preserves the
+     * applied bridge voltage when the bus changes.  Output-voltage feedback is
+     * still handled independently by the QPR loops above.
      */
     for (axis = 0; axis < 2; ++axis)
     {
@@ -392,10 +448,12 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
         ctl_offgrid_limit_qr_state(&ctrl->current_qpr[axis].resonant_part, ctrl->modulation_limit_pu);
         current_correction = ctl_sat(current_correction, ctrl->modulation_limit_pu, -ctrl->modulation_limit_pu);
 
-        ctrl->modulation_ab.dat[axis] = ctl_mul(ctrl->voltage_feedforward_gain, core->vab0.dat[axis]) +
-                                        current_correction -
-                                        ctl_mul(ctrl->active_damping_gain,
-                                                ctrl->capacitor_current_est_ab.dat[axis]);
+        ctrl->modulation_ab.dat[axis] = ctl_mul(
+            dc_bus_gain_ctrl,
+            ctl_mul(ctrl->voltage_feedforward_gain, core->vab0.dat[axis]) +
+                current_correction -
+                ctl_mul(ctrl->active_damping_gain,
+                        ctrl->capacitor_current_est_ab.dat[axis]));
     }
     ctl_offgrid_limit_vector(&ctrl->modulation_ab, ctrl->modulation_limit_pu);
 }
