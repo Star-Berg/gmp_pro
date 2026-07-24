@@ -26,7 +26,7 @@ extern "C"
 #define PGS_INV_GFL_SIM_SDPE_PROJECT_ID "pgs_inv_gfl_simulate"
 #define PGS_INV_GFL_SIM_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-23"
+#define PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-24"
 
 //=================================================================================================
 /**
@@ -55,6 +55,17 @@ extern "C"
  *        Options: (1), (2), (3)
  */
 #define GFL_VOLTAGE_SAMPLE_PHASE_MODE (1)
+
+//=================================================================================================
+/**
+ * @brief BUILD_LEVEL 6 RMS Amplitude Loop.
+ */
+
+/**
+ * @brief Enable the slow RMS amplitude correction loop for BUILD_LEVEL 6.
+ *        Options: (0), (1)
+ */
+#define GFL_LEVEL6_ENABLE_RMS_AMPLITUDE_LOOP (0)
 
 //=================================================================================================
 /**
@@ -165,6 +176,31 @@ extern "C"
  * @brief Converter current bias.
  */
 #define CTRL_INVERTER_CURRENT_BIAS (1.65f)
+
+/**
+ * @brief Low-pass cutoff used by the Level 6 RMS voltage estimator.
+ */
+#define GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ (10.0f)
+
+/**
+ * @brief Integral gain of the slow Level 6 RMS amplitude correction loop.
+ */
+#define GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S (1.0f)
+
+/**
+ * @brief Minimum internal amplitude correction multiplier.
+ */
+#define GFL_LEVEL6_RMS_GAIN_MIN (0.95f)
+
+/**
+ * @brief Maximum internal amplitude correction multiplier.
+ */
+#define GFL_LEVEL6_RMS_GAIN_MAX (1.05f)
+
+/**
+ * @brief Delay after voltage soft start before enabling RMS amplitude correction.
+ */
+#define GFL_LEVEL6_RMS_SETTLE_TIME_S (0.30f)
 
 /**
  * @brief Startup delay in milliseconds.

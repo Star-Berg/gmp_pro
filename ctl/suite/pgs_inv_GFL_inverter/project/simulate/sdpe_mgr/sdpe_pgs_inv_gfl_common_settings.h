@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-23"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-24"
 
 //=================================================================================================
 /**
@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
  */
-#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (32.0f)
+#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (36.0f)
 
 /**
  * @brief Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.

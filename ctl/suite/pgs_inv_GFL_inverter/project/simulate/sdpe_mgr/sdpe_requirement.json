@@ -8,8 +8,12 @@
   "updated_at": "2026-07-24",
   "output_header": "sdpe_pgs_inv_gfl_simulate_settings.h",
   "hardware": [
-    {"entity": "gmp_helios_3phganinv_lv"},
-    {"entity": "gmp_harmonia_3ph_lc_filter"}
+    {
+      "entity": "gmp_helios_3phganinv_lv"
+    },
+    {
+      "entity": "gmp_harmonia_3ph_lc_filter"
+    }
   ],
   "code_sections": {
     "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>",
@@ -24,7 +28,14 @@
       "weak": false,
       "value": "(6)",
       "options_preset": "",
-      "options": ["(1)", "(2)", "(3)", "(4)", "(5)", "(6)"],
+      "options": [
+        "(1)",
+        "(2)",
+        "(3)",
+        "(4)",
+        "(5)",
+        "(6)"
+      ],
       "description": "Incremental control level; level 5 is grid-connected P/Q control and level 6 is stand-alone line-voltage control for the resload model."
     },
     {
@@ -34,7 +45,10 @@
       "weak": false,
       "value": "(3)",
       "options_preset": "",
-      "options": ["(2)", "(3)"],
+      "options": [
+        "(2)",
+        "(3)"
+      ],
       "description": "Number of directly sampled phase currents."
     },
     {
@@ -44,7 +58,11 @@
       "weak": false,
       "value": "(1)",
       "options_preset": "",
-      "options": ["(1)", "(2)", "(3)"],
+      "options": [
+        "(1)",
+        "(2)",
+        "(3)"
+      ],
       "description": "Simulation supplies Uab and Ubc line-to-line voltage samples; mode 1 reconstructs stationary phase-voltage alpha/beta feedback."
     },
     {
@@ -52,52 +70,369 @@
       "macro": "GFL_LEVEL6_ENABLE_RMS_AMPLITUDE_LOOP",
       "enabled": true,
       "weak": false,
-      "value": "(1)",
+      "value": "(0)",
       "options_preset": "",
-      "options": ["(0)", "(1)"],
+      "options": [
+        "(0)",
+        "(1)"
+      ],
       "description": "Enable the slow RMS amplitude correction loop for BUILD_LEVEL 6."
     }
   ],
   "requirements": [
-    {"role":"controller_frequency","macro":"CONTROLLER_FREQUENCY","enabled":true,"weak":false,"binding":{"number":"20e3"},"description":"Simulation control step frequency."},
-    {"role":"pwm_compare_max","macro":"CTRL_PWM_CMP_MAX","enabled":true,"weak":false,"binding":{"number":"3000"},"description":"Virtual PWM compare range."},
-    {"role":"pwm_deadband","macro":"CTRL_PWM_DEADBAND_CMP","enabled":true,"weak":false,"binding":{"number":"50"},"description":"Virtual PWM dead-band count."},
-    {"role":"adc_voltage_reference","macro":"CTRL_ADC_VOLTAGE_REF","enabled":true,"weak":false,"binding":{"float":"3.3"},"description":"Virtual ADC reference."},
-    {"role":"dc_bus_voltage_base","macro":"CTRL_DCBUS_VOLTAGE","enabled":true,"weak":false,"binding":{"float":"80.0"},"description":"DC-bus voltage base."},
-    {"role":"phase_voltage_base","macro":"CTRL_VOLTAGE_BASE","enabled":true,"weak":false,"binding":{"literal":"(CTRL_DCBUS_VOLTAGE / 1.73205081f)"},"description":"SVPWM phase-voltage base."},
-    {"role":"current_base","macro":"CTRL_CURRENT_BASE","enabled":true,"weak":false,"binding":{"float":"10.0"},"description":"Phase-current base."},
-    {"role":"grid_filter_inductance","macro":"GFL_GRID_FILTER_INDUCTANCE_H","enabled":true,"weak":false,"binding":{"literal":"(HARMONIA_3PH_LC_FILTER_INDUCTANCE_H)"},"description":"Harmonia inductance."},
-    {"role":"grid_filter_capacitance","macro":"GFL_GRID_FILTER_CAPACITANCE_F","enabled":true,"weak":false,"binding":{"literal":"(HARMONIA_3PH_LC_FILTER_CAPACITANCE_F)"},"description":"Harmonia capacitance."},
-    {"role":"dc_voltage_sensitivity","macro":"CTRL_DC_VOLTAGE_SENSITIVITY","enabled":true,"weak":false,"binding":{"float":"0.02738589"},"description":"DC voltage gain."},
-    {"role":"dc_voltage_bias","macro":"CTRL_DC_VOLTAGE_BIAS","enabled":true,"weak":false,"binding":{"float":"0.0"},"description":"DC voltage bias."},
-    {"role":"grid_voltage_sensitivity","macro":"CTRL_GRID_VOLTAGE_SENSITIVITY","enabled":true,"weak":false,"binding":{"float":"0.0135135"},"description":"Grid-voltage gain."},
-    {"role":"grid_voltage_bias","macro":"CTRL_GRID_VOLTAGE_BIAS","enabled":true,"weak":false,"binding":{"float":"1.65"},"description":"Grid-voltage bias."},
-    {"role":"inverter_voltage_sensitivity","macro":"CTRL_INVERTER_VOLTAGE_SENSITIVITY","enabled":true,"weak":false,"binding":{"float":"0.02738589"},"description":"Converter voltage gain."},
-    {"role":"inverter_voltage_bias","macro":"CTRL_INVERTER_VOLTAGE_BIAS","enabled":true,"weak":false,"binding":{"float":"0.0"},"description":"Converter voltage bias."},
-    {"role":"dc_current_sensitivity","macro":"CTRL_DC_CURRENT_SENSITIVITY","enabled":true,"weak":false,"binding":{"float":"0.02475"},"description":"DC current sensitivity."},
-    {"role":"dc_current_bias","macro":"CTRL_DC_CURRENT_BIAS","enabled":true,"weak":false,"binding":{"float":"1.65"},"description":"DC current bias."},
-    {"role":"grid_current_sensitivity","macro":"CTRL_GRID_CURRENT_SENSITIVITY","enabled":true,"weak":false,"binding":{"literal":"(HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)"},"description":"Grid-current sensitivity."},
-    {"role":"grid_current_bias","macro":"CTRL_GRID_CURRENT_BIAS","enabled":true,"weak":false,"binding":{"literal":"(HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)"},"description":"Grid-current bias."},
-    {"role":"inverter_current_sensitivity","macro":"CTRL_INVERTER_CURRENT_SENSITIVITY","enabled":true,"weak":false,"binding":{"float":"0.05"},"description":"Converter current sensitivity."},
-    {"role":"inverter_current_bias","macro":"CTRL_INVERTER_CURRENT_BIAS","enabled":true,"weak":false,"binding":{"float":"1.65"},"description":"Converter current bias."},
-    {"role":"level6_rms_filter_cutoff","macro":"GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ","enabled":true,"weak":false,"binding":{"float":"10.0"},"description":"Low-pass cutoff used by the Level 6 RMS voltage estimator."},
-    {"role":"level6_rms_integral_gain","macro":"GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S","enabled":true,"weak":false,"binding":{"float":"1.0"},"description":"Integral gain of the slow Level 6 RMS amplitude correction loop."},
-    {"role":"level6_rms_gain_min","macro":"GFL_LEVEL6_RMS_GAIN_MIN","enabled":true,"weak":false,"binding":{"float":"0.95"},"description":"Minimum internal amplitude correction multiplier."},
-    {"role":"level6_rms_gain_max","macro":"GFL_LEVEL6_RMS_GAIN_MAX","enabled":true,"weak":false,"binding":{"float":"1.05"},"description":"Maximum internal amplitude correction multiplier."},
-    {"role":"level6_rms_settle_time","macro":"GFL_LEVEL6_RMS_SETTLE_TIME_S","enabled":true,"weak":false,"binding":{"float":"0.30"},"description":"Delay after voltage soft start before enabling RMS amplitude correction."},
-    {"role":"startup_delay","macro":"CTRL_STARTUP_DELAY","enabled":true,"weak":false,"binding":{"number":"50"},"description":"Startup delay in milliseconds."}
+    {
+      "role": "controller_frequency",
+      "macro": "CONTROLLER_FREQUENCY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "20e3"
+      },
+      "description": "Simulation control step frequency."
+    },
+    {
+      "role": "pwm_compare_max",
+      "macro": "CTRL_PWM_CMP_MAX",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "3000"
+      },
+      "description": "Virtual PWM compare range."
+    },
+    {
+      "role": "pwm_deadband",
+      "macro": "CTRL_PWM_DEADBAND_CMP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "50"
+      },
+      "description": "Virtual PWM dead-band count."
+    },
+    {
+      "role": "adc_voltage_reference",
+      "macro": "CTRL_ADC_VOLTAGE_REF",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "3.3"
+      },
+      "description": "Virtual ADC reference."
+    },
+    {
+      "role": "dc_bus_voltage_base",
+      "macro": "CTRL_DCBUS_VOLTAGE",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "80.0"
+      },
+      "description": "DC-bus voltage base."
+    },
+    {
+      "role": "phase_voltage_base",
+      "macro": "CTRL_VOLTAGE_BASE",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(CTRL_DCBUS_VOLTAGE / 1.73205081f)"
+      },
+      "description": "SVPWM phase-voltage base."
+    },
+    {
+      "role": "current_base",
+      "macro": "CTRL_CURRENT_BASE",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "10.0"
+      },
+      "description": "Phase-current base."
+    },
+    {
+      "role": "grid_filter_inductance",
+      "macro": "GFL_GRID_FILTER_INDUCTANCE_H",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(HARMONIA_3PH_LC_FILTER_INDUCTANCE_H)"
+      },
+      "description": "Harmonia inductance."
+    },
+    {
+      "role": "grid_filter_capacitance",
+      "macro": "GFL_GRID_FILTER_CAPACITANCE_F",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(HARMONIA_3PH_LC_FILTER_CAPACITANCE_F)"
+      },
+      "description": "Harmonia capacitance."
+    },
+    {
+      "role": "dc_voltage_sensitivity",
+      "macro": "CTRL_DC_VOLTAGE_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.02738589"
+      },
+      "description": "DC voltage gain."
+    },
+    {
+      "role": "dc_voltage_bias",
+      "macro": "CTRL_DC_VOLTAGE_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "DC voltage bias."
+    },
+    {
+      "role": "grid_voltage_sensitivity",
+      "macro": "CTRL_GRID_VOLTAGE_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0135135"
+      },
+      "description": "Grid-voltage gain."
+    },
+    {
+      "role": "grid_voltage_bias",
+      "macro": "CTRL_GRID_VOLTAGE_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.65"
+      },
+      "description": "Grid-voltage bias."
+    },
+    {
+      "role": "inverter_voltage_sensitivity",
+      "macro": "CTRL_INVERTER_VOLTAGE_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.02738589"
+      },
+      "description": "Converter voltage gain."
+    },
+    {
+      "role": "inverter_voltage_bias",
+      "macro": "CTRL_INVERTER_VOLTAGE_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "Converter voltage bias."
+    },
+    {
+      "role": "dc_current_sensitivity",
+      "macro": "CTRL_DC_CURRENT_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.02475"
+      },
+      "description": "DC current sensitivity."
+    },
+    {
+      "role": "dc_current_bias",
+      "macro": "CTRL_DC_CURRENT_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.65"
+      },
+      "description": "DC current bias."
+    },
+    {
+      "role": "grid_current_sensitivity",
+      "macro": "CTRL_GRID_CURRENT_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)"
+      },
+      "description": "Grid-current sensitivity."
+    },
+    {
+      "role": "grid_current_bias",
+      "macro": "CTRL_GRID_CURRENT_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)"
+      },
+      "description": "Grid-current bias."
+    },
+    {
+      "role": "inverter_current_sensitivity",
+      "macro": "CTRL_INVERTER_CURRENT_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.05"
+      },
+      "description": "Converter current sensitivity."
+    },
+    {
+      "role": "inverter_current_bias",
+      "macro": "CTRL_INVERTER_CURRENT_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.65"
+      },
+      "description": "Converter current bias."
+    },
+    {
+      "role": "level6_rms_filter_cutoff",
+      "macro": "GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "10.0"
+      },
+      "description": "Low-pass cutoff used by the Level 6 RMS voltage estimator."
+    },
+    {
+      "role": "level6_rms_integral_gain",
+      "macro": "GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.0"
+      },
+      "description": "Integral gain of the slow Level 6 RMS amplitude correction loop."
+    },
+    {
+      "role": "level6_rms_gain_min",
+      "macro": "GFL_LEVEL6_RMS_GAIN_MIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.95"
+      },
+      "description": "Minimum internal amplitude correction multiplier."
+    },
+    {
+      "role": "level6_rms_gain_max",
+      "macro": "GFL_LEVEL6_RMS_GAIN_MAX",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.05"
+      },
+      "description": "Maximum internal amplitude correction multiplier."
+    },
+    {
+      "role": "level6_rms_settle_time",
+      "macro": "GFL_LEVEL6_RMS_SETTLE_TIME_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.30"
+      },
+      "description": "Delay after voltage soft start before enabling RMS amplitude correction."
+    },
+    {
+      "role": "startup_delay",
+      "macro": "CTRL_STARTUP_DELAY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "50"
+      },
+      "description": "Startup delay in milliseconds."
+    }
   ],
   "requirement_groups": [
-    {"name":"Peripheral Parameters","requirements":["controller_frequency","pwm_compare_max","pwm_deadband","adc_voltage_reference"]},
-    {"name":"Per-Unit Base Parameters","requirements":["dc_bus_voltage_base","phase_voltage_base","current_base"]},
-    {"name":"Grid Filter Parameters","requirements":["grid_filter_inductance","grid_filter_capacitance"]},
-    {"name":"DC Bus Voltage Sensor","requirements":["dc_voltage_sensitivity","dc_voltage_bias"]},
-    {"name":"Grid Voltage Sensor","requirements":["grid_voltage_sensitivity","grid_voltage_bias"]},
-    {"name":"Inverter Phase Voltage Sensor","requirements":["inverter_voltage_sensitivity","inverter_voltage_bias"]},
-    {"name":"DC Current Sensor","requirements":["dc_current_sensitivity","dc_current_bias"]},
-    {"name":"Grid Current Sensor","requirements":["grid_current_sensitivity","grid_current_bias"]},
-    {"name":"Inverter Phase Current Sensor","requirements":["inverter_current_sensitivity","inverter_current_bias"]},
-    {"name":"BUILD_LEVEL 6 RMS Amplitude Loop","requirements":["level6_rms_filter_cutoff","level6_rms_integral_gain","level6_rms_gain_min","level6_rms_gain_max","level6_rms_settle_time"]},
-    {"name":"Runtime Parameters","requirements":["startup_delay"]}
+    {
+      "name": "Peripheral Parameters",
+      "requirements": [
+        "controller_frequency",
+        "pwm_compare_max",
+        "pwm_deadband",
+        "adc_voltage_reference"
+      ]
+    },
+    {
+      "name": "Per-Unit Base Parameters",
+      "requirements": [
+        "dc_bus_voltage_base",
+        "phase_voltage_base",
+        "current_base"
+      ]
+    },
+    {
+      "name": "Grid Filter Parameters",
+      "requirements": [
+        "grid_filter_inductance",
+        "grid_filter_capacitance"
+      ]
+    },
+    {
+      "name": "DC Bus Voltage Sensor",
+      "requirements": [
+        "dc_voltage_sensitivity",
+        "dc_voltage_bias"
+      ]
+    },
+    {
+      "name": "Grid Voltage Sensor",
+      "requirements": [
+        "grid_voltage_sensitivity",
+        "grid_voltage_bias"
+      ]
+    },
+    {
+      "name": "Inverter Phase Voltage Sensor",
+      "requirements": [
+        "inverter_voltage_sensitivity",
+        "inverter_voltage_bias"
+      ]
+    },
+    {
+      "name": "DC Current Sensor",
+      "requirements": [
+        "dc_current_sensitivity",
+        "dc_current_bias"
+      ]
+    },
+    {
+      "name": "Grid Current Sensor",
+      "requirements": [
+        "grid_current_sensitivity",
+        "grid_current_bias"
+      ]
+    },
+    {
+      "name": "Inverter Phase Current Sensor",
+      "requirements": [
+        "inverter_current_sensitivity",
+        "inverter_current_bias"
+      ]
+    },
+    {
+      "name": "BUILD_LEVEL 6 RMS Amplitude Loop",
+      "requirements": [
+        "level6_rms_filter_cutoff",
+        "level6_rms_integral_gain",
+        "level6_rms_gain_min",
+        "level6_rms_gain_max",
+        "level6_rms_settle_time"
+      ]
+    },
+    {
+      "name": "Runtime Parameters",
+      "requirements": [
+        "startup_delay"
+      ]
+    }
   ]
 }

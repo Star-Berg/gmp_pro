@@ -12,7 +12,7 @@ PGS_INV_GFL_SIM_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_SIM_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-23';
+PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-24';
 
 %% Hardware macros
 INN100E0016A_ID = 'inn100e0016a';
@@ -341,6 +341,11 @@ GFL_CURRENT_SAMPLE_PHASE_MODE = 3;
 % Options: (1), (2), (3)
 GFL_VOLTAGE_SAMPLE_PHASE_MODE = 1;
 
+%% BUILD_LEVEL 6 RMS Amplitude Loop
+% Enable the slow RMS amplitude correction loop for BUILD_LEVEL 6.
+% Options: (0), (1)
+GFL_LEVEL6_ENABLE_RMS_AMPLITUDE_LOOP = 0;
+
 %% Requirement bindings
 % Simulation control step frequency.
 CONTROLLER_FREQUENCY = 20e3;
@@ -404,6 +409,21 @@ CTRL_INVERTER_CURRENT_SENSITIVITY = 0.05;
 
 % Converter current bias.
 CTRL_INVERTER_CURRENT_BIAS = 1.65;
+
+% Low-pass cutoff used by the Level 6 RMS voltage estimator.
+GFL_LEVEL6_RMS_FILTER_CUTOFF_HZ = 10.0;
+
+% Integral gain of the slow Level 6 RMS amplitude correction loop.
+GFL_LEVEL6_RMS_INTEGRAL_GAIN_PER_S = 1.0;
+
+% Minimum internal amplitude correction multiplier.
+GFL_LEVEL6_RMS_GAIN_MIN = 0.95;
+
+% Maximum internal amplitude correction multiplier.
+GFL_LEVEL6_RMS_GAIN_MAX = 1.05;
+
+% Delay after voltage soft start before enabling RMS amplitude correction.
+GFL_LEVEL6_RMS_SETTLE_TIME_S = 0.30;
 
 % Startup delay in milliseconds.
 CTRL_STARTUP_DELAY = 50;

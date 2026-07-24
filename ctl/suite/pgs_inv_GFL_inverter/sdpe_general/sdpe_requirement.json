@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-23",
+  "updated_at": "2026-07-24",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -275,7 +275,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "32.0"
+        "float": "36.0"
       },
       "description": "BUILD_LEVEL 6 default line-to-line RMS voltage command in volts."
     },
