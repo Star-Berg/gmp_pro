@@ -111,8 +111,8 @@ SINV_MODEL_DIODE_RON = 0.01;
 % Body-diode forward voltage.
 SINV_MODEL_DIODE_VF = 0.5;
 
-% DC bus overvoltage threshold.
-CTRL_PROT_VBUS_MAX = 90.0;
+% DC bus overvoltage threshold for simulation startup transients.
+CTRL_PROT_VBUS_MAX = 100.0;
 
 % Fast AC peak-current threshold.
 CTRL_PROT_IAC_PEAK_MAX = 18.0;

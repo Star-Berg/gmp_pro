@@ -37,6 +37,15 @@ extern adc_channel_t adc_i_ac;
 // DC Bus Voltage Feedback
 extern adc_channel_t adc_v_bus;
 
+// Buck Inductor Current Feedback
+extern adc_channel_t adc_i_buck;
+
+// Buck Input Voltage Feedback, currently unused because Buck Vin shares adc_v_bus
+extern adc_channel_t adc_v_buck_in;
+
+// Buck Output Voltage Feedback from external measurement board
+extern adc_channel_t adc_v_buck_out;
+
 // dlog DSA objects
 //extern basic_trigger_t trigger;
 

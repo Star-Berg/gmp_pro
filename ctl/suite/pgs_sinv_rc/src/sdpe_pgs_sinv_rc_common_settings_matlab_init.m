@@ -12,7 +12,7 @@ PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-23';
+PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-24';
 
 %% Control Features
 % Enable delayed insertion of the frequency-adaptive repetitive controller.
@@ -99,13 +99,13 @@ SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.65;
 SINV_OUTER_LOOP_FREQUENCY_HZ = 1000.0;
 
 % Buck voltage-loop execution frequency.
-SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ = 1000.0;
+SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ = 200.0;
 
 % Buck voltage-loop proportional gain.
-SINV_BUCK_VOLTAGE_LOOP_KP = 0.35;
+SINV_BUCK_VOLTAGE_LOOP_KP = 0.1;
 
 % Buck voltage-loop integral gain per second.
-SINV_BUCK_VOLTAGE_LOOP_KI = 30.0;
+SINV_BUCK_VOLTAGE_LOOP_KI = 15.0;
 
 % Buck current-loop proportional gain.
 SINV_BUCK_CURRENT_LOOP_KP = 0.20;
@@ -128,8 +128,20 @@ SINV_LEVEL4_ACTIVE_POWER_REF_PU = 0.15;
 % BUILD_LEVEL 5 physical DC bus voltage target.
 SINV_DC_BUS_REF_V = 80.0;
 
+% BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
+SINV_POWER_FACTOR_REF = 1.0;
+
+% BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+SINV_POWER_FACTOR_Q_SIGN = -1.0;
+
+% BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
+SINV_POWER_FACTOR_Q_GAIN = 1.06;
+
 % Buck output voltage target.
 SINV_BUCK_OUTPUT_REF_V = 60.0;
+
+% Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.
+SINV_BUCK_VREF_SLEW_V_S = 120.0;
 
 % Buck inductor-current command limit in ampere.
 SINV_BUCK_CURRENT_LIMIT_A = 5.0;
@@ -142,9 +154,6 @@ SINV_BUCK_START_VBUS_MIN_V = 55.0;
 
 % Delay after the Buck start condition is met before PWM compare ramps.
 SINV_BUCK_START_DELAY_MS = 100;
-
-% Maximum Buck duty compare-command slew rate in PU per second.
-SINV_BUCK_DUTY_SLEW_PU_S = 2.0;
 
 % Buck duty-cycle lower clamp.
 SINV_BUCK_DUTY_MIN = 0.0;
@@ -162,7 +171,7 @@ SINV_BUCK_DUTY_FF_MARGIN = 0.02;
 SINV_BUCK_VIN_FF_LPF_ALPHA = 0.006;
 
 % Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward.
-SINV_BUCK_DUTY_FF_GAIN = 0.35;
+SINV_BUCK_DUTY_FF_GAIN = 0.15;
 
 % Nominal grid frequency in Hz.
 CTRL_GRID_FREQUENCY = 50.0;

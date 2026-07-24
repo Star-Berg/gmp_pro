@@ -23,7 +23,7 @@ extern "C"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_ID "pgs_sinv_rc_common"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-23"
+#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-24"
 
 //=================================================================================================
 /**
@@ -178,17 +178,17 @@ extern "C"
 /**
  * @brief Buck voltage-loop execution frequency.
  */
-#define SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ (1000.0f)
+#define SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ (200.0f)
 
 /**
  * @brief Buck voltage-loop proportional gain.
  */
-#define SINV_BUCK_VOLTAGE_LOOP_KP (0.35f)
+#define SINV_BUCK_VOLTAGE_LOOP_KP (0.1f)
 
 /**
  * @brief Buck voltage-loop integral gain per second.
  */
-#define SINV_BUCK_VOLTAGE_LOOP_KI (30.0f)
+#define SINV_BUCK_VOLTAGE_LOOP_KI (15.0f)
 
 /**
  * @brief Buck current-loop proportional gain.
@@ -226,9 +226,29 @@ extern "C"
 #define SINV_DC_BUS_REF_V (80.0f)
 
 /**
+ * @brief BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
+ */
+#define SINV_POWER_FACTOR_REF (1.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+ */
+#define SINV_POWER_FACTOR_Q_SIGN (-1.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
+ */
+#define SINV_POWER_FACTOR_Q_GAIN (1.06f)
+
+/**
  * @brief Buck output voltage target.
  */
 #define SINV_BUCK_OUTPUT_REF_V (60.0f)
+
+/**
+ * @brief Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.
+ */
+#define SINV_BUCK_VREF_SLEW_V_S (120.0f)
 
 /**
  * @brief Buck inductor-current command limit in ampere.
@@ -249,11 +269,6 @@ extern "C"
  * @brief Delay after the Buck start condition is met before PWM compare ramps.
  */
 #define SINV_BUCK_START_DELAY_MS (100)
-
-/**
- * @brief Maximum Buck duty compare-command slew rate in PU per second.
- */
-#define SINV_BUCK_DUTY_SLEW_PU_S (2.0f)
 
 /**
  * @brief Buck duty-cycle lower clamp.
@@ -283,7 +298,7 @@ extern "C"
 /**
  * @brief Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward.
  */
-#define SINV_BUCK_DUTY_FF_GAIN (0.35f)
+#define SINV_BUCK_DUTY_FF_GAIN (0.15f)
 
 /**
  * @brief Nominal grid frequency in Hz.

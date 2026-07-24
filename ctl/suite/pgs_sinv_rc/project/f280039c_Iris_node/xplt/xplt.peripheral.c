@@ -90,8 +90,8 @@ void setup_peripheral(void)
                          12, 24);
 
     ctl_init_adc_channel(&adc_i_buck,
-                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_AC_CURRENT_SENSITIVITY, CTRL_CURRENT_BASE),
-                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_AC_CURRENT_BIAS),
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_CURRENT_SENSITIVITY, CTRL_CURRENT_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_CURRENT_BIAS),
                          12, 24);
 
     ctl_init_adc_channel(&adc_v_buck_in,
@@ -100,8 +100,9 @@ void setup_peripheral(void)
                          12, 24);
 
     ctl_init_adc_channel(&adc_v_buck_out,
-                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_SENSITIVITY, CTRL_VOLTAGE_BASE),
-                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY,
+                                               CTRL_VOLTAGE_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_OUTPUT_VOLTAGE_BIAS),
                          12, 24);
 
     // ---------------------------------------------------------

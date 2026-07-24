@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_sinv_rc projects.",
   "suite": "pgs_sinv_rc",
   "version": "1.0.0",
-  "updated_at": "2026-07-23",
+  "updated_at": "2026-07-24",
   "output_header": "sdpe_pgs_sinv_rc_common_settings.h",
   "hardware": [],
   "feature_macros": [
@@ -282,7 +282,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1000.0"
+        "float": "200.0"
       },
       "description": "Buck voltage-loop execution frequency."
     },
@@ -292,7 +292,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.35"
+        "float": "0.1"
       },
       "description": "Buck voltage-loop proportional gain."
     },
@@ -302,7 +302,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "30.0"
+        "float": "15.0"
       },
       "description": "Buck voltage-loop integral gain per second."
     },
@@ -377,6 +377,36 @@
       "description": "BUILD_LEVEL 5 physical DC bus voltage target."
     },
     {
+      "role": "power_factor_ref",
+      "macro": "SINV_POWER_FACTOR_REF",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.0"
+      },
+      "description": "BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0."
+    },
+    {
+      "role": "power_factor_q_sign",
+      "macro": "SINV_POWER_FACTOR_Q_SIGN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "-1.0"
+      },
+      "description": "BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction."
+    },
+    {
+      "role": "power_factor_q_gain",
+      "macro": "SINV_POWER_FACTOR_Q_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.06"
+      },
+      "description": "BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction."
+    },
+    {
       "role": "buck_output_ref",
       "macro": "SINV_BUCK_OUTPUT_REF_V",
       "enabled": true,
@@ -385,6 +415,16 @@
         "float": "60.0"
       },
       "description": "Buck output voltage target."
+    },
+    {
+      "role": "buck_vref_slew",
+      "macro": "SINV_BUCK_VREF_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "120.0"
+      },
+      "description": "Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter."
     },
     {
       "role": "buck_current_limit",
@@ -425,16 +465,6 @@
         "number": "100"
       },
       "description": "Delay after the Buck start condition is met before PWM compare ramps."
-    },
-    {
-      "role": "buck_duty_slew",
-      "macro": "SINV_BUCK_DUTY_SLEW_PU_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "2.0"
-      },
-      "description": "Maximum Buck duty compare-command slew rate in PU per second."
     },
     {
       "role": "buck_duty_min",
@@ -492,7 +522,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.35"
+        "float": "0.15"
       },
       "description": "Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward."
     },
@@ -555,7 +585,11 @@
         "level3_reactive",
         "level4_power",
         "bus_ref",
+        "power_factor_ref",
+        "power_factor_q_sign",
+        "power_factor_q_gain",
         "buck_output_ref",
+        "buck_vref_slew",
         "buck_current_limit"
       ]
     },
@@ -565,7 +599,6 @@
         "startup_delay",
         "buck_start_vbus_min",
         "buck_start_delay",
-        "buck_duty_slew",
         "buck_duty_min",
         "buck_duty_max",
         "buck_duty_trim_limit",
