@@ -12,9 +12,10 @@
  *     -> alpha/beta QPR voltage loop
  *     -> load-current + capacitor-current feed-forward
  *     -> estimated inductor-current reference
- *     -> alpha/beta QPR current loop
+ *     -> alpha/beta QPR current loop in bridge-voltage per unit
  *     -> capacitor-voltage feed-forward + active damping
- *     -> rate-limited DC-bus feed-forward normalization
+ *     -> bridge-voltage command limiting
+ *     -> measured DC-bus voltage-to-modulation conversion
  *     -> SPWM modulation command
  *
  * Both stationary axes use the same resonant frequency, so positive- and
@@ -34,7 +35,7 @@
 #define GFL_LEVEL6_VOLTAGE_REFERENCE_GAIN (1.0f)
 #endif
 
-/* Experimental measured DC-bus feed-forward normalization. */
+/* Experimental measured DC-bus normalization. */
 #ifndef GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD
 #define GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD (1)
 #endif
@@ -55,7 +56,7 @@
 #define GFL_LEVEL6_DCBUS_GAIN_MAX (1.50f)
 #endif
 
-/* Maximum change of the feed-forward multiplier per second. */
+/* Maximum change of the nominal/measured DC-bus ratio per second. */
 #ifndef GFL_LEVEL6_DCBUS_GAIN_SLEW_PER_S
 #define GFL_LEVEL6_DCBUS_GAIN_SLEW_PER_S (5.0f)
 #endif
@@ -97,7 +98,7 @@ typedef struct _tag_offgrid_voltage_ctrl
     parameter_gt frequency_cmd_hz;
     parameter_gt frequency_active_hz;
 
-    /* DC-bus feed-forward monitoring values, in physical volts and ratio. */
+    /* DC-bus conversion monitoring values, in physical volts and ratio. */
     parameter_gt dc_bus_voltage_nominal_v;
     parameter_gt dc_bus_voltage_meas_v;
     parameter_gt dc_bus_feedforward_target_gain;
@@ -115,6 +116,7 @@ typedef struct _tag_offgrid_voltage_ctrl
     ctl_vector2_t capacitor_current_est_ab;
     ctl_vector2_t inductor_current_ref_ab;
     ctl_vector2_t inductor_current_est_ab;
+    ctl_vector2_t bridge_voltage_cmd_ab;
     ctl_vector2_t modulation_ab;
 
     /* QPR loops for alpha and beta axes. */
@@ -137,8 +139,9 @@ typedef struct _tag_offgrid_voltage_ctrl
     ctrl_gt voltage_slew_step_v;
     ctrl_gt capacitor_derivative_gain;
     ctrl_gt capacitor_reference_gain;
-    ctrl_gt voltage_feedforward_gain;
-    ctrl_gt active_damping_gain;
+    ctrl_gt nominal_voltage_to_modulation_gain;
+    ctrl_gt active_damping_voltage_gain;
+    ctrl_gt bridge_voltage_limit_pu;
     ctrl_gt current_limit_pu;
     ctrl_gt modulation_limit_pu;
 
@@ -247,6 +250,7 @@ GMP_STATIC_INLINE void ctl_clear_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ct
     ctl_vector2_clear(&ctrl->capacitor_current_est_ab);
     ctl_vector2_clear(&ctrl->inductor_current_ref_ab);
     ctl_vector2_clear(&ctrl->inductor_current_est_ab);
+    ctl_vector2_clear(&ctrl->bridge_voltage_cmd_ab);
     ctl_vector2_clear(&ctrl->modulation_ab);
     ctl_vector2_clear(&ctrl->voltage_ab_last);
 
@@ -257,7 +261,8 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
                                                       const offgrid_voltage_ctrl_init_t* init)
 {
     parameter_gt voltage_kp;
-    parameter_gt current_kp;
+    parameter_gt current_kp_voltage_pu;
+    parameter_gt nominal_voltage_to_modulation_gain;
     int axis;
 
     gmp_base_assert(ctrl);
@@ -272,34 +277,46 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl->current_base = init->current_base;
     ctrl->filter_capacitance = init->filter_capacitance;
     ctrl->voltage_qpr_kr = init->voltage_qpr_kr;
-    ctrl->current_qpr_kr = init->current_qpr_kr;
     ctrl->qpr_bandwidth_hz = init->qpr_bandwidth_hz;
     ctrl->dc_bus_voltage_nominal_v = init->dc_bus_voltage;
     ctrl->dc_bus_gain_slew_step = GFL_LEVEL6_DCBUS_GAIN_SLEW_PER_S / init->fs;
 
+    nominal_voltage_to_modulation_gain =
+        2.0f * init->voltage_base / init->dc_bus_voltage;
+
     /*
      * Voltage loop: voltage-pu -> current-pu.
-     * Current loop: current-pu -> SPWM modulation index at nominal DC bus.
+     * Current loop: current-pu -> requested bridge-voltage-pu.
+     *
+     * The configured current-loop Kr was historically expressed in nominal
+     * modulation units.  Convert it once into bridge-voltage-pu so the new
+     * implementation remains equivalent at the nominal DC bus.
      */
     voltage_kp = init->filter_capacitance * CTL_PARAM_CONST_2PI * init->voltage_loop_bw_hz *
                  init->voltage_base / init->current_base;
-    current_kp = 2.0f * init->filter_inductance * CTL_PARAM_CONST_2PI * init->current_loop_bw_hz *
-                 init->current_base / init->dc_bus_voltage;
+    current_kp_voltage_pu = init->filter_inductance * CTL_PARAM_CONST_2PI *
+                            init->current_loop_bw_hz * init->current_base /
+                            init->voltage_base;
+    ctrl->current_qpr_kr = init->current_qpr_kr / nominal_voltage_to_modulation_gain;
 
     for (axis = 0; axis < 2; ++axis)
     {
         ctl_init_qpr_controller(&ctrl->voltage_qpr[axis], voltage_kp, init->voltage_qpr_kr,
                                 init->default_frequency_hz, init->qpr_bandwidth_hz, init->fs);
-        ctl_init_qpr_controller(&ctrl->current_qpr[axis], current_kp, init->current_qpr_kr,
+        ctl_init_qpr_controller(&ctrl->current_qpr[axis], current_kp_voltage_pu, ctrl->current_qpr_kr,
                                 init->default_frequency_hz, init->qpr_bandwidth_hz, init->fs);
     }
 
     ctrl->voltage_slew_step_v = float2ctrl(init->voltage_slew_v_per_s / init->fs);
     ctrl->capacitor_derivative_gain = float2ctrl(init->filter_capacitance * init->fs * init->voltage_base /
                                                  init->current_base);
-    ctrl->voltage_feedforward_gain = float2ctrl(2.0f * init->voltage_base / init->dc_bus_voltage);
-    ctrl->active_damping_gain =
-        float2ctrl(2.0f * init->active_damping_resistance_ohm * init->current_base / init->dc_bus_voltage);
+    ctrl->nominal_voltage_to_modulation_gain =
+        float2ctrl(nominal_voltage_to_modulation_gain);
+    ctrl->active_damping_voltage_gain =
+        float2ctrl(init->active_damping_resistance_ohm * init->current_base /
+                   init->voltage_base);
+    ctrl->bridge_voltage_limit_pu =
+        float2ctrl(init->modulation_limit_pu / nominal_voltage_to_modulation_gain);
     ctrl->current_limit_pu = float2ctrl(init->current_limit_pu);
     ctrl->modulation_limit_pu = float2ctrl(init->modulation_limit_pu);
 
@@ -319,9 +336,11 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl_gt voltage_ref_peak_pu;
     ctrl_gt voltage_step;
     ctrl_gt voltage_correction;
-    ctrl_gt current_correction;
+    ctrl_gt current_voltage_correction;
     ctrl_gt delta_voltage;
     ctrl_gt dc_bus_gain_ctrl;
+    ctrl_gt voltage_to_modulation_gain;
+    ctrl_gt bridge_voltage_limit_pu;
     parameter_gt quantized_command;
     parameter_gt dc_bus_gain_delta;
     int axis;
@@ -373,8 +392,8 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
 
     /*
      * The GFL core filters the decoded DC-bus ADC value in per unit.  Convert
-     * it back to volts and calculate nominal/measured feed-forward.  Invalid
-     * measurements command a smooth return to unity rather than a jump.
+     * it back to volts and calculate the nominal/measured ratio.  Invalid
+     * measurements command a smooth return to the nominal conversion.
      */
 #if GFL_LEVEL6_ENABLE_DCBUS_FEEDFORWARD
     ctrl->dc_bus_voltage_meas_v =
@@ -400,9 +419,9 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
 #endif
 
     /*
-     * Rate-limit the compensation multiplier so an 80 V -> 70 V bus step does
-     * not instantly apply the full 14.3 percent modulation change to the LC
-     * filter.  At the default 5 /s limit, the transition takes about 29 ms.
+     * Rate-limit the voltage-to-modulation conversion so a bus step does not
+     * instantaneously excite the LC filter.  The control loops above and below
+     * this conversion remain expressed in physical per-unit quantities.
      */
     dc_bus_gain_delta =
         ctrl->dc_bus_feedforward_target_gain - ctrl->dc_bus_feedforward_gain;
@@ -414,6 +433,11 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
         ctrl->dc_bus_feedforward_gain = ctrl->dc_bus_feedforward_target_gain;
 
     dc_bus_gain_ctrl = float2ctrl(ctrl->dc_bus_feedforward_gain);
+    voltage_to_modulation_gain =
+        ctl_mul(ctrl->nominal_voltage_to_modulation_gain, dc_bus_gain_ctrl);
+    bridge_voltage_limit_pu =
+        ctl_div(ctrl->modulation_limit_pu, voltage_to_modulation_gain);
+    ctrl->bridge_voltage_limit_pu = bridge_voltage_limit_pu;
 
     /* Keep phase continuous when the frequency command changes. */
     ctrl->angle_pu += ctrl->angle_step_pu;
@@ -459,25 +483,37 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctl_offgrid_limit_vector(&ctrl->inductor_current_ref_ab, ctrl->current_limit_pu);
 
     /*
-     * Current-loop output is first calculated for nominal DC bus.  Multiplying
-     * the complete modulation vector by the rate-limited Vdc ratio preserves
-     * the applied bridge voltage without a hard feed-forward step.
+     * The current controller, capacitor-voltage feed-forward, and active
+     * damping now all produce bridge-voltage-pu.  They are combined and
+     * limited before the single voltage-to-modulation conversion.
      */
     for (axis = 0; axis < 2; ++axis)
     {
-        current_correction = ctl_step_qpr_controller(
+        current_voltage_correction = ctl_step_qpr_controller(
             &ctrl->current_qpr[axis],
             ctrl->inductor_current_ref_ab.dat[axis] - ctrl->inductor_current_est_ab.dat[axis]);
-        ctl_offgrid_limit_qr_state(&ctrl->current_qpr[axis].resonant_part, ctrl->modulation_limit_pu);
-        current_correction = ctl_sat(current_correction, ctrl->modulation_limit_pu, -ctrl->modulation_limit_pu);
+        ctl_offgrid_limit_qr_state(&ctrl->current_qpr[axis].resonant_part,
+                                   bridge_voltage_limit_pu);
+        current_voltage_correction = ctl_sat(current_voltage_correction,
+                                             bridge_voltage_limit_pu,
+                                             -bridge_voltage_limit_pu);
 
-        ctrl->modulation_ab.dat[axis] = ctl_mul(
-            dc_bus_gain_ctrl,
-            ctl_mul(ctrl->voltage_feedforward_gain, core->vab0.dat[axis]) +
-                current_correction -
-                ctl_mul(ctrl->active_damping_gain,
-                        ctrl->capacitor_current_est_ab.dat[axis]));
+        ctrl->bridge_voltage_cmd_ab.dat[axis] =
+            core->vab0.dat[axis] + current_voltage_correction -
+            ctl_mul(ctrl->active_damping_voltage_gain,
+                    ctrl->capacitor_current_est_ab.dat[axis]);
     }
+
+    ctl_offgrid_limit_vector(&ctrl->bridge_voltage_cmd_ab, bridge_voltage_limit_pu);
+
+    for (axis = 0; axis < 2; ++axis)
+    {
+        ctrl->modulation_ab.dat[axis] =
+            ctl_mul(voltage_to_modulation_gain,
+                    ctrl->bridge_voltage_cmd_ab.dat[axis]);
+    }
+
+    /* Numerical guard; normal operation is already limited in voltage domain. */
     ctl_offgrid_limit_vector(&ctrl->modulation_ab, ctrl->modulation_limit_pu);
 }
 
