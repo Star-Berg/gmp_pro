@@ -185,6 +185,8 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
             ctl_step_sinv_ref_gen_pq(&ref_gen,
                 p_ref, ctl_calc_sinv_q_ref_from_pf(p_ref),
                 ctl_abs(pll.v_mag), &pll.phasor);
+#elif BUILD_LEVEL == 6
+            ctl_step_sinv_ref_gen_pq(&ref_gen, g_p_ref_user, g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #endif
         }
         else
@@ -231,10 +233,17 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
             ctl_clear_single_phase_H_modulation(&hpwm);
         }
 
+#if BUILD_LEVEL == 6
+        ctl_step_sinv_buck(&buck_ctrl, adc_v_buck_out.control_port.value,
+                           adc_v_bus.control_port.value, adc_i_buck.control_port.value,
+                           cia402_sm.state_word.bits.operation_enabled &&
+                               (adc_v_buck_out.control_port.value >= float2ctrl(1.0f / CTRL_VOLTAGE_BASE)));
+#else
         ctl_step_sinv_buck(&buck_ctrl, adc_v_bus.control_port.value,
                            adc_v_buck_out.control_port.value, adc_i_buck.control_port.value,
                            cia402_sm.state_word.bits.operation_enabled &&
                                (adc_v_bus.control_port.value >= float2ctrl(SINV_BUCK_START_VBUS_MIN_V / CTRL_VOLTAGE_BASE)));
+#endif
 
     }
 }

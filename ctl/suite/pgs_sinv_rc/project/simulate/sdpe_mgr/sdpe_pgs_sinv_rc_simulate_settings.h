@@ -24,7 +24,7 @@ extern "C"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_ID "pgs_sinv_rc_simulate"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-23"
+#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-24"
 
 //=================================================================================================
 /**
@@ -52,10 +52,10 @@ extern "C"
  */
 
 /**
- * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop.
- *        Options: (1), (2), (3), (4), (5)
+ * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 boost-fed grid mode.
+ *        Options: (1), (2), (3), (4), (5), (6)
  */
-#define BUILD_LEVEL (5)
+#define BUILD_LEVEL (6)
 
 //=================================================================================================
 /**
@@ -101,6 +101,31 @@ extern "C"
  * @brief Nominal grid/load RMS voltage.
  */
 #define CTRL_GRID_VOLTAGE_RMS (36.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+ */
+#define SINV_LEVEL6_GRID_VOLTAGE_RMS (36.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+ */
+#define SINV_LEVEL6_DC_BUS_REF_V (80.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
+ */
+#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+ */
+#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+ */
+#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
 
 /**
  * @brief Rated RMS AC current.
@@ -163,14 +188,24 @@ extern "C"
 #define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
- * @brief AC voltage sensor sensitivity in V/V.
+ * @brief AC/PCC voltage sensor sensitivity from the LC filter board voltage sense path.
  */
-#define CTRL_AC_VOLTAGE_SENSITIVITY (0.020f)
+#define CTRL_AC_VOLTAGE_SENSITIVITY (0.013559322f)
 
 /**
- * @brief AC voltage ADC bias.
+ * @brief AC/PCC voltage ADC bias from the LC filter board voltage sense path.
  */
 #define CTRL_AC_VOLTAGE_BIAS (1.65f)
+
+/**
+ * @brief Buck output-voltage sensing gain from the LC filter board voltage sense path. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because Vbus/Vin_buck still use the half-bridge DC bus sensor.
+ */
+#define CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY (0.013559322f)
+
+/**
+ * @brief Buck output-voltage ADC bias from the LC filter board voltage sense path.
+ */
+#define CTRL_BUCK_OUTPUT_VOLTAGE_BIAS (1.65f)
 
 /**
  * @brief AC current sensor sensitivity in V/A.
@@ -196,6 +231,36 @@ extern "C"
  * @brief Body-diode forward voltage.
  */
 #define SINV_MODEL_DIODE_VF (0.5f)
+
+/**
+ * @brief Peak current-reference limit in per unit.
+ */
+#define CTRL_CURRENT_LIMIT_PU (0.9f)
+
+/**
+ * @brief Active-power command slew limit in PU/s.
+ */
+#define CTRL_P_SLEW_PU_S (5.0f)
+
+/**
+ * @brief Reactive-power command slew limit in PU/s.
+ */
+#define CTRL_Q_SLEW_PU_S (5.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+ */
+#define SINV_POWER_FACTOR_Q_SIGN (-1.0f)
+
+/**
+ * @brief Buck output voltage target.
+ */
+#define SINV_BUCK_OUTPUT_REF_V (60.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
+ */
+#define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
 
 /**
  * @brief DC bus overvoltage threshold for simulation startup transients.
@@ -228,8 +293,8 @@ extern "C"
 #define TIMEOUT_ADC_CALIB_MS (3000)
 
 // User project tail code
-#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)
-#error BUILD_LEVEL_must_be_between_1_and_5
+#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)
+#error BUILD_LEVEL_must_be_between_1_and_6
 #endif
 
 #ifdef __cplusplus
