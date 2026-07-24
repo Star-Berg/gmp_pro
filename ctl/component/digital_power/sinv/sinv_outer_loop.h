@@ -16,9 +16,12 @@ typedef struct _tag_sinv_outer_loop {
     ctl_pi_t dc_bus_pi;
     ctrl_gt active_power_cmd;
     ctrl_gt dc_bus_ref;
+    ctrl_gt dc_bus_feedback_lpf;
+    ctrl_gt dc_bus_lpf_alpha;
     ctrl_gt output_limit;
     uint32_t execution_divider;
     uint32_t execution_tick;
+    fast_gt dc_bus_lpf_initialized;
 } ctl_sinv_outer_loop_t;
 
 GMP_STATIC_INLINE void ctl_init_sinv_outer_loop(ctl_sinv_outer_loop_t* loop,
@@ -39,6 +42,14 @@ GMP_STATIC_INLINE void ctl_init_sinv_outer_loop(ctl_sinv_outer_loop_t* loop,
         loop->execution_divider = 1U;
     loop->execution_tick = 0U;
     loop->dc_bus_ref = float2ctrl(0.0f);
+    loop->dc_bus_feedback_lpf = float2ctrl(0.0f);
+#ifdef SINV_DC_BUS_FEEDBACK_LPF_ALPHA
+    loop->dc_bus_lpf_alpha = ctl_sat(float2ctrl(SINV_DC_BUS_FEEDBACK_LPF_ALPHA),
+                                     float2ctrl(1.0f), float2ctrl(0.0f));
+#else
+    loop->dc_bus_lpf_alpha = float2ctrl(1.0f);
+#endif
+    loop->dc_bus_lpf_initialized = 0;
     loop->active_power_cmd = float2ctrl(0.0f);
 }
 
@@ -48,6 +59,8 @@ GMP_STATIC_INLINE void ctl_clear_sinv_outer_loop(ctl_sinv_outer_loop_t* loop)
     ctl_clear_pi(&loop->dc_bus_pi);
     loop->execution_tick = 0U;
     loop->active_power_cmd = float2ctrl(0.0f);
+    loop->dc_bus_feedback_lpf = float2ctrl(0.0f);
+    loop->dc_bus_lpf_initialized = 0;
 }
 
 GMP_STATIC_INLINE fast_gt ctl_sinv_outer_loop_due(ctl_sinv_outer_loop_t* loop)
@@ -60,7 +73,7 @@ GMP_STATIC_INLINE fast_gt ctl_sinv_outer_loop_due(ctl_sinv_outer_loop_t* loop)
 }
 
 GMP_STATIC_INLINE ctrl_gt ctl_step_sinv_power_loop(ctl_sinv_outer_loop_t* loop,
-                                                    ctrl_gt power_ref, ctrl_gt power_feedback)
+                                                     ctrl_gt power_ref, ctrl_gt power_feedback)
 {
     if (ctl_sinv_outer_loop_due(loop))
         loop->active_power_cmd = ctl_step_pi_par(&loop->power_pi, power_ref - power_feedback);
@@ -73,7 +86,16 @@ GMP_STATIC_INLINE ctrl_gt ctl_step_sinv_dc_bus_loop(ctl_sinv_outer_loop_t* loop,
 {
     loop->dc_bus_ref = bus_ref;
     if (ctl_sinv_outer_loop_due(loop)) {
-        ctrl_gt magnitude = ctl_step_pi_par(&loop->dc_bus_pi, bus_ref - bus_feedback);
+        if (!loop->dc_bus_lpf_initialized) {
+            loop->dc_bus_feedback_lpf = bus_feedback;
+            loop->dc_bus_lpf_initialized = 1;
+        } else {
+            loop->dc_bus_feedback_lpf += ctl_mul(loop->dc_bus_lpf_alpha,
+                                                 bus_feedback - loop->dc_bus_feedback_lpf);
+        }
+
+        ctrl_gt magnitude = ctl_step_pi_par(&loop->dc_bus_pi,
+                                            bus_ref - loop->dc_bus_feedback_lpf);
         loop->active_power_cmd = ctl_mul(rectifier_polarity, magnitude);
     }
     return loop->active_power_cmd;
