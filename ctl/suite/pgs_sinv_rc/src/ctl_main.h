@@ -185,6 +185,16 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
             ctl_step_sinv_ref_gen_pq(&ref_gen,
                 p_ref, ctl_calc_sinv_q_ref_from_pf(p_ref),
                 ctl_abs(pll.v_mag), &pll.phasor);
+#elif BUILD_LEVEL == 6
+#if SINV_LEVEL6_ENABLE_DCBUS_LOOP != 0
+            ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
+                adc_v_bus.control_port.value, float2ctrl(SINV_LEVEL6_DCBUS_POWER_SIGN));
+            ctl_step_sinv_ref_gen_pq(&ref_gen,
+                p_ref, g_q_ref_user,
+                ctl_abs(pll.v_mag), &pll.phasor);
+#else
+            ctl_step_sinv_ref_gen_pq(&ref_gen, g_p_ref_user, g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
+#endif
 #endif
         }
         else

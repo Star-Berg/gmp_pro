@@ -372,7 +372,8 @@ SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
 % BUILD_LEVEL 3: grid current loop with signed P/Q command.
 % BUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.
 % BUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command.
-% Options: (1), (2), (3), (4), (5)
+% BUILD_LEVEL 6: bidirectional grid mode; direct signed P/Q by default, optional DC-bus loop generates signed P.
+% Options: (1), (2), (3), (4), (5), (6)
 BUILD_LEVEL = 5;
 
 %% PWM Modulator
@@ -488,7 +489,7 @@ CTRL_VOLTAGE_BASE = 34.0;
 CTRL_CURRENT_BASE = 14.14;
 
 % Total AC-side filter/grid inductance in H.
-CTRL_AC_INDUCTANCE = 0.003;
+CTRL_AC_INDUCTANCE = 0.0015;
 
 % Total AC-side series resistance in Ohm.
 CTRL_AC_RESISTANCE = 0.1;
@@ -500,10 +501,10 @@ CTRL_DC_VOLTAGE_SENSITIVITY = GMP_LVFB_VOLTAGE_SENSITIVITY;
 CTRL_DC_VOLTAGE_BIAS = GMP_LVFB_VOLTAGE_BIAS_V;
 
 % AC voltage sensing gain from the grid LC filter voltage sense path.
-CTRL_AC_VOLTAGE_SENSITIVITY = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN;
+CTRL_AC_VOLTAGE_SENSITIVITY = 0.013559322;
 
 % AC voltage sensing ADC bias from the grid LC filter.
-CTRL_AC_VOLTAGE_BIAS = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V;
+CTRL_AC_VOLTAGE_BIAS = 1.65;
 
 % AC current sensing sensitivity from the LVFB inverter current sensor.
 CTRL_AC_CURRENT_SENSITIVITY = GMP_LVFB_CURRENT_SENSITIVITY;
@@ -517,14 +518,11 @@ CTRL_BUCK_CURRENT_SENSITIVITY = GMP_LVFB_CURRENT_SENSITIVITY;
 % Buck inductor-current ADC bias from the lower LVFB half-bridge B5A current sensor.
 CTRL_BUCK_CURRENT_BIAS = GMP_LVFB_CURRENT_BIAS_V;
 
-% Buck output-voltage sensing gain from the external QuadSensorDocker voltage measurement board. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because the lower half-bridge voltage sensor measures its own DC bus, not Vo_buck.
-CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY = 0.020;
+% Buck output-voltage sensing gain from the LC filter board voltage sense path. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because the lower half-bridge voltage sensor measures its own DC bus, not Vo_buck.
+CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY = 0.013559322;
 
-% Buck output-voltage ADC bias from the external QuadSensorDocker voltage measurement board.
-CTRL_BUCK_OUTPUT_VOLTAGE_BIAS = 1.62;
-
-% Minimum PLL voltage magnitude used by P/Q reference division.
-CTRL_GRID_VMIN_PU = 0.1;
+% Buck output-voltage ADC bias from the LC filter board voltage sense path.
+CTRL_BUCK_OUTPUT_VOLTAGE_BIAS = 1.65;
 
 % Maximum hardware DC bus voltage from the LVFB inverter board.
 CTRL_MAX_HW_VOLTAGE = GMP_LVFB_VBUS_MAX_V;
@@ -547,18 +545,6 @@ CTRL_DCBUS_READY_MIN = CTRL_DCBUS_VOLTAGE * 0.8;
 % Maximum physical DC-bus voltage accepted by the startup state machine.
 CTRL_DCBUS_READY_MAX = CTRL_PROT_VBUS_MAX;
 
-% Single-phase PLL proportional gain.
-CTRL_PLL_KP = 10.0;
-
-% Single-phase PLL integral time constant in seconds.
-CTRL_PLL_TI = 0.02;
-
-% PLL q-axis error low-pass cutoff in Hz.
-CTRL_PLL_LPF_FC = 20.0;
-
-% Measured active/reactive power low-pass cutoff in Hz.
-CTRL_PQ_LPF_FC = 200.0;
-
 % Peak current-reference limit in per unit.
 CTRL_CURRENT_LIMIT_PU = 1.5;
 
@@ -568,137 +554,20 @@ CTRL_P_SLEW_PU_S = 10.0;
 % Reactive-power command slew limit in PU/s.
 CTRL_Q_SLEW_PU_S = 20.0;
 
-% BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
-SINV_POWER_FACTOR_REF = 1.0;
-
 % BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
 SINV_POWER_FACTOR_Q_SIGN = 1.0;
-
-% BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
-SINV_POWER_FACTOR_Q_GAIN = 1.06;
-
-% Current polarity deadband for PWM dead-time compensation.
-CTRL_CURRENT_DB_PU = 0.01;
-
-% QPR current-loop crossover target in Hz.
-SINV_CURRENT_LOOP_BANDWIDTH_HZ = 600.0;
-
-% Minimum fundamental frequency tracked by the repetitive controller in Hz.
-CTRL_FDRC_MIN_FREQ = 45.0;
-
-% Settling time before repetitive control starts learning.
-SINV_FDRC_ENABLE_DELAY_MS = 300;
-
-% Frequency-adaptive repetitive-control learning gain.
-SINV_FDRC_LEARNING_GAIN = 0.10;
-
-% Frequency-adaptive repetitive-control robustness-filter cutoff frequency.
-SINV_FDRC_Q_FILTER_HZ = 1000.0;
-
-% Frequency-adaptive repetitive-control plant-delay compensation in controller samples.
-SINV_FDRC_LEAD_STEPS = 3.0;
-
-% Current-error threshold above which repetitive-control learning is frozen.
-SINV_FDRC_FREEZE_ERROR_PU = 0.05;
-
-% BUILD_LEVEL 1 sinusoidal H-bridge voltage amplitude.
-SINV_LEVEL1_VOLTAGE_REF_PU = 0.35;
-
-% Active-power outer-loop proportional gain.
-SINV_POWER_LOOP_KP = 0.6;
-
-% Active-power outer-loop integral gain per second.
-SINV_POWER_LOOP_KI = 8.0;
-
-% DC-bus outer-loop proportional gain.
-SINV_DC_BUS_LOOP_KP = 0.8;
-
-% DC-bus outer-loop integral gain per second.
-SINV_DC_BUS_LOOP_KI = 12.0;
-
-% Symmetric outer-loop active-power command limit.
-SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.65;
-
-% Power and DC-bus outer-loop execution frequency.
-SINV_OUTER_LOOP_FREQUENCY_HZ = 1000.0;
 
 % ADC calibration timeout in ms.
 TIMEOUT_ADC_CALIB_MS = 3000;
 
-% SPLL close-loop convergence criterion.
-CTRL_SPLL_EPSILON = float2ctrl(0.005);
-
 % Startup delay in ms.
 CTRL_STARTUP_DELAY = 100;
-
-% Minimum operation-enabled transition delay used by the CiA402 startup sequence.
-SINV_CIA402_OPERATION_ENABLE_DELAY_MS = 100;
-
-% Nominal AC grid/fundamental frequency in Hz.
-CTRL_GRID_FREQUENCY = 50.0;
 
 % Buck output voltage target.
 SINV_BUCK_OUTPUT_REF_V = 48.0;
 
 % BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
 SINV_DC_BUS_REF_V = CTRL_DCBUS_VOLTAGE;
-
-% BUILD_LEVEL 2 peak current command with a resistive load.
-SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.20;
-
-% BUILD_LEVEL 3 signed grid active-power command; positive exports power.
-SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.10;
-
-% BUILD_LEVEL 3 grid reactive-power command.
-SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;
-
-% BUILD_LEVEL 4 measured active-power closed-loop target.
-SINV_LEVEL4_ACTIVE_POWER_REF_PU = 0.15;
-
-% Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.
-SINV_BUCK_VREF_SLEW_V_S = 120.0;
-
-% Minimum DC bus voltage before Buck soft-start is allowed.
-SINV_BUCK_START_VBUS_MIN_V = 55.0;
-
-% Delay after the Buck start condition is met before PWM compare ramps.
-SINV_BUCK_START_DELAY_MS = 100;
-
-% Buck duty-cycle lower clamp.
-SINV_BUCK_DUTY_MIN = 0.0;
-
-% Buck duty-cycle upper clamp.
-SINV_BUCK_DUTY_MAX = 1.0;
-
-% Maximum Buck current-loop duty correction around input-voltage feedforward.
-SINV_BUCK_DUTY_TRIM_LIMIT = 0.03;
-
-% Extra duty headroom above Buck voltage feedforward during startup and transients.
-SINV_BUCK_DUTY_FF_MARGIN = 0.02;
-
-% First-order low-pass coefficient for Buck input-voltage feedforward.
-SINV_BUCK_VIN_FF_LPF_ALPHA = 0.006;
-
-% Buck input-voltage feedforward blending gain; 0 disables source feedforward and 1 uses full Vref/Vin feedforward.
-SINV_BUCK_DUTY_FF_GAIN = 0.15;
-
-% Buck inductor-current command limit in ampere.
-SINV_BUCK_CURRENT_LIMIT_A = 5.0;
-
-% Buck voltage-loop execution frequency.
-SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ = 200.0;
-
-% Buck voltage-loop proportional gain.
-SINV_BUCK_VOLTAGE_LOOP_KP = 0.1;
-
-% Buck voltage-loop integral gain per second.
-SINV_BUCK_VOLTAGE_LOOP_KI = 15.0;
-
-% Buck current-loop proportional gain.
-SINV_BUCK_CURRENT_LOOP_KP = 0.20;
-
-% Buck current-loop integral gain per second.
-SINV_BUCK_CURRENT_LOOP_KI = 500.0;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

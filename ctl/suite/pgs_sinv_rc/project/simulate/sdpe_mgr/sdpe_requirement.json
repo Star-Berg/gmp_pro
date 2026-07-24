@@ -10,7 +10,7 @@
   "hardware": [],
   "code_sections": {
     "after_extern_open": "#include <sdpe_pgs_sinv_rc_common_settings.h>\n#define SPECIFY_PC_ENVIRONMENT",
-    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)\n#error BUILD_LEVEL_must_be_between_1_and_5\n#endif"
+    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)\n#error BUILD_LEVEL_must_be_between_1_and_6\n#endif"
   },
   "feature_macros": [
     {
@@ -51,9 +51,10 @@
         "(2)",
         "(3)",
         "(4)",
-        "(5)"
+        "(5)",
+        "(6)"
       ],
-      "description": "1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop."
+      "description": "1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode."
     }
   ],
   "requirements": [
@@ -263,9 +264,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.020"
+        "float": "0.013559322"
       },
-      "description": "AC voltage sensor sensitivity in V/V."
+      "description": "AC/PCC voltage sensor sensitivity from the LC filter board voltage sense path."
     },
     {
       "role": "ac_voltage_bias",
@@ -275,7 +276,27 @@
       "binding": {
         "float": "1.65"
       },
-      "description": "AC voltage ADC bias."
+      "description": "AC/PCC voltage ADC bias from the LC filter board voltage sense path."
+    },
+    {
+      "role": "buck_output_voltage_sensitivity",
+      "macro": "CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.013559322"
+      },
+      "description": "Buck output-voltage sensing gain from the LC filter board voltage sense path. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because Vbus/Vin_buck still use the half-bridge DC bus sensor."
+    },
+    {
+      "role": "buck_output_voltage_bias",
+      "macro": "CTRL_BUCK_OUTPUT_VOLTAGE_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.65"
+      },
+      "description": "Buck output-voltage ADC bias from the LC filter board voltage sense path."
     },
     {
       "role": "ac_current_gain",
@@ -296,6 +317,66 @@
         "float": "1.65"
       },
       "description": "AC current ADC bias."
+    },
+    {
+      "role": "current_limit",
+      "macro": "CTRL_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.9"
+      },
+      "description": "Peak current command limit in PU."
+    },
+    {
+      "role": "p_slew",
+      "macro": "CTRL_P_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Active-power command slew limit in PU/s."
+    },
+    {
+      "role": "q_slew",
+      "macro": "CTRL_Q_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Reactive-power command slew limit in PU/s."
+    },
+    {
+      "role": "bus_ref",
+      "macro": "SINV_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "expr": "CTRL_DCBUS_VOLTAGE"
+      },
+      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting."
+    },
+    {
+      "role": "power_factor_q_sign",
+      "macro": "SINV_POWER_FACTOR_Q_SIGN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "-1.0"
+      },
+      "description": "BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction."
+    },
+    {
+      "role": "buck_output_ref",
+      "macro": "SINV_BUCK_OUTPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "60.0"
+      },
+      "description": "Buck output voltage target."
     },
     {
       "role": "mosfet_ron",
@@ -442,10 +523,28 @@
       ]
     },
     {
+      "name": "Buck Output Voltage Sensor",
+      "requirements": [
+        "buck_output_voltage_sensitivity",
+        "buck_output_voltage_bias"
+      ]
+    },
+    {
       "name": "AC Current Sensor",
       "requirements": [
         "ac_current_gain",
         "ac_current_bias"
+      ]
+    },
+    {
+      "name": "Platform Commissioning Defaults",
+      "requirements": [
+        "current_limit",
+        "p_slew",
+        "q_slew",
+        "bus_ref",
+        "power_factor_q_sign",
+        "buck_output_ref"
       ]
     },
     {

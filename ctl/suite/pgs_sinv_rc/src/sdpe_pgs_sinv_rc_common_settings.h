@@ -86,21 +86,6 @@ extern "C"
 #define CTRL_PQ_LPF_FC (200.0f)
 
 /**
- * @brief Peak current command limit in PU.
- */
-#define CTRL_CURRENT_LIMIT_PU (0.9f)
-
-/**
- * @brief Active-power command slew limit in PU/s.
- */
-#define CTRL_P_SLEW_PU_S (5.0f)
-
-/**
- * @brief Reactive-power command slew limit in PU/s.
- */
-#define CTRL_Q_SLEW_PU_S (5.0f)
-
-/**
  * @brief Current deadband used by PWM dead-time compensation.
  */
 #define CTRL_CURRENT_DB_PU (0.01f)
@@ -221,9 +206,24 @@ extern "C"
 #define SINV_LEVEL4_ACTIVE_POWER_REF_PU (0.15f)
 
 /**
- * @brief BUILD_LEVEL 5 physical DC bus voltage target.
+ * @brief BUILD_LEVEL 6 signed grid active-power command used when SINV_LEVEL6_ENABLE_DCBUS_LOOP is 0. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
  */
-#define SINV_DC_BUS_REF_V (80.0f)
+#define SINV_LEVEL6_ACTIVE_POWER_REF_PU (0.10f)
+
+/**
+ * @brief BUILD_LEVEL 6 reactive-power command. It is used directly in both direct signed-P/Q mode and DC-bus-loop mode.
+ */
+#define SINV_LEVEL6_REACTIVE_POWER_REF_PU (0.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 mode selector. 0: use SINV_LEVEL6_ACTIVE_POWER_REF_PU directly for bidirectional grid-current THD tests. 1: close the DC-bus voltage loop and let it generate signed active-power command.
+ */
+#define SINV_LEVEL6_ENABLE_DCBUS_LOOP (0)
+
+/**
+ * @brief BUILD_LEVEL 6 DC-bus-loop polarity from bus-voltage error to grid active-power command. Keep it separate from BUILD_LEVEL 5 so bidirectional power-flow sign calibration does not disturb the rectifier baseline.
+ */
+#define SINV_LEVEL6_DCBUS_POWER_SIGN (-1.0f)
 
 /**
  * @brief BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
@@ -231,19 +231,9 @@ extern "C"
 #define SINV_POWER_FACTOR_REF (1.0f)
 
 /**
- * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
- */
-#define SINV_POWER_FACTOR_Q_SIGN (-1.0f)
-
-/**
  * @brief BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
  */
 #define SINV_POWER_FACTOR_Q_GAIN (1.06f)
-
-/**
- * @brief Buck output voltage target.
- */
-#define SINV_BUCK_OUTPUT_REF_V (60.0f)
 
 /**
  * @brief Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.

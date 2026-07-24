@@ -52,8 +52,8 @@ extern "C"
  */
 
 /**
- * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop.
- *        Options: (1), (2), (3), (4), (5)
+ * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode.
+ *        Options: (1), (2), (3), (4), (5), (6)
  */
 #define BUILD_LEVEL (5)
 
@@ -163,14 +163,24 @@ extern "C"
 #define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
- * @brief AC voltage sensor sensitivity in V/V.
+ * @brief AC/PCC voltage sensor sensitivity from the LC filter board voltage sense path.
  */
-#define CTRL_AC_VOLTAGE_SENSITIVITY (0.020f)
+#define CTRL_AC_VOLTAGE_SENSITIVITY (0.013559322f)
 
 /**
- * @brief AC voltage ADC bias.
+ * @brief AC/PCC voltage ADC bias from the LC filter board voltage sense path.
  */
 #define CTRL_AC_VOLTAGE_BIAS (1.65f)
+
+/**
+ * @brief Buck output-voltage sensing gain from the LC filter board voltage sense path. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because Vbus/Vin_buck still use the half-bridge DC bus sensor.
+ */
+#define CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY (0.013559322f)
+
+/**
+ * @brief Buck output-voltage ADC bias from the LC filter board voltage sense path.
+ */
+#define CTRL_BUCK_OUTPUT_VOLTAGE_BIAS (1.65f)
 
 /**
  * @brief AC current sensor sensitivity in V/A.
@@ -181,6 +191,36 @@ extern "C"
  * @brief AC current ADC bias.
  */
 #define CTRL_AC_CURRENT_BIAS (1.65f)
+
+/**
+ * @brief Peak current command limit in PU.
+ */
+#define CTRL_CURRENT_LIMIT_PU (0.9f)
+
+/**
+ * @brief Active-power command slew limit in PU/s.
+ */
+#define CTRL_P_SLEW_PU_S (5.0f)
+
+/**
+ * @brief Reactive-power command slew limit in PU/s.
+ */
+#define CTRL_Q_SLEW_PU_S (5.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
+ */
+#define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
+
+/**
+ * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+ */
+#define SINV_POWER_FACTOR_Q_SIGN (-1.0f)
+
+/**
+ * @brief Buck output voltage target.
+ */
+#define SINV_BUCK_OUTPUT_REF_V (60.0f)
 
 /**
  * @brief Plant MOSFET on resistance.
@@ -228,8 +268,8 @@ extern "C"
 #define TIMEOUT_ADC_CALIB_MS (3000)
 
 // User project tail code
-#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)
-#error BUILD_LEVEL_must_be_between_1_and_5
+#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)
+#error BUILD_LEVEL_must_be_between_1_and_6
 #endif
 
 #ifdef __cplusplus

@@ -121,7 +121,7 @@ void ctl_init(void)
     //
     ctl_sinv_prot_init_t prot_init = {0};
     prot_init.error_mask = SINV_PROT_BIT_HW_TZ | SINV_PROT_BIT_DC_OVP_FAST | SINV_PROT_BIT_AC_OCP_FAST;
-#if BUILD_LEVEL != 5
+#if (BUILD_LEVEL != 5) && !((BUILD_LEVEL == 6) && (SINV_LEVEL6_ENABLE_DCBUS_LOOP != 0))
     /* During passive-rectifier takeover Vgrid/Vdc can legitimately demand
        more than one PU before the boost stage raises the DC link. */
     prot_init.error_mask |= SINV_PROT_BIT_CTRL_DIVERGE;
@@ -158,8 +158,12 @@ void ctl_init(void)
 #elif BUILD_LEVEL == 4
     g_p_ref_user = float2ctrl(SINV_LEVEL4_ACTIVE_POWER_REF_PU);
     g_q_ref_user = float2ctrl(0.0f);
-#elif BUILD_LEVEL == 5
+#elif (BUILD_LEVEL == 5) || (BUILD_LEVEL == 6)
     g_vbus_ref_user = float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
+#if BUILD_LEVEL == 6
+    g_p_ref_user = float2ctrl(SINV_LEVEL6_ACTIVE_POWER_REF_PU);
+    g_q_ref_user = float2ctrl(SINV_LEVEL6_REACTIVE_POWER_REF_PU);
+#endif
 #endif
     rc_core.flag_enable_fdrc = 0;
 #if BUILD_LEVEL >= 2 && defined(SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD)

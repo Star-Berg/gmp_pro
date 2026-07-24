@@ -25,8 +25,8 @@ SINV_SIM_AUTO_ENABLE = true;
 % ENABLE_GMP_DL_PIL_SIM = true;
 
 %% Commissioning
-% 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop.
-% Options: (1), (2), (3), (4), (5)
+% 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode.
+% Options: (1), (2), (3), (4), (5), (6)
 BUILD_LEVEL = 5;
 
 %% Requirement bindings
@@ -90,17 +90,41 @@ CTRL_DC_VOLTAGE_SENSITIVITY = 0.02705;
 % DC bus voltage ADC bias.
 CTRL_DC_VOLTAGE_BIAS = 0.0;
 
-% AC voltage sensor sensitivity in V/V.
-CTRL_AC_VOLTAGE_SENSITIVITY = 0.020;
+% AC/PCC voltage sensor sensitivity from the LC filter board voltage sense path.
+CTRL_AC_VOLTAGE_SENSITIVITY = 0.013559322;
 
-% AC voltage ADC bias.
+% AC/PCC voltage ADC bias from the LC filter board voltage sense path.
 CTRL_AC_VOLTAGE_BIAS = 1.65;
+
+% Buck output-voltage sensing gain from the LC filter board voltage sense path. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because Vbus/Vin_buck still use the half-bridge DC bus sensor.
+CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY = 0.013559322;
+
+% Buck output-voltage ADC bias from the LC filter board voltage sense path.
+CTRL_BUCK_OUTPUT_VOLTAGE_BIAS = 1.65;
 
 % AC current sensor sensitivity in V/A.
 CTRL_AC_CURRENT_SENSITIVITY = 0.150;
 
 % AC current ADC bias.
 CTRL_AC_CURRENT_BIAS = 1.65;
+
+% Peak current command limit in PU.
+CTRL_CURRENT_LIMIT_PU = 0.9;
+
+% Active-power command slew limit in PU/s.
+CTRL_P_SLEW_PU_S = 5.0;
+
+% Reactive-power command slew limit in PU/s.
+CTRL_Q_SLEW_PU_S = 5.0;
+
+% BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
+SINV_DC_BUS_REF_V = CTRL_DCBUS_VOLTAGE;
+
+% BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+SINV_POWER_FACTOR_Q_SIGN = -1.0;
+
+% Buck output voltage target.
+SINV_BUCK_OUTPUT_REF_V = 60.0;
 
 % Plant MOSFET on resistance.
 SINV_MODEL_MOSFET_RON = 4.6e-3;
