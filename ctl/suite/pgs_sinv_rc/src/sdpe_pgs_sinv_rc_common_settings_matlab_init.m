@@ -132,7 +132,7 @@ SINV_LEVEL6_ACTIVE_POWER_REF_PU = 0.10;
 SINV_LEVEL6_REACTIVE_POWER_REF_PU = 0.0;
 
 % BUILD_LEVEL 6 mode selector. 0: use SINV_LEVEL6_ACTIVE_POWER_REF_PU directly for bidirectional grid-current THD tests. 1: close the DC-bus voltage loop and let it generate signed active-power command.
-SINV_LEVEL6_ENABLE_DCBUS_LOOP = 0;
+SINV_LEVEL6_ENABLE_DCBUS_LOOP = 1;
 
 % BUILD_LEVEL 6 DC-bus-loop polarity from bus-voltage error to grid active-power command. Keep it separate from BUILD_LEVEL 5 so bidirectional power-flow sign calibration does not disturb the rectifier baseline.
 SINV_LEVEL6_DCBUS_POWER_SIGN = -1.0;

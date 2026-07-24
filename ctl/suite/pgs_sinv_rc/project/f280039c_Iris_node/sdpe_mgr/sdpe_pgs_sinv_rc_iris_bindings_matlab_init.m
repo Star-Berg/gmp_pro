@@ -372,7 +372,7 @@ SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
 % BUILD_LEVEL 3: grid current loop with signed P/Q command.
 % BUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.
 % BUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command.
-% BUILD_LEVEL 6: bidirectional grid mode; direct signed P/Q by default, optional DC-bus loop generates signed P.
+% BUILD_LEVEL 6: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
 % Options: (1), (2), (3), (4), (5), (6)
 BUILD_LEVEL = 5;
 
@@ -478,6 +478,21 @@ CTRL_DCBUS_VOLTAGE = 60.0;
 
 % Rated AC grid/load RMS voltage.
 CTRL_GRID_VOLTAGE_RMS = 24.0;
+
+% BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+SINV_LEVEL6_GRID_VOLTAGE_RMS = 24.0;
+
+% BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+SINV_LEVEL6_DC_BUS_REF_V = 60.0;
+
+% BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side.
+SINV_LEVEL6_BOOST_INPUT_REF_V = 48.0;
+
+% BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+SINV_LEVEL6_BOOST_VBUS_SLEW_V_S = 120.0;
+
+% BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+SINV_LEVEL6_BOOST_START_DELAY_MS = 100;
 
 % Rated AC output RMS current.
 CTRL_RATED_CURRENT_RMS = 10.0;

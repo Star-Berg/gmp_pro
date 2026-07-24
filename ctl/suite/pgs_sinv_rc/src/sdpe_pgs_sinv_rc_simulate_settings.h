@@ -24,7 +24,7 @@ extern "C"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_ID "pgs_sinv_rc_simulate"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-23"
+#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-24"
 
 //=================================================================================================
 /**
@@ -52,10 +52,10 @@ extern "C"
  */
 
 /**
- * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop.
- *        Options: (1), (2), (3), (4), (5)
+ * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode.
+ *        Options: (1), (2), (3), (4), (5), (6)
  */
-#define BUILD_LEVEL (5)
+#define BUILD_LEVEL (6)
 
 //=================================================================================================
 /**
@@ -163,14 +163,24 @@ extern "C"
 #define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
- * @brief AC voltage sensor sensitivity in V/V.
+ * @brief AC/PCC voltage sensor sensitivity from the LC filter board voltage sense path.
  */
-#define CTRL_AC_VOLTAGE_SENSITIVITY (0.020f)
+#define CTRL_AC_VOLTAGE_SENSITIVITY (0.013559322f)
 
 /**
- * @brief AC voltage ADC bias.
+ * @brief AC/PCC voltage ADC bias from the LC filter board voltage sense path.
  */
 #define CTRL_AC_VOLTAGE_BIAS (1.65f)
+
+/**
+ * @brief Buck output-voltage sensing gain from the LC filter board voltage sense path. This is separate from CTRL_DC_VOLTAGE_SENSITIVITY because Vbus/Vin_buck still use the half-bridge DC bus sensor.
+ */
+#define CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY (0.013559322f)
+
+/**
+ * @brief Buck output-voltage ADC bias from the LC filter board voltage sense path.
+ */
+#define CTRL_BUCK_OUTPUT_VOLTAGE_BIAS (1.65f)
 
 /**
  * @brief AC current sensor sensitivity in V/A.
@@ -228,8 +238,8 @@ extern "C"
 #define TIMEOUT_ADC_CALIB_MS (3000)
 
 // User project tail code
-#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)
-#error BUILD_LEVEL_must_be_between_1_and_5
+#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)
+#error BUILD_LEVEL_must_be_between_1_and_6
 #endif
 
 #ifdef __cplusplus

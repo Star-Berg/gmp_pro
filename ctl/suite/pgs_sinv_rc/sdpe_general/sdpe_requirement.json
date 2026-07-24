@@ -344,7 +344,7 @@
       "binding": {
         "float": "0.10"
       },
-      "description": "BUILD_LEVEL 6 signed grid active-power command used when SINV_LEVEL6_ENABLE_DCBUS_LOOP is 0. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction."
+      "description": "BUILD_LEVEL 6 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction."
     },
     {
       "role": "level6_reactive",
@@ -354,27 +354,7 @@
       "binding": {
         "float": "0.0"
       },
-      "description": "BUILD_LEVEL 6 reactive-power command. It is used directly in both direct signed-P/Q mode and DC-bus-loop mode."
-    },
-    {
-      "role": "level6_enable_dcbus_loop",
-      "macro": "SINV_LEVEL6_ENABLE_DCBUS_LOOP",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "number": "0"
-      },
-      "description": "BUILD_LEVEL 6 mode selector. 0: use SINV_LEVEL6_ACTIVE_POWER_REF_PU directly for bidirectional grid-current THD tests. 1: close the DC-bus voltage loop and let it generate signed active-power command."
-    },
-    {
-      "role": "level6_dcbus_power_sign",
-      "macro": "SINV_LEVEL6_DCBUS_POWER_SIGN",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "-1.0"
-      },
-      "description": "BUILD_LEVEL 6 DC-bus-loop polarity from bus-voltage error to grid active-power command. Keep it separate from BUILD_LEVEL 5 so bidirectional power-flow sign calibration does not disturb the rectifier baseline."
+      "description": "BUILD_LEVEL 6 reactive-power command for the boost-fed grid mode."
     },
     {
       "role": "power_factor_ref",
@@ -563,8 +543,6 @@
         "level4_power",
         "level6_power",
         "level6_reactive",
-        "level6_enable_dcbus_loop",
-        "level6_dcbus_power_sign",
         "power_factor_ref",
         "power_factor_q_gain",
         "buck_vref_slew",

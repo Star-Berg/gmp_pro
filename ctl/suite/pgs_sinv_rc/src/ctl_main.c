@@ -70,7 +70,11 @@ void ctl_init(void)
     rc_init.freq_grid = CTRL_GRID_FREQUENCY;
     rc_init.v_base = CTRL_VOLTAGE_BASE;
     rc_init.i_base = CTRL_CURRENT_BASE;
+#if BUILD_LEVEL == 6
+    rc_init.v_bus = SINV_LEVEL6_DC_BUS_REF_V;
+#else
     rc_init.v_bus = CTRL_DCBUS_VOLTAGE;
+#endif
     rc_init.L_ac = CTRL_AC_INDUCTANCE;
     rc_init.R_ac = CTRL_AC_RESISTANCE;
     rc_init.current_loop_bw = SINV_CURRENT_LOOP_BANDWIDTH_HZ;
@@ -121,9 +125,9 @@ void ctl_init(void)
     //
     ctl_sinv_prot_init_t prot_init = {0};
     prot_init.error_mask = SINV_PROT_BIT_HW_TZ | SINV_PROT_BIT_DC_OVP_FAST | SINV_PROT_BIT_AC_OCP_FAST;
-#if (BUILD_LEVEL != 5) && !((BUILD_LEVEL == 6) && (SINV_LEVEL6_ENABLE_DCBUS_LOOP != 0))
-    /* During passive-rectifier takeover Vgrid/Vdc can legitimately demand
-       more than one PU before the boost stage raises the DC link. */
+#if (BUILD_LEVEL != 5) && (BUILD_LEVEL != 6)
+    /* During passive-rectifier or boost takeover, Vgrid/Vdc can legitimately
+       demand more than one PU before the DC link reaches its target. */
     prot_init.error_mask |= SINV_PROT_BIT_CTRL_DIVERGE;
 #endif
     prot_init.warning_mask = SINV_PROT_BIT_AC_OVP_RMS | SINV_PROT_BIT_AC_UVP_RMS | SINV_PROT_BIT_PLL_FREQ_ERR;
@@ -131,8 +135,13 @@ void ctl_init(void)
     prot_init.v_bus_max = CTRL_PROT_VBUS_MAX / CTRL_VOLTAGE_BASE;
     prot_init.i_ac_max = CTRL_PROT_IAC_PEAK_MAX / CTRL_CURRENT_BASE;
     prot_init.v_ctrl_max = CTRL_PROT_VCTRL_MAX_PU;
+#if BUILD_LEVEL == 6
+    prot_init.v_ac_rms_max = 1.2f * SINV_LEVEL6_GRID_VOLTAGE_RMS / CTRL_VOLTAGE_BASE;
+    prot_init.v_ac_rms_min = 0.8f * SINV_LEVEL6_GRID_VOLTAGE_RMS / CTRL_VOLTAGE_BASE;
+#else
     prot_init.v_ac_rms_max = 1.2f * CTRL_GRID_VOLTAGE_RMS / CTRL_VOLTAGE_BASE;
     prot_init.v_ac_rms_min = 0.8f * CTRL_GRID_VOLTAGE_RMS / CTRL_VOLTAGE_BASE;
+#endif
     prot_init.freq_grid_nom = CTRL_GRID_FREQUENCY;
     prot_init.freq_dev_max = 1.0f;
     prot_init.i_ac_rated_rms = CTRL_RATED_CURRENT_RMS / CTRL_CURRENT_BASE;
@@ -158,12 +167,12 @@ void ctl_init(void)
 #elif BUILD_LEVEL == 4
     g_p_ref_user = float2ctrl(SINV_LEVEL4_ACTIVE_POWER_REF_PU);
     g_q_ref_user = float2ctrl(0.0f);
-#elif (BUILD_LEVEL == 5) || (BUILD_LEVEL == 6)
+#elif BUILD_LEVEL == 5
     g_vbus_ref_user = float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
-#if BUILD_LEVEL == 6
+#elif BUILD_LEVEL == 6
+    g_vbus_ref_user = float2ctrl(SINV_LEVEL6_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
     g_p_ref_user = float2ctrl(SINV_LEVEL6_ACTIVE_POWER_REF_PU);
     g_q_ref_user = float2ctrl(SINV_LEVEL6_REACTIVE_POWER_REF_PU);
-#endif
 #endif
     rc_core.flag_enable_fdrc = 0;
 #if BUILD_LEVEL >= 2 && defined(SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD)
@@ -362,9 +371,16 @@ void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck)
     ctl_set_pid_int_limit(&buck->current_pid, float2ctrl(SINV_BUCK_DUTY_TRIM_LIMIT),
                           float2ctrl(-SINV_BUCK_DUTY_TRIM_LIMIT));
 
+#if BUILD_LEVEL == 6
+    buck->v_ref_target = float2ctrl(SINV_LEVEL6_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
+    buck->v_ref_step = float2ctrl(SINV_LEVEL6_BOOST_VBUS_SLEW_V_S / CTRL_VOLTAGE_BASE / CONTROLLER_FREQUENCY);
+    buck->startup_delay_count =
+        (uint32_t)((float)SINV_LEVEL6_BOOST_START_DELAY_MS * (float)CONTROLLER_FREQUENCY / 1000.0f);
+#else
     buck->v_ref_target = float2ctrl(SINV_BUCK_OUTPUT_REF_V / CTRL_VOLTAGE_BASE);
     buck->v_ref_step = float2ctrl(SINV_BUCK_VREF_SLEW_V_S / CTRL_VOLTAGE_BASE / CONTROLLER_FREQUENCY);
     buck->startup_delay_count = (uint32_t)((float)SINV_BUCK_START_DELAY_MS * (float)CONTROLLER_FREQUENCY / 1000.0f);
+#endif
     ctl_clear_sinv_buck(buck);
 }
 
@@ -401,8 +417,74 @@ pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, c
         return 0U;
     }
 
-    /* Buck 输出电压采样存在开关纹波/采样碎纹；这里用固定软件低通，
-       只给电压外环使用，不作为 SDPE 参数暴露，避免再引入一项调参量。 */
+#if BUILD_LEVEL == 6
+    /* Level 6: low-voltage-side Boost mode. The DCDC stage regulates the DC bus
+       from the low-side source, while the grid side stays in direct signed P/Q mode. */
+    if (!buck->flag_enable)
+    {
+        buck->v_out_lpf = v_out;
+        buck->flag_enable = 1;
+    }
+    else
+    {
+        buck->v_out_lpf += ctl_mul(float2ctrl(0.02f), v_out - buck->v_out_lpf);
+    }
+
+    buck->v_ref += buck->v_ref_step;
+    if (buck->v_ref > buck->v_ref_target)
+        buck->v_ref = buck->v_ref_target;
+
+    const uint32_t voltage_loop_div =
+        (uint32_t)((float)CONTROLLER_FREQUENCY / (float)SINV_BUCK_VOLTAGE_LOOP_FREQUENCY_HZ);
+    if ((buck->voltage_loop_counter == 0U) || (voltage_loop_div <= 1U))
+    {
+        buck->i_ref = ctl_step_pid_par(&buck->voltage_pid, buck->v_ref - buck->v_out_lpf);
+    }
+    buck->voltage_loop_counter++;
+    if ((voltage_loop_div > 1U) && (buck->voltage_loop_counter >= voltage_loop_div))
+        buck->voltage_loop_counter = 0U;
+
+    ctrl_gt v_in_safe = v_in;
+    if (v_in_safe < float2ctrl(1.0f / CTRL_VOLTAGE_BASE))
+        v_in_safe = float2ctrl(1.0f / CTRL_VOLTAGE_BASE);
+
+    ctrl_gt v_ref_safe = buck->v_ref;
+    if (v_ref_safe < float2ctrl(1.0f / CTRL_VOLTAGE_BASE))
+        v_ref_safe = float2ctrl(1.0f / CTRL_VOLTAGE_BASE);
+
+    if (buck->v_in_ff <= float2ctrl(0.0f))
+        buck->v_in_ff = v_in_safe;
+    else
+        buck->v_in_ff += ctl_mul(float2ctrl(SINV_BUCK_VIN_FF_LPF_ALPHA), v_in_safe - buck->v_in_ff);
+
+    /* Boost control uses the low-side switch duty: D_low = 1 - Vin / Vbus.
+       On the real ePWM half bridge, CMPA maps to complementary outputs as:
+       upper 8A duty = 1 - CMPA/TBPRD, lower 8B duty = CMPA/TBPRD. */
+    ctrl_gt upper_duty_nominal = ctl_div(float2ctrl(SINV_LEVEL6_BOOST_INPUT_REF_V / CTRL_VOLTAGE_BASE), v_ref_safe);
+    upper_duty_nominal = ctl_sat(upper_duty_nominal, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+    ctrl_gt duty_nominal = float2ctrl(1.0f) - upper_duty_nominal;
+
+    ctrl_gt upper_duty_vin_ff = ctl_div(buck->v_in_ff, v_ref_safe);
+    upper_duty_vin_ff = ctl_sat(upper_duty_vin_ff, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+    ctrl_gt duty_vin_ff = float2ctrl(1.0f) - upper_duty_vin_ff;
+
+    buck->duty_ff = duty_nominal + ctl_mul(float2ctrl(SINV_BUCK_DUTY_FF_GAIN), duty_vin_ff - duty_nominal);
+    buck->duty_ff = ctl_sat(buck->duty_ff, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+
+    buck->duty_trim = ctl_step_pid_par(&buck->current_pid, buck->i_ref - i_l);
+    buck->duty_cmd = buck->duty_ff + buck->duty_trim;
+
+    ctrl_gt duty_lower = buck->duty_ff - float2ctrl(SINV_BUCK_DUTY_FF_MARGIN);
+    duty_lower = ctl_sat(duty_lower, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+    ctrl_gt duty_upper = buck->duty_ff + float2ctrl(SINV_BUCK_DUTY_FF_MARGIN);
+    duty_upper = ctl_sat(duty_upper, float2ctrl(SINV_BUCK_DUTY_MAX), float2ctrl(SINV_BUCK_DUTY_MIN));
+
+    buck->duty = ctl_sat(buck->duty_cmd, duty_upper, duty_lower);
+    buck->pwm_cmp = pwm_sat(ctrl2float(buck->duty) * (float)(CTRL_PWM_CMP_MAX + 1), CTRL_PWM_CMP_MAX + 1, 0);
+    return buck->pwm_cmp;
+#else
+    /* Buck output-voltage sampling keeps a fixed software low-pass filter here,
+       only for the voltage outer loop and not exposed as an SDPE parameter. */
     if (!buck->flag_enable)
     {
         buck->v_out_lpf = v_out;
@@ -454,6 +536,7 @@ pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, c
     buck->duty = ctl_sat(buck->duty_cmd, duty_upper, float2ctrl(SINV_BUCK_DUTY_MIN));
     buck->pwm_cmp = pwm_sat(ctrl2float(buck->duty) * (float)(CTRL_PWM_CMP_MAX + 1), CTRL_PWM_CMP_MAX + 1, 0);
     return buck->pwm_cmp;
+#endif
 }
 
 void ctl_enable_pwm(void)

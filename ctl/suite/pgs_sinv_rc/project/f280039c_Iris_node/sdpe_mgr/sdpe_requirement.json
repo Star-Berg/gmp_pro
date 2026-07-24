@@ -95,7 +95,7 @@
         "(5)",
         "(6)"
       ],
-      "description": "Single-phase converter commissioning build level, aligned with the simulation controller branches.\nBUILD_LEVEL 1: open-loop H-bridge modulation for resistive-load validation.\nBUILD_LEVEL 2: sinusoidal current command for resistive-load current-loop validation.\nBUILD_LEVEL 3: grid current loop with signed P/Q command.\nBUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.\nBUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command.\nBUILD_LEVEL 6: bidirectional grid mode; direct signed P/Q by default, optional DC-bus loop generates signed P."
+      "description": "Single-phase converter commissioning build level, aligned with the simulation controller branches.\nBUILD_LEVEL 1: open-loop H-bridge modulation for resistive-load validation.\nBUILD_LEVEL 2: sinusoidal current command for resistive-load current-loop validation.\nBUILD_LEVEL 3: grid current loop with signed P/Q command.\nBUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.\nBUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command.\nBUILD_LEVEL 6: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q."
     },
     {
       "group": "PWM Modulator",
@@ -528,6 +528,56 @@
       "description": "Rated AC grid/load RMS voltage."
     },
     {
+      "role": "level6_grid_voltage_rms",
+      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "24.0"
+      },
+      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
+    },
+    {
+      "role": "level6_dc_bus_ref",
+      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "60.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
+    },
+    {
+      "role": "level6_boost_input_ref",
+      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "48.0"
+      },
+      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side."
+    },
+    {
+      "role": "level6_boost_vbus_slew",
+      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "120.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
+    },
+    {
+      "role": "level6_boost_start_delay",
+      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "100"
+      },
+      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
+    },
+    {
       "role": "rated_current_rms",
       "macro": "CTRL_RATED_CURRENT_RMS",
       "enabled": true,
@@ -911,6 +961,16 @@
         "q_slew_pu_s",
         "power_factor_q_sign",
         "adc_calibration_timeout"
+      ]
+    },
+    {
+      "name": "Level 6 Parameters",
+      "requirements": [
+        "level6_grid_voltage_rms",
+        "level6_dc_bus_ref",
+        "level6_boost_input_ref",
+        "level6_boost_vbus_slew",
+        "level6_boost_start_delay"
       ]
     },
     {

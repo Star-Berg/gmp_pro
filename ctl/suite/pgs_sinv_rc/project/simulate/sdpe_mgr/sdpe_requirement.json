@@ -5,7 +5,7 @@
   "description": "Windows SIL platform, plant and sensing settings for all SINV commissioning models.",
   "suite": "pgs_sinv_rc",
   "version": "1.0.0",
-  "updated_at": "2026-07-23",
+  "updated_at": "2026-07-24",
   "output_header": "sdpe_pgs_sinv_rc_simulate_settings.h",
   "hardware": [],
   "code_sections": {
@@ -44,7 +44,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(5)",
+      "value": "(6)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -54,7 +54,7 @@
         "(5)",
         "(6)"
       ],
-      "description": "1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode."
+      "description": "1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 boost-fed grid mode."
     }
   ],
   "requirements": [
@@ -137,6 +137,56 @@
         "float": "36.0"
       },
       "description": "Nominal grid/load RMS voltage."
+    },
+    {
+      "role": "level6_grid_voltage_rms",
+      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "36.0"
+      },
+      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
+    },
+    {
+      "role": "level6_dc_bus_ref",
+      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "80.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
+    },
+    {
+      "role": "level6_boost_input_ref",
+      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "48.0"
+      },
+      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value."
+    },
+    {
+      "role": "level6_boost_vbus_slew",
+      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "120.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
+    },
+    {
+      "role": "level6_boost_start_delay",
+      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "100"
+      },
+      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
     },
     {
       "role": "current_rms",
@@ -319,66 +369,6 @@
       "description": "AC current ADC bias."
     },
     {
-      "role": "current_limit",
-      "macro": "CTRL_CURRENT_LIMIT_PU",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.9"
-      },
-      "description": "Peak current command limit in PU."
-    },
-    {
-      "role": "p_slew",
-      "macro": "CTRL_P_SLEW_PU_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "5.0"
-      },
-      "description": "Active-power command slew limit in PU/s."
-    },
-    {
-      "role": "q_slew",
-      "macro": "CTRL_Q_SLEW_PU_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "5.0"
-      },
-      "description": "Reactive-power command slew limit in PU/s."
-    },
-    {
-      "role": "bus_ref",
-      "macro": "SINV_DC_BUS_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "expr": "CTRL_DCBUS_VOLTAGE"
-      },
-      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting."
-    },
-    {
-      "role": "power_factor_q_sign",
-      "macro": "SINV_POWER_FACTOR_Q_SIGN",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "-1.0"
-      },
-      "description": "BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction."
-    },
-    {
-      "role": "buck_output_ref",
-      "macro": "SINV_BUCK_OUTPUT_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "60.0"
-      },
-      "description": "Buck output voltage target."
-    },
-    {
       "role": "mosfet_ron",
       "macro": "SINV_MODEL_MOSFET_RON",
       "enabled": true,
@@ -407,6 +397,66 @@
         "float": "0.5"
       },
       "description": "Body-diode forward voltage."
+    },
+    {
+      "role": "current_limit_pu",
+      "macro": "CTRL_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.9"
+      },
+      "description": "Peak current-reference limit in per unit."
+    },
+    {
+      "role": "p_slew_pu_s",
+      "macro": "CTRL_P_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Active-power command slew limit in PU/s."
+    },
+    {
+      "role": "q_slew_pu_s",
+      "macro": "CTRL_Q_SLEW_PU_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "Reactive-power command slew limit in PU/s."
+    },
+    {
+      "role": "power_factor_q_sign",
+      "macro": "SINV_POWER_FACTOR_Q_SIGN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "-1.0"
+      },
+      "description": "BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction."
+    },
+    {
+      "role": "buck_output_ref",
+      "macro": "SINV_BUCK_OUTPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "60.0"
+      },
+      "description": "Buck output voltage target."
+    },
+    {
+      "role": "bus_ref",
+      "macro": "SINV_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "expr": "CTRL_DCBUS_VOLTAGE"
+      },
+      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting."
     },
     {
       "role": "prot_vbus",
@@ -537,17 +587,6 @@
       ]
     },
     {
-      "name": "Platform Commissioning Defaults",
-      "requirements": [
-        "current_limit",
-        "p_slew",
-        "q_slew",
-        "bus_ref",
-        "power_factor_q_sign",
-        "buck_output_ref"
-      ]
-    },
-    {
       "name": "MOSFET Parameters",
       "requirements": [
         "mosfet_ron",
@@ -566,9 +605,35 @@
       ]
     },
     {
+      "name": "Level 6 Parameters",
+      "requirements": [
+        "level6_grid_voltage_rms",
+        "level6_dc_bus_ref",
+        "level6_boost_input_ref",
+        "level6_boost_vbus_slew",
+        "level6_boost_start_delay"
+      ]
+    },
+    {
       "name": "Runtime Parameters",
       "requirements": [
         "cal_timeout"
+      ]
+    },
+    {
+      "name": "Control Runtime Limits",
+      "requirements": [
+        "current_limit_pu",
+        "p_slew_pu_s",
+        "q_slew_pu_s"
+      ]
+    },
+    {
+      "name": "Commissioning Targets",
+      "requirements": [
+        "power_factor_q_sign",
+        "buck_output_ref",
+        "bus_ref"
       ]
     }
   ]

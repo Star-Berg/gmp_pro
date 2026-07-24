@@ -32,7 +32,11 @@ for k = 1:numel(models)
     configure_plant_mask(plant);
 
     if getSimulinkBlockHandle([model '/Constant']) ~= -1
-        set_param([model '/Constant'], 'Value', 'CTRL_DCBUS_VOLTAGE');
+        if exist('BUILD_LEVEL', 'var') && BUILD_LEVEL == 6
+            set_param([model '/Constant'], 'Value', 'SINV_LEVEL6_BOOST_INPUT_REF_V');
+        else
+            set_param([model '/Constant'], 'Value', 'CTRL_DCBUS_VOLTAGE');
+        end
     end
     if strcmp(model, 'PGS_STD_SINV_MODEL_RLOAD')
         set_param([model '/Load'], 'BranchType', 'R', 'Resistance', 'SINV_RLOAD_OHM');
@@ -161,8 +165,12 @@ source_ports = [source_ph.LConn source_ph.RConn];
 for k = 1:2
     add_line(model, source_ports(k), peers(k), 'autorouting', 'on');
 end
+grid_amplitude = 'sqrt(2) * CTRL_GRID_VOLTAGE_RMS';
+if exist('BUILD_LEVEL', 'var') && BUILD_LEVEL == 6
+    grid_amplitude = 'sqrt(2) * SINV_LEVEL6_GRID_VOLTAGE_RMS';
+end
 add_block('simulink/Sources/Sine Wave', sine, ...
-    'Amplitude', 'sqrt(2) * CTRL_GRID_VOLTAGE_RMS', ...
+    'Amplitude', grid_amplitude, ...
     'Frequency', '2*pi*CTRL_GRID_FREQUENCY', ...
     'SampleTime', '0', 'Position', pos + [-130 0 -130 0]);
 sine_ph = get_param(sine, 'PortHandles');

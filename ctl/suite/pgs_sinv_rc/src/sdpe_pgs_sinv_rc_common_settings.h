@@ -206,24 +206,14 @@ extern "C"
 #define SINV_LEVEL4_ACTIVE_POWER_REF_PU (0.15f)
 
 /**
- * @brief BUILD_LEVEL 6 signed grid active-power command used when SINV_LEVEL6_ENABLE_DCBUS_LOOP is 0. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
+ * @brief BUILD_LEVEL 6 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
  */
 #define SINV_LEVEL6_ACTIVE_POWER_REF_PU (0.10f)
 
 /**
- * @brief BUILD_LEVEL 6 reactive-power command. It is used directly in both direct signed-P/Q mode and DC-bus-loop mode.
+ * @brief BUILD_LEVEL 6 reactive-power command for the boost-fed grid mode.
  */
 #define SINV_LEVEL6_REACTIVE_POWER_REF_PU (0.0f)
-
-/**
- * @brief BUILD_LEVEL 6 mode selector. 0: use SINV_LEVEL6_ACTIVE_POWER_REF_PU directly for bidirectional grid-current THD tests. 1: close the DC-bus voltage loop and let it generate signed active-power command.
- */
-#define SINV_LEVEL6_ENABLE_DCBUS_LOOP (0)
-
-/**
- * @brief BUILD_LEVEL 6 DC-bus-loop polarity from bus-voltage error to grid active-power command. Keep it separate from BUILD_LEVEL 5 so bidirectional power-flow sign calibration does not disturb the rectifier baseline.
- */
-#define SINV_LEVEL6_DCBUS_POWER_SIGN (-1.0f)
 
 /**
  * @brief BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.

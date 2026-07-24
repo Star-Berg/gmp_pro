@@ -80,3 +80,18 @@ project\f280039c_Iris_node\sdpe_mgr\sdpe_generate.bat
 | PF 从 1 改成 0.8 | common 层 `SINV_POWER_FACTOR_REF`；方向不对时改平台层 `SINV_POWER_FACTOR_Q_SIGN`；幅值偏差再用 common 层 `SINV_POWER_FACTOR_Q_GAIN` 微调 |
 | 并网电流 THD/碎波形 | common 层电流环、PLL、FDRC 参数；如果刚换 LC，先确认平台层 `CTRL_AC_INDUCTANCE` 和传感器标定正确 |
 
+
+## 6. BUILD_LEVEL 6：Boost-fed grid mode
+
+`BUILD_LEVEL = 6` 当前固定为：低压侧 DC 源经 Buck 半桥反向 Boost 到 DC bus，单相全桥再按 signed P/Q 做并网电流控制。它不再包含“母线外环生成 P_ref”的子模式，切到 level6 就是 Boost 控母线 + 并网侧直接 P/Q。
+
+| 想调什么 | 改哪里 | 说明 |
+| --- | --- | --- |
+| 并网额定电压 | 对应平台层 `SINV_LEVEL6_GRID_VOLTAGE_RMS` | 这是 level6 的额定/目标 RMS，用于仿真电网源和 RMS 保护窗口；PLL 仍然使用实测 `Vac`，不应拿实时电网波动去动态改这个目标值。 |
+| Boost 后的 DC bus 目标 | 对应平台层 `SINV_LEVEL6_DC_BUS_REF_V` | level6 下 DCDC 级的输出目标，控制对象是 `adc_v_bus`。 |
+| Boost 低压侧 DC 源 | 对应平台层 `SINV_LEVEL6_BOOST_INPUT_REF_V` | 仿真时外部低压 DC 源设为这个值；控制代码中它也作为 Boost 前馈的名义输入值。 |
+| Boost 母线软启动速度 | 对应平台层 `SINV_LEVEL6_BOOST_VBUS_SLEW_V_S` | 内部母线参考从 0 按该斜率爬到 `SINV_LEVEL6_DC_BUS_REF_V`，用于避免启动超调。 |
+| Boost 延迟启动时间 | 对应平台层 `SINV_LEVEL6_BOOST_START_DELAY_MS` | 低压侧输入存在且 CiA402 operation-enabled 后，再延迟这么久开始 Boost PWM。 |
+| 并网有功/无功 | common 层 `SINV_LEVEL6_ACTIVE_POWER_REF_PU`、`SINV_LEVEL6_REACTIVE_POWER_REF_PU` | level6 并网侧直接使用 signed P/Q 指令。实物方向可能受电压/电流传感器极性影响，上电后用小功率确认 P/Q 符号。 |
+
+level6 仿真接线口径：`adc_v_buck_out` 在 level6 中表示 Boost 低压输入侧电压，`adc_v_bus` 表示 Boost 输出母线电压，Buck/Boost 电感电流仍走 `adc_i_buck`。如果模型或实物半桥 PWM 比较值对应的是另一只管子的占空比，表现通常是母线升不起来或 duty 方向反，此时应只在 level6 的 PWM 极性/compare 输出处修正，不要改外环参数来硬凑。

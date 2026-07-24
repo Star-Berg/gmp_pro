@@ -31,7 +31,15 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
 {
     simulink_tx_buffer.pwm_cmp[0] = ctl_get_single_phase_modulation_L_phase(&hpwm);
     simulink_tx_buffer.pwm_cmp[1] = ctl_get_single_phase_modulation_N_phase(&hpwm);
+#if BUILD_LEVEL == 6
+    /* Level 6 Boost control stores the low-side 8B duty in buck_ctrl.pwm_cmp.
+       The Simulink half-bridge duty model input drives the upper 8A MOSFET,
+       so send the complementary compare value to keep 8B as the Boost switch. */
+    simulink_tx_buffer.pwm_cmp[2] =
+        (buck_ctrl.pwm_cmp >= CTRL_PWM_CMP_MAX) ? 0U : (CTRL_PWM_CMP_MAX - buck_ctrl.pwm_cmp);
+#else
     simulink_tx_buffer.pwm_cmp[2] = buck_ctrl.pwm_cmp;
+#endif
     simulink_tx_buffer.monitor[0] = ctrl2float(adc_v_grid.control_port.value) * CTRL_VOLTAGE_BASE;
     simulink_tx_buffer.monitor[1] = ctrl2float(adc_i_ac.control_port.value) * CTRL_CURRENT_BASE;
     simulink_tx_buffer.monitor[2] = ctrl2float(adc_v_bus.control_port.value) * CTRL_VOLTAGE_BASE;
