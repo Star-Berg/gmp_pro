@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-24';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -25,8 +25,8 @@ USE_DEBUG_DISCRETE_PID = true;
 % USING_NPC_MODULATOR = true;
 
 %% Runtime
-% SPECIFY_ENABLE_ADC_CALIBRATE is disabled in the SDPE project requirement.
-% SPECIFY_ENABLE_ADC_CALIBRATE = true;
+% Enable startup ADC offset calibration. Only enable while all calibrated power inputs are in a known zero state.
+SPECIFY_ENABLE_ADC_CALIBRATE = true;
 
 % ENABLE_GMP_DL_PIL_SIM is disabled in the SDPE project requirement.
 % ENABLE_GMP_DL_PIL_SIM = true;
@@ -98,7 +98,7 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
 % BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
-GFL_LEVEL6_OUTPUT_LINE_RMS_V = 36.0;
+GFL_LEVEL6_OUTPUT_LINE_RMS_V = 33.0;
 
 % Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
 GFL_LEVEL6_VOLTAGE_MIN_RMS_V = 24.0;
