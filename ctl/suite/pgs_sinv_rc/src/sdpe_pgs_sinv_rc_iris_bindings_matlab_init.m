@@ -352,12 +352,6 @@ SPECIFY_ENABLE_ADC_CALIBRATE = true;
 % Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence.
 CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 
-% SINV_ENABLE_REPETITIVE_CONTROL is disabled in the SDPE project requirement.
-% SINV_ENABLE_REPETITIVE_CONTROL = true;
-
-% Enable grid-voltage feedforward for closed-current-loop build levels.
-SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
-
 %% Diagnostics and Simulation
 % ENABLE_GMP_DL_PIL_SIM is disabled in the SDPE project requirement.
 % ENABLE_GMP_DL_PIL_SIM = true;

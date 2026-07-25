@@ -24,7 +24,7 @@ extern "C"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_ID "pgs_sinv_rc_simulate"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-24"
+#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-25"
 
 //=================================================================================================
 /**
@@ -95,12 +95,12 @@ extern "C"
 /**
  * @brief Rated and nominal DC-bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (80.0f)
+#define CTRL_DCBUS_VOLTAGE (40.0f)
 
 /**
  * @brief Nominal grid/load RMS voltage.
  */
-#define CTRL_GRID_VOLTAGE_RMS (36.0f)
+#define CTRL_GRID_VOLTAGE_RMS (24.0f)
 
 /**
  * @brief Rated RMS AC current.
@@ -110,7 +110,7 @@ extern "C"
 /**
  * @brief Peak voltage PU base.
  */
-#define CTRL_VOLTAGE_BASE (50.91f)
+#define CTRL_VOLTAGE_BASE (34.0f)
 
 /**
  * @brief Peak current PU base.
@@ -185,7 +185,7 @@ extern "C"
 /**
  * @brief AC current sensor sensitivity in V/A.
  */
-#define CTRL_AC_CURRENT_SENSITIVITY (0.150f)
+#define CTRL_AC_CURRENT_SENSITIVITY (-0.150f)
 
 /**
  * @brief AC current ADC bias.

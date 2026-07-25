@@ -5,7 +5,7 @@
   "description": "Windows SIL platform, plant and sensing settings for all SINV commissioning models.",
   "suite": "pgs_sinv_rc",
   "version": "1.0.0",
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-25",
   "output_header": "sdpe_pgs_sinv_rc_simulate_settings.h",
   "hardware": [],
   "code_sections": {
@@ -124,7 +124,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "80.0"
+        "float": "40.0"
       },
       "description": "Rated and nominal DC-bus voltage."
     },
@@ -134,7 +134,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "36.0"
+        "float": "24.0"
       },
       "description": "Nominal grid/load RMS voltage."
     },
@@ -154,7 +154,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "50.91"
+        "float": "34.0"
       },
       "description": "Peak voltage PU base."
     },
@@ -304,7 +304,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.150"
+        "float": "-0.150"
       },
       "description": "AC current sensor sensitivity in V/A."
     },

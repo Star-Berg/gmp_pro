@@ -61,16 +61,6 @@ extern "C"
  */
 #define CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH
 
-/**
- * @brief Enable delayed insertion of the frequency-adaptive repetitive controller.
- */
-// #define SINV_ENABLE_REPETITIVE_CONTROL
-
-/**
- * @brief Enable grid-voltage feedforward for closed-current-loop build levels.
- */
-#define SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD
-
 //=================================================================================================
 /**
  * @brief Diagnostics and Simulation.

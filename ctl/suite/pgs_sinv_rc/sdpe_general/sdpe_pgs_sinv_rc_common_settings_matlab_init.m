@@ -15,8 +15,8 @@ PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
 
 %% Control Features
-% Enable delayed insertion of the frequency-adaptive repetitive controller.
-SINV_ENABLE_REPETITIVE_CONTROL = true;
+% SINV_ENABLE_REPETITIVE_CONTROL is disabled in the SDPE project requirement.
+% SINV_ENABLE_REPETITIVE_CONTROL = true;
 
 % Enable grid-voltage feedforward for closed-current-loop build levels.
 SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
@@ -30,7 +30,7 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 CTRL_GRID_VMIN_PU = 0.1;
 
 % SOGI PLL proportional gain. Keep this moderate on hardware because Vac ADC noise is directly converted into frequency jitter.
-CTRL_PLL_KP = 1.0;
+CTRL_PLL_KP = 0.8;
 
 % SOGI PLL integral time constant in seconds. Larger values slow the PLL but reduce frequency-estimate ripple.
 CTRL_PLL_TI = 0.08;

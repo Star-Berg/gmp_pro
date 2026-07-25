@@ -47,22 +47,6 @@
       "description": "Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence."
     },
     {
-      "group": "Control Features",
-      "macro": "SINV_ENABLE_REPETITIVE_CONTROL",
-      "enabled": false,
-      "weak": false,
-      "value": "",
-      "description": "Enable delayed insertion of the frequency-adaptive repetitive controller."
-    },
-    {
-      "group": "Control Features",
-      "macro": "SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD",
-      "enabled": true,
-      "weak": false,
-      "value": "",
-      "description": "Enable grid-voltage feedforward for closed-current-loop build levels."
-    },
-    {
       "group": "Diagnostics and Simulation",
       "macro": "ENABLE_GMP_DL_PIL_SIM",
       "enabled": false,
