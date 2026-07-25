@@ -52,7 +52,7 @@ extern "C"
  */
 
 /**
- * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode.
+ * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 boost-fed grid mode.
  *        Options: (1), (2), (3), (4), (5), (6)
  */
 #define BUILD_LEVEL (6)
@@ -233,9 +233,64 @@ extern "C"
 #define CTRL_DCBUS_READY_MAX (90.0f)
 
 /**
+ * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+ */
+#define SINV_LEVEL6_GRID_VOLTAGE_RMS (36.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+ */
+#define SINV_LEVEL6_DC_BUS_REF_V (80.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
+ */
+#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+ */
+#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+ */
+#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
+
+/**
  * @brief ADC calibration timeout.
  */
 #define TIMEOUT_ADC_CALIB_MS (3000)
+
+/**
+ * @brief Peak current-reference limit in per unit.
+ */
+#define CTRL_CURRENT_LIMIT_PU (0.9f)
+
+/**
+ * @brief Active-power command slew limit in PU/s.
+ */
+#define CTRL_P_SLEW_PU_S (5.0f)
+
+/**
+ * @brief Reactive-power command slew limit in PU/s.
+ */
+#define CTRL_Q_SLEW_PU_S (5.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+ */
+#define SINV_POWER_FACTOR_Q_SIGN (-1.0f)
+
+/**
+ * @brief Buck output voltage target.
+ */
+#define SINV_BUCK_OUTPUT_REF_V (60.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
+ */
+#define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)

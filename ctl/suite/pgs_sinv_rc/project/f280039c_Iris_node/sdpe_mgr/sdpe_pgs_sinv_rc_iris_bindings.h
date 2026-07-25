@@ -29,7 +29,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-24"
+#define SDPE_PROJECT_UPDATED_AT "2026-07-25"
 
 //=================================================================================================
 /**
@@ -64,7 +64,7 @@ extern "C"
 /**
  * @brief Enable delayed insertion of the frequency-adaptive repetitive controller.
  */
-#define SINV_ENABLE_REPETITIVE_CONTROL
+// #define SINV_ENABLE_REPETITIVE_CONTROL
 
 /**
  * @brief Enable grid-voltage feedforward for closed-current-loop build levels.
@@ -101,7 +101,7 @@ extern "C"
  *        BUILD_LEVEL 6: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
  *        Options: (1), (2), (3), (4), (5), (6)
  */
-#define BUILD_LEVEL (5)
+#define BUILD_LEVEL (3)
 
 //=================================================================================================
 /**
@@ -146,7 +146,7 @@ extern "C"
  * @brief Gate-driver enable GPIO.
  *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
  */
-#define PWM_ENABLE_PORT IRIS_GPIO1
+#define PWM_ENABLE_PORT IRIS_GPIO5
 
 /**
  * @brief Gate-driver reset GPIO.
@@ -289,37 +289,12 @@ extern "C"
 /**
  * @brief Rated DC bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (60.0f)
+#define CTRL_DCBUS_VOLTAGE (40.0f)
 
 /**
  * @brief Rated AC grid/load RMS voltage.
  */
 #define CTRL_GRID_VOLTAGE_RMS (24.0f)
-
-/**
- * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
- */
-#define SINV_LEVEL6_GRID_VOLTAGE_RMS (24.0f)
-
-/**
- * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
- */
-#define SINV_LEVEL6_DC_BUS_REF_V (60.0f)
-
-/**
- * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side.
- */
-#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
-
-/**
- * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
- */
-#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
-
-/**
- * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
- */
-#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
 
 /**
  * @brief Rated AC output RMS current.
@@ -369,7 +344,7 @@ extern "C"
 /**
  * @brief AC current sensing sensitivity from the LVFB inverter current sensor.
  */
-#define CTRL_AC_CURRENT_SENSITIVITY GMP_LVFB_CURRENT_SENSITIVITY
+#define CTRL_AC_CURRENT_SENSITIVITY (-0.15f)
 
 /**
  * @brief AC current sensing ADC bias from the LVFB inverter current sensor.
@@ -455,6 +430,31 @@ extern "C"
  * @brief ADC calibration timeout in ms.
  */
 #define TIMEOUT_ADC_CALIB_MS (3000)
+
+/**
+ * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+ */
+#define SINV_LEVEL6_GRID_VOLTAGE_RMS (24.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+ */
+#define SINV_LEVEL6_DC_BUS_REF_V (60.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side.
+ */
+#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+ */
+#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+ */
+#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
 
 /**
  * @brief Startup delay in ms.

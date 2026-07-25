@@ -12,11 +12,11 @@ PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-24';
+PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
 
 %% Control Features
-% Enable delayed insertion of the frequency-adaptive repetitive controller.
-SINV_ENABLE_REPETITIVE_CONTROL = true;
+% SINV_ENABLE_REPETITIVE_CONTROL is disabled in the SDPE project requirement.
+% SINV_ENABLE_REPETITIVE_CONTROL = true;
 
 % Enable grid-voltage feedforward for closed-current-loop build levels.
 SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
@@ -29,29 +29,20 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % Minimum voltage magnitude used by the P/Q reference generator.
 CTRL_GRID_VMIN_PU = 0.1;
 
-% SOGI PLL proportional gain.
-CTRL_PLL_KP = 10.0;
+% SOGI PLL proportional gain. Keep this moderate on hardware because Vac ADC noise is directly converted into frequency jitter.
+CTRL_PLL_KP = 0.8;
 
-% SOGI PLL integral time constant in seconds.
-CTRL_PLL_TI = 0.02;
+% SOGI PLL integral time constant in seconds. Larger values slow the PLL but reduce frequency-estimate ripple.
+CTRL_PLL_TI = 0.08;
 
-% PLL error-filter cutoff frequency in Hz.
-CTRL_PLL_LPF_FC = 20.0;
+% PLL q-axis error-filter cutoff frequency in Hz. Lower values suppress Vac sampling noise before the loop PI.
+CTRL_PLL_LPF_FC = 5.0;
 
-% PLL frequency-error lock threshold in PU.
-CTRL_SPLL_EPSILON = 0.005;
+% PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid.
+CTRL_SPLL_EPSILON = 0.001;
 
 % Power measurement low-pass cutoff frequency in Hz.
 CTRL_PQ_LPF_FC = 200.0;
-
-% Peak current command limit in PU.
-CTRL_CURRENT_LIMIT_PU = 0.9;
-
-% Active-power command slew limit in PU/s.
-CTRL_P_SLEW_PU_S = 5.0;
-
-% Reactive-power command slew limit in PU/s.
-CTRL_Q_SLEW_PU_S = 5.0;
 
 % Current deadband used by PWM dead-time compensation.
 CTRL_CURRENT_DB_PU = 0.01;
@@ -114,10 +105,10 @@ SINV_BUCK_CURRENT_LOOP_KP = 0.20;
 SINV_BUCK_CURRENT_LOOP_KI = 500.0;
 
 % BUILD_LEVEL 2 peak current command with a resistive load.
-SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.20;
+SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.02;
 
 % BUILD_LEVEL 3 signed grid active-power command; positive exports power.
-SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.10;
+SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.02;
 
 % BUILD_LEVEL 3 grid reactive-power command.
 SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;
@@ -125,32 +116,17 @@ SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;
 % BUILD_LEVEL 4 measured active-power closed-loop target.
 SINV_LEVEL4_ACTIVE_POWER_REF_PU = 0.15;
 
-% BUILD_LEVEL 6 signed grid active-power command used when SINV_LEVEL6_ENABLE_DCBUS_LOOP is 0. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
+% BUILD_LEVEL 6 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
 SINV_LEVEL6_ACTIVE_POWER_REF_PU = 0.10;
 
-% BUILD_LEVEL 6 reactive-power command. It is used directly in both direct signed-P/Q mode and DC-bus-loop mode.
+% BUILD_LEVEL 6 reactive-power command for the boost-fed grid mode.
 SINV_LEVEL6_REACTIVE_POWER_REF_PU = 0.0;
-
-% BUILD_LEVEL 6 mode selector. 0: use SINV_LEVEL6_ACTIVE_POWER_REF_PU directly for bidirectional grid-current THD tests. 1: close the DC-bus voltage loop and let it generate signed active-power command.
-SINV_LEVEL6_ENABLE_DCBUS_LOOP = 1;
-
-% BUILD_LEVEL 6 DC-bus-loop polarity from bus-voltage error to grid active-power command. Keep it separate from BUILD_LEVEL 5 so bidirectional power-flow sign calibration does not disturb the rectifier baseline.
-SINV_LEVEL6_DCBUS_POWER_SIGN = -1.0;
-
-% BUILD_LEVEL 5 physical DC bus voltage target.
-SINV_DC_BUS_REF_V = 80.0;
 
 % BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
 SINV_POWER_FACTOR_REF = 1.0;
 
-% BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
-SINV_POWER_FACTOR_Q_SIGN = -1.0;
-
 % BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
 SINV_POWER_FACTOR_Q_GAIN = 1.06;
-
-% Buck output voltage target.
-SINV_BUCK_OUTPUT_REF_V = 60.0;
 
 % Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.
 SINV_BUCK_VREF_SLEW_V_S = 120.0;

@@ -25,7 +25,7 @@ SINV_SIM_AUTO_ENABLE = true;
 % ENABLE_GMP_DL_PIL_SIM = true;
 
 %% Commissioning
-% 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 bidirectional grid mode.
+% 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 boost-fed grid mode.
 % Options: (1), (2), (3), (4), (5), (6)
 BUILD_LEVEL = 6;
 
@@ -132,8 +132,41 @@ CTRL_DCBUS_READY_MIN = 25.0;
 % Maximum DC bus accepted by startup.
 CTRL_DCBUS_READY_MAX = 90.0;
 
+% BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+SINV_LEVEL6_GRID_VOLTAGE_RMS = 36.0;
+
+% BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+SINV_LEVEL6_DC_BUS_REF_V = 80.0;
+
+% BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
+SINV_LEVEL6_BOOST_INPUT_REF_V = 48.0;
+
+% BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+SINV_LEVEL6_BOOST_VBUS_SLEW_V_S = 120.0;
+
+% BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+SINV_LEVEL6_BOOST_START_DELAY_MS = 100;
+
 % ADC calibration timeout.
 TIMEOUT_ADC_CALIB_MS = 3000;
+
+% Peak current-reference limit in per unit.
+CTRL_CURRENT_LIMIT_PU = 0.9;
+
+% Active-power command slew limit in PU/s.
+CTRL_P_SLEW_PU_S = 5.0;
+
+% Reactive-power command slew limit in PU/s.
+CTRL_Q_SLEW_PU_S = 5.0;
+
+% BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+SINV_POWER_FACTOR_Q_SIGN = -1.0;
+
+% Buck output voltage target.
+SINV_BUCK_OUTPUT_REF_V = 60.0;
+
+% BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
+SINV_DC_BUS_REF_V = CTRL_DCBUS_VOLTAGE;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

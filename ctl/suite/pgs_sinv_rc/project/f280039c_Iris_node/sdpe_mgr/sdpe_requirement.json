@@ -4,7 +4,7 @@
   "description": "Single-phase inverter project requirement prepared from xplt/ctrl_settings.h.\nThis requirement introduces the GMP LVFB 150V 2-phase inverter board as the switching stage and the GMP Harmonia 3-phase LC filter as the grid filter. IRIS F280039C is included as the peripheral option provider.",
   "suite": "pgs_sinv_rc",
   "version": "0.2.0",
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-25",
   "output_header": "sdpe_pgs_sinv_rc_iris_bindings.h",
   "hardware": [
     {
@@ -49,7 +49,7 @@
     {
       "group": "Control Features",
       "macro": "SINV_ENABLE_REPETITIVE_CONTROL",
-      "enabled": true,
+      "enabled": false,
       "weak": false,
       "value": "",
       "description": "Enable delayed insertion of the frequency-adaptive repetitive controller."
@@ -85,7 +85,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(5)",
+      "value": "(3)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -166,7 +166,7 @@
       "macro": "PWM_ENABLE_PORT",
       "enabled": true,
       "weak": false,
-      "value": "IRIS_GPIO1",
+      "value": "IRIS_GPIO5",
       "options_preset": "iris_f280039c_node.IRIS_GPIO",
       "options": [
         "IRIS_GPIO1",
@@ -513,7 +513,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "60.0"
+        "float": "40.0"
       },
       "description": "Rated DC bus voltage."
     },
@@ -526,56 +526,6 @@
         "float": "24.0"
       },
       "description": "Rated AC grid/load RMS voltage."
-    },
-    {
-      "role": "level6_grid_voltage_rms",
-      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "24.0"
-      },
-      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
-    },
-    {
-      "role": "level6_dc_bus_ref",
-      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "60.0"
-      },
-      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
-    },
-    {
-      "role": "level6_boost_input_ref",
-      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "48.0"
-      },
-      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side."
-    },
-    {
-      "role": "level6_boost_vbus_slew",
-      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "120.0"
-      },
-      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
-    },
-    {
-      "role": "level6_boost_start_delay",
-      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "number": "100"
-      },
-      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
     },
     {
       "role": "rated_current_rms",
@@ -673,7 +623,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "export": "gmp_lvfb_150_2ph_v2.current_sensitivity"
+        "float": "-0.15"
       },
       "description": "AC current sensing sensitivity from the LVFB inverter current sensor."
     },
@@ -846,6 +796,56 @@
         "number": "3000"
       },
       "description": "ADC calibration timeout in ms."
+    },
+    {
+      "role": "level6_grid_voltage_rms",
+      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "24.0"
+      },
+      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
+    },
+    {
+      "role": "level6_dc_bus_ref",
+      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "60.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
+    },
+    {
+      "role": "level6_boost_input_ref",
+      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "48.0"
+      },
+      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side."
+    },
+    {
+      "role": "level6_boost_vbus_slew",
+      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "120.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
+    },
+    {
+      "role": "level6_boost_start_delay",
+      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "100"
+      },
+      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
     },
     {
       "role": "startup_delay",

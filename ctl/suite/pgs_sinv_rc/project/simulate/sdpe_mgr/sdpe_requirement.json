@@ -139,56 +139,6 @@
       "description": "Nominal grid/load RMS voltage."
     },
     {
-      "role": "level6_grid_voltage_rms",
-      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "36.0"
-      },
-      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
-    },
-    {
-      "role": "level6_dc_bus_ref",
-      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "80.0"
-      },
-      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
-    },
-    {
-      "role": "level6_boost_input_ref",
-      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "48.0"
-      },
-      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value."
-    },
-    {
-      "role": "level6_boost_vbus_slew",
-      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "120.0"
-      },
-      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
-    },
-    {
-      "role": "level6_boost_start_delay",
-      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "number": "100"
-      },
-      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
-    },
-    {
       "role": "current_rms",
       "macro": "CTRL_RATED_CURRENT_RMS",
       "enabled": true,
@@ -399,6 +349,116 @@
       "description": "Body-diode forward voltage."
     },
     {
+      "role": "prot_vbus",
+      "macro": "CTRL_PROT_VBUS_MAX",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "100.0"
+      },
+      "description": "DC bus overvoltage threshold for simulation startup transients."
+    },
+    {
+      "role": "prot_current",
+      "macro": "CTRL_PROT_IAC_PEAK_MAX",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "18.0"
+      },
+      "description": "Fast AC peak-current threshold."
+    },
+    {
+      "role": "prot_control",
+      "macro": "CTRL_PROT_VCTRL_MAX_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.5"
+      },
+      "description": "Controller divergence threshold; BUILD_LEVEL 5 masks it only during passive-rectifier takeover."
+    },
+    {
+      "role": "bus_ready_min",
+      "macro": "CTRL_DCBUS_READY_MIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "25.0"
+      },
+      "description": "Minimum precharged DC bus accepted by startup."
+    },
+    {
+      "role": "bus_ready_max",
+      "macro": "CTRL_DCBUS_READY_MAX",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "90.0"
+      },
+      "description": "Maximum DC bus accepted by startup."
+    },
+    {
+      "role": "level6_grid_voltage_rms",
+      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "36.0"
+      },
+      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
+    },
+    {
+      "role": "level6_dc_bus_ref",
+      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "80.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
+    },
+    {
+      "role": "level6_boost_input_ref",
+      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "48.0"
+      },
+      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value."
+    },
+    {
+      "role": "level6_boost_vbus_slew",
+      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "120.0"
+      },
+      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
+    },
+    {
+      "role": "level6_boost_start_delay",
+      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "100"
+      },
+      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
+    },
+    {
+      "role": "cal_timeout",
+      "macro": "TIMEOUT_ADC_CALIB_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "3000"
+      },
+      "description": "ADC calibration timeout."
+    },
+    {
       "role": "current_limit_pu",
       "macro": "CTRL_CURRENT_LIMIT_PU",
       "enabled": true,
@@ -457,66 +517,6 @@
         "expr": "CTRL_DCBUS_VOLTAGE"
       },
       "description": "BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting."
-    },
-    {
-      "role": "prot_vbus",
-      "macro": "CTRL_PROT_VBUS_MAX",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "100.0"
-      },
-      "description": "DC bus overvoltage threshold for simulation startup transients."
-    },
-    {
-      "role": "prot_current",
-      "macro": "CTRL_PROT_IAC_PEAK_MAX",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "18.0"
-      },
-      "description": "Fast AC peak-current threshold."
-    },
-    {
-      "role": "prot_control",
-      "macro": "CTRL_PROT_VCTRL_MAX_PU",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "1.5"
-      },
-      "description": "Controller divergence threshold; BUILD_LEVEL 5 masks it only during passive-rectifier takeover."
-    },
-    {
-      "role": "bus_ready_min",
-      "macro": "CTRL_DCBUS_READY_MIN",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "25.0"
-      },
-      "description": "Minimum precharged DC bus accepted by startup."
-    },
-    {
-      "role": "bus_ready_max",
-      "macro": "CTRL_DCBUS_READY_MAX",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "90.0"
-      },
-      "description": "Maximum DC bus accepted by startup."
-    },
-    {
-      "role": "cal_timeout",
-      "macro": "TIMEOUT_ADC_CALIB_MS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "number": "3000"
-      },
-      "description": "ADC calibration timeout."
     }
   ],
   "requirement_groups": [
