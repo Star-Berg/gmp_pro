@@ -206,22 +206,22 @@ extern "C"
 #define SINV_LEVEL4_ACTIVE_POWER_REF_PU (0.15f)
 
 /**
- * @brief BUILD_LEVEL 6 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
+ * @brief BUILD_LEVEL 7 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
  */
-#define SINV_LEVEL6_ACTIVE_POWER_REF_PU (0.10f)
+#define SINV_LEVEL7_ACTIVE_POWER_REF_PU (0.10f)
 
 /**
- * @brief BUILD_LEVEL 6 reactive-power command for the boost-fed grid mode.
+ * @brief BUILD_LEVEL 7 reactive-power command for the boost-fed grid mode.
  */
-#define SINV_LEVEL6_REACTIVE_POWER_REF_PU (0.0f)
+#define SINV_LEVEL7_REACTIVE_POWER_REF_PU (0.0f)
 
 /**
- * @brief BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
+ * @brief BUILD_LEVEL 6 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
  */
 #define SINV_POWER_FACTOR_REF (1.0f)
 
 /**
- * @brief BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
+ * @brief BUILD_LEVEL 6 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
  */
 #define SINV_POWER_FACTOR_Q_GAIN (1.06f)
 

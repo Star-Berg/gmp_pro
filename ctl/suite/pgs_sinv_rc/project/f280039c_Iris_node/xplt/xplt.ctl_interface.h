@@ -94,18 +94,25 @@ GMP_STATIC_INLINE void ctl_fast_enable_output(void)
 {
     DINT;
 
-    // Reset histories first and preload a zero differential-voltage command.
-    clear_all_controllers();
+    // Reset run-control histories first and preload a zero differential-voltage command.
+    // Keep PLL/PQ states: BUILD_LEVEL 3~5 already require PLL lock before entering
+    // Operation Enabled, and clearing PLL here can inject a phase/frequency transient.
+    clear_run_controllers_for_pwm_enable();
     EPWM_setCounterCompareValue(PHASE_L_BASE, EPWM_COUNTER_COMPARE_A,
                                 ctl_get_single_phase_modulation_L_phase(&hpwm));
     EPWM_setCounterCompareValue(PHASE_N_BASE, EPWM_COUNTER_COMPARE_A,
                                 ctl_get_single_phase_modulation_N_phase(&hpwm));
     EPWM_setCounterCompareValue(BUCK_PWM_BASE, EPWM_COUNTER_COMPARE_A, buck_ctrl.pwm_cmp);
 
-    // Clear any Trip Zone (TZ) flag for Phase L and Phase N
+    // Clear any Trip Zone (TZ) flag for the active power stages.
     EPWM_clearTripZoneFlag(PHASE_L_BASE, EPWM_TZ_FORCE_EVENT_OST);
     EPWM_clearTripZoneFlag(PHASE_N_BASE, EPWM_TZ_FORCE_EVENT_OST);
+#if BUILD_LEVEL >= 6
     EPWM_clearTripZoneFlag(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
+#else
+    // Buck/Boost is intentionally disabled in BUILD_LEVEL 1~5.
+    EPWM_forceTripZoneEvent(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
+#endif
 
     // Hardware PWM gate driver enable
     GPIO_WritePin(PWM_ENABLE_PORT, 1);

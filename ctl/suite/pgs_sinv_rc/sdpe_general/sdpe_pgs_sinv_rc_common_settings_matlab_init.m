@@ -116,16 +116,16 @@ SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;
 % BUILD_LEVEL 4 measured active-power closed-loop target.
 SINV_LEVEL4_ACTIVE_POWER_REF_PU = 0.15;
 
-% BUILD_LEVEL 6 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
-SINV_LEVEL6_ACTIVE_POWER_REF_PU = 0.10;
+% BUILD_LEVEL 7 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction.
+SINV_LEVEL7_ACTIVE_POWER_REF_PU = 0.10;
 
-% BUILD_LEVEL 6 reactive-power command for the boost-fed grid mode.
-SINV_LEVEL6_REACTIVE_POWER_REF_PU = 0.0;
+% BUILD_LEVEL 7 reactive-power command for the boost-fed grid mode.
+SINV_LEVEL7_REACTIVE_POWER_REF_PU = 0.0;
 
-% BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
+% BUILD_LEVEL 6 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
 SINV_POWER_FACTOR_REF = 1.0;
 
-% BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
+% BUILD_LEVEL 6 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction.
 SINV_POWER_FACTOR_Q_GAIN = 1.06;
 
 % Buck output-voltage reference soft-start slew rate in V/s. After Buck start conditions are met, the internal voltage reference ramps from 0 V to SINV_BUCK_OUTPUT_REF_V at this rate. This is the Buck soft-start parameter.

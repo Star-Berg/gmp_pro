@@ -32,8 +32,8 @@ for k = 1:numel(models)
     configure_plant_mask(plant);
 
     if getSimulinkBlockHandle([model '/Constant']) ~= -1
-        if exist('BUILD_LEVEL', 'var') && BUILD_LEVEL == 6
-            set_param([model '/Constant'], 'Value', 'SINV_LEVEL6_BOOST_INPUT_REF_V');
+        if exist('BUILD_LEVEL', 'var') && BUILD_LEVEL == 7
+            set_param([model '/Constant'], 'Value', 'SINV_LEVEL7_BOOST_INPUT_REF_V');
         else
             set_param([model '/Constant'], 'Value', 'CTRL_DCBUS_VOLTAGE');
         end
@@ -166,8 +166,8 @@ for k = 1:2
     add_line(model, source_ports(k), peers(k), 'autorouting', 'on');
 end
 grid_amplitude = 'sqrt(2) * CTRL_GRID_VOLTAGE_RMS';
-if exist('BUILD_LEVEL', 'var') && BUILD_LEVEL == 6
-    grid_amplitude = 'sqrt(2) * SINV_LEVEL6_GRID_VOLTAGE_RMS';
+if exist('BUILD_LEVEL', 'var') && BUILD_LEVEL == 7
+    grid_amplitude = 'sqrt(2) * SINV_LEVEL7_GRID_VOLTAGE_RMS';
 end
 add_block('simulink/Sources/Sine Wave', sine, ...
     'Amplitude', grid_amplitude, ...

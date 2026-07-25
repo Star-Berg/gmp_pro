@@ -52,10 +52,10 @@ extern "C"
  */
 
 /**
- * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 boost-fed grid mode.
- *        Options: (1), (2), (3), (4), (5), (6)
+ * @brief 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 original DC-bus rectifier loop without Buck/Boost PWM; 6 rectifier + Buck extension; 7 boost-fed grid mode.
+ *        Options: (1), (2), (3), (4), (5), (6), (7)
  */
-#define BUILD_LEVEL (6)
+#define BUILD_LEVEL (5)
 
 //=================================================================================================
 /**
@@ -233,29 +233,29 @@ extern "C"
 #define CTRL_DCBUS_READY_MAX (90.0f)
 
 /**
- * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+ * @brief BUILD_LEVEL 7 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
  */
-#define SINV_LEVEL6_GRID_VOLTAGE_RMS (36.0f)
+#define SINV_LEVEL7_GRID_VOLTAGE_RMS (36.0f)
 
 /**
- * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+ * @brief BUILD_LEVEL 7 Boost target DC-bus voltage. In level 7 the DCDC stage regulates Vbus from the low-voltage input side.
  */
-#define SINV_LEVEL6_DC_BUS_REF_V (80.0f)
+#define SINV_LEVEL7_DC_BUS_REF_V (80.0f)
 
 /**
- * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
+ * @brief BUILD_LEVEL 7 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
  */
-#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
+#define SINV_LEVEL7_BOOST_INPUT_REF_V (48.0f)
 
 /**
- * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+ * @brief BUILD_LEVEL 7 Boost DC-bus reference soft-start slew rate in V/s.
  */
-#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
+#define SINV_LEVEL7_BOOST_VBUS_SLEW_V_S (120.0f)
 
 /**
- * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+ * @brief BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
  */
-#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
+#define SINV_LEVEL7_BOOST_START_DELAY_MS (100)
 
 /**
  * @brief ADC calibration timeout.
@@ -278,7 +278,7 @@ extern "C"
 #define CTRL_Q_SLEW_PU_S (5.0f)
 
 /**
- * @brief BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
+ * @brief BUILD_LEVEL 6 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction.
  */
 #define SINV_POWER_FACTOR_Q_SIGN (-1.0f)
 
@@ -293,8 +293,8 @@ extern "C"
 #define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
 
 // User project tail code
-#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)
-#error BUILD_LEVEL_must_be_between_1_and_6
+#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)
+#error BUILD_LEVEL_must_be_between_1_and_7
 #endif
 
 #ifdef __cplusplus
