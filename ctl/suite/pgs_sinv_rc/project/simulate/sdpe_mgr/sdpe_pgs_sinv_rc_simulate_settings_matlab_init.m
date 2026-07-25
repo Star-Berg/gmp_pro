@@ -12,7 +12,7 @@ PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-15';
+PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
 
 %% SIL Runtime
 % Automatically request CiA402 ENABLE_OPERATION in the simulation executable.
@@ -27,7 +27,7 @@ SINV_SIM_AUTO_ENABLE = true;
 %% Commissioning
 % 1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop.
 % Options: (1), (2), (3), (4), (5)
-BUILD_LEVEL = 5;
+BUILD_LEVEL = 3;
 
 %% Requirement bindings
 % SIL controller and PWM update frequency.
@@ -75,14 +75,20 @@ SINV_FILTER_CAPACITANCE_F = 22e-6;
 % Filter capacitor ESR.
 SINV_FILTER_CAP_ESR_OHM = 0.10;
 
-% DC-link capacitance.
-SINV_DC_CAPACITANCE_F = 2200e-6;
-
 % Resistive load for levels 1 and 2.
 SINV_RLOAD_OHM = 12.0;
 
 % DC-side load for level 5. At 60 V this draws 120 W, within the configured converter current rating.
 SINV_RECTIFIER_RLOAD_OHM = 30.0;
+
+% DC-link capacitance.
+SINV_DC_CAPACITANCE_F = 2200e-6;
+
+% DC bus voltage sensor sensitivity in V/V.
+CTRL_DC_VOLTAGE_SENSITIVITY = 0.040;
+
+% DC bus voltage ADC bias.
+CTRL_DC_VOLTAGE_BIAS = 0.0;
 
 % AC voltage sensor sensitivity in V/V.
 CTRL_AC_VOLTAGE_SENSITIVITY = 0.020;
@@ -96,11 +102,14 @@ CTRL_AC_CURRENT_SENSITIVITY = 0.150;
 % AC current ADC bias.
 CTRL_AC_CURRENT_BIAS = 1.65;
 
-% DC bus voltage sensor sensitivity in V/V.
-CTRL_DC_VOLTAGE_SENSITIVITY = 0.040;
+% Plant MOSFET on resistance.
+SINV_MODEL_MOSFET_RON = 4.6e-3;
 
-% DC bus voltage ADC bias.
-CTRL_DC_VOLTAGE_BIAS = 0.0;
+% Body-diode on resistance.
+SINV_MODEL_DIODE_RON = 0.01;
+
+% Body-diode forward voltage.
+SINV_MODEL_DIODE_VF = 0.5;
 
 % DC bus overvoltage threshold.
 CTRL_PROT_VBUS_MAX = 90.0;
@@ -119,15 +128,6 @@ CTRL_DCBUS_READY_MAX = 90.0;
 
 % ADC calibration timeout.
 TIMEOUT_ADC_CALIB_MS = 3000;
-
-% Plant MOSFET on resistance.
-SINV_MODEL_MOSFET_RON = 4.6e-3;
-
-% Body-diode on resistance.
-SINV_MODEL_DIODE_RON = 0.01;
-
-% Body-diode forward voltage.
-SINV_MODEL_DIODE_VF = 0.5;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)
