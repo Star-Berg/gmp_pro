@@ -13,7 +13,7 @@ SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 SDPE_PROJECT_VERSION = '0.2.0';
 
-SDPE_PROJECT_UPDATED_AT = '2026-07-24';
+SDPE_PROJECT_UPDATED_AT = '2026-07-25';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -352,12 +352,6 @@ SPECIFY_ENABLE_ADC_CALIBRATE = true;
 % Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence.
 CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 
-% Enable delayed insertion of the frequency-adaptive repetitive controller.
-SINV_ENABLE_REPETITIVE_CONTROL = true;
-
-% Enable grid-voltage feedforward for closed-current-loop build levels.
-SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
-
 %% Diagnostics and Simulation
 % ENABLE_GMP_DL_PIL_SIM is disabled in the SDPE project requirement.
 % ENABLE_GMP_DL_PIL_SIM = true;
@@ -374,7 +368,7 @@ SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
 % BUILD_LEVEL 5: rectifier DC-bus voltage loop with PF-derived Q command.
 % BUILD_LEVEL 6: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
 % Options: (1), (2), (3), (4), (5), (6)
-BUILD_LEVEL = 5;
+BUILD_LEVEL = 3;
 
 %% PWM Modulator
 % Use negative PWM modulator logic.
@@ -397,7 +391,7 @@ BUCK_PWM_BASE = 'IRIS_EPWM5_BASE';
 %% Gate Driver GPIO
 % Gate-driver enable GPIO.
 % Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
-PWM_ENABLE_PORT = 'IRIS_GPIO1';
+PWM_ENABLE_PORT = 'IRIS_GPIO5';
 
 % Gate-driver reset GPIO.
 % Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
@@ -474,25 +468,10 @@ DSP_C2000_DSP_TIME_DIV = 120000 / CTRL_PWM_CMP_MAX / 2;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % Rated DC bus voltage.
-CTRL_DCBUS_VOLTAGE = 60.0;
+CTRL_DCBUS_VOLTAGE = 40.0;
 
 % Rated AC grid/load RMS voltage.
 CTRL_GRID_VOLTAGE_RMS = 24.0;
-
-% BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
-SINV_LEVEL6_GRID_VOLTAGE_RMS = 24.0;
-
-% BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
-SINV_LEVEL6_DC_BUS_REF_V = 60.0;
-
-% BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side.
-SINV_LEVEL6_BOOST_INPUT_REF_V = 48.0;
-
-% BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
-SINV_LEVEL6_BOOST_VBUS_SLEW_V_S = 120.0;
-
-% BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
-SINV_LEVEL6_BOOST_START_DELAY_MS = 100;
 
 % Rated AC output RMS current.
 CTRL_RATED_CURRENT_RMS = 10.0;
@@ -522,7 +501,7 @@ CTRL_AC_VOLTAGE_SENSITIVITY = 0.013559322;
 CTRL_AC_VOLTAGE_BIAS = 1.65;
 
 % AC current sensing sensitivity from the LVFB inverter current sensor.
-CTRL_AC_CURRENT_SENSITIVITY = GMP_LVFB_CURRENT_SENSITIVITY;
+CTRL_AC_CURRENT_SENSITIVITY = -0.15;
 
 % AC current sensing ADC bias from the LVFB inverter current sensor.
 CTRL_AC_CURRENT_BIAS = GMP_LVFB_CURRENT_BIAS_V;
@@ -574,6 +553,21 @@ SINV_POWER_FACTOR_Q_SIGN = 1.0;
 
 % ADC calibration timeout in ms.
 TIMEOUT_ADC_CALIB_MS = 3000;
+
+% BUILD_LEVEL 6 grid RMS voltage reference used by the RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+SINV_LEVEL6_GRID_VOLTAGE_RMS = 24.0;
+
+% BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+SINV_LEVEL6_DC_BUS_REF_V = 60.0;
+
+% BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side.
+SINV_LEVEL6_BOOST_INPUT_REF_V = 48.0;
+
+% BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+SINV_LEVEL6_BOOST_VBUS_SLEW_V_S = 120.0;
+
+% BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+SINV_LEVEL6_BOOST_START_DELAY_MS = 100;
 
 % Startup delay in ms.
 CTRL_STARTUP_DELAY = 100;

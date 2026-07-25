@@ -12,11 +12,11 @@ PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-24';
+PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
 
 %% Control Features
-% Enable delayed insertion of the frequency-adaptive repetitive controller.
-SINV_ENABLE_REPETITIVE_CONTROL = true;
+% SINV_ENABLE_REPETITIVE_CONTROL is disabled in the SDPE project requirement.
+% SINV_ENABLE_REPETITIVE_CONTROL = true;
 
 % Enable grid-voltage feedforward for closed-current-loop build levels.
 SINV_ENABLE_GRID_VOLTAGE_FEEDFORWARD = true;
@@ -29,17 +29,17 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % Minimum voltage magnitude used by the P/Q reference generator.
 CTRL_GRID_VMIN_PU = 0.1;
 
-% SOGI PLL proportional gain.
-CTRL_PLL_KP = 10.0;
+% SOGI PLL proportional gain. Keep this moderate on hardware because Vac ADC noise is directly converted into frequency jitter.
+CTRL_PLL_KP = 0.8;
 
-% SOGI PLL integral time constant in seconds.
-CTRL_PLL_TI = 0.02;
+% SOGI PLL integral time constant in seconds. Larger values slow the PLL but reduce frequency-estimate ripple.
+CTRL_PLL_TI = 0.08;
 
-% PLL error-filter cutoff frequency in Hz.
-CTRL_PLL_LPF_FC = 20.0;
+% PLL q-axis error-filter cutoff frequency in Hz. Lower values suppress Vac sampling noise before the loop PI.
+CTRL_PLL_LPF_FC = 5.0;
 
-% PLL frequency-error lock threshold in PU.
-CTRL_SPLL_EPSILON = 0.005;
+% PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid.
+CTRL_SPLL_EPSILON = 0.001;
 
 % Power measurement low-pass cutoff frequency in Hz.
 CTRL_PQ_LPF_FC = 200.0;
@@ -105,10 +105,10 @@ SINV_BUCK_CURRENT_LOOP_KP = 0.20;
 SINV_BUCK_CURRENT_LOOP_KI = 500.0;
 
 % BUILD_LEVEL 2 peak current command with a resistive load.
-SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.20;
+SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.02;
 
 % BUILD_LEVEL 3 signed grid active-power command; positive exports power.
-SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.10;
+SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.02;
 
 % BUILD_LEVEL 3 grid reactive-power command.
 SINV_LEVEL3_REACTIVE_POWER_REF_PU = 0.0;

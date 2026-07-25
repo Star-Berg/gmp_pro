@@ -23,7 +23,7 @@ extern "C"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_ID "pgs_sinv_rc_common"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-24"
+#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-25"
 
 //=================================================================================================
 /**
@@ -33,7 +33,7 @@ extern "C"
 /**
  * @brief Enable delayed insertion of the frequency-adaptive repetitive controller.
  */
-#define SINV_ENABLE_REPETITIVE_CONTROL
+// #define SINV_ENABLE_REPETITIVE_CONTROL
 
 /**
  * @brief Enable grid-voltage feedforward for closed-current-loop build levels.
@@ -61,24 +61,24 @@ extern "C"
 #define CTRL_GRID_VMIN_PU (0.1f)
 
 /**
- * @brief SOGI PLL proportional gain.
+ * @brief SOGI PLL proportional gain. Keep this moderate on hardware because Vac ADC noise is directly converted into frequency jitter.
  */
-#define CTRL_PLL_KP (10.0f)
+#define CTRL_PLL_KP (0.8f)
 
 /**
- * @brief SOGI PLL integral time constant in seconds.
+ * @brief SOGI PLL integral time constant in seconds. Larger values slow the PLL but reduce frequency-estimate ripple.
  */
-#define CTRL_PLL_TI (0.02f)
+#define CTRL_PLL_TI (0.08f)
 
 /**
- * @brief PLL error-filter cutoff frequency in Hz.
+ * @brief PLL q-axis error-filter cutoff frequency in Hz. Lower values suppress Vac sampling noise before the loop PI.
  */
-#define CTRL_PLL_LPF_FC (20.0f)
+#define CTRL_PLL_LPF_FC (5.0f)
 
 /**
- * @brief PLL frequency-error lock threshold in PU.
+ * @brief PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid.
  */
-#define CTRL_SPLL_EPSILON (0.005f)
+#define CTRL_SPLL_EPSILON (0.001f)
 
 /**
  * @brief Power measurement low-pass cutoff frequency in Hz.
@@ -188,12 +188,12 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 2 peak current command with a resistive load.
  */
-#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.20f)
+#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.02f)
 
 /**
  * @brief BUILD_LEVEL 3 signed grid active-power command; positive exports power.
  */
-#define SINV_LEVEL3_ACTIVE_POWER_REF_PU (0.10f)
+#define SINV_LEVEL3_ACTIVE_POWER_REF_PU (0.02f)
 
 /**
  * @brief BUILD_LEVEL 3 grid reactive-power command.

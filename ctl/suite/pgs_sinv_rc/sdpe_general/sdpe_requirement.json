@@ -5,14 +5,14 @@
   "description": "Platform-independent control contract shared by all pgs_sinv_rc projects.",
   "suite": "pgs_sinv_rc",
   "version": "1.0.0",
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-25",
   "output_header": "sdpe_pgs_sinv_rc_common_settings.h",
   "hardware": [],
   "feature_macros": [
     {
       "group": "Control Features",
       "macro": "SINV_ENABLE_REPETITIVE_CONTROL",
-      "enabled": true,
+      "enabled": false,
       "weak": false,
       "value": "",
       "description": "Enable delayed insertion of the frequency-adaptive repetitive controller."
@@ -52,9 +52,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "10.0"
+        "float": "0.8"
       },
-      "description": "SOGI PLL proportional gain."
+      "description": "SOGI PLL proportional gain. Keep this moderate on hardware because Vac ADC noise is directly converted into frequency jitter."
     },
     {
       "role": "pll_ti",
@@ -62,9 +62,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.02"
+        "float": "0.08"
       },
-      "description": "SOGI PLL integral time constant in seconds."
+      "description": "SOGI PLL integral time constant in seconds. Larger values slow the PLL but reduce frequency-estimate ripple."
     },
     {
       "role": "pll_lpf",
@@ -72,9 +72,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "20.0"
+        "float": "5.0"
       },
-      "description": "PLL error-filter cutoff frequency in Hz."
+      "description": "PLL q-axis error-filter cutoff frequency in Hz. Lower values suppress Vac sampling noise before the loop PI."
     },
     {
       "role": "pll_epsilon",
@@ -82,9 +82,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.005"
+        "float": "0.001"
       },
-      "description": "PLL frequency-error lock threshold in PU."
+      "description": "PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid."
     },
     {
       "role": "pq_lpf",
@@ -302,7 +302,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.20"
+        "float": "0.02"
       },
       "description": "BUILD_LEVEL 2 peak current command with a resistive load."
     },
@@ -312,7 +312,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.10"
+        "float": "0.02"
       },
       "description": "BUILD_LEVEL 3 signed grid active-power command; positive exports power."
     },

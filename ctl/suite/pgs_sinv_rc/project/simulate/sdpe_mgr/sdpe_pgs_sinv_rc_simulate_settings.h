@@ -24,7 +24,7 @@ extern "C"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_ID "pgs_sinv_rc_simulate"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-24"
+#define PGS_SINV_RC_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-25"
 
 //=================================================================================================
 /**
@@ -95,37 +95,12 @@ extern "C"
 /**
  * @brief Rated and nominal DC-bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (80.0f)
+#define CTRL_DCBUS_VOLTAGE (40.0f)
 
 /**
  * @brief Nominal grid/load RMS voltage.
  */
-#define CTRL_GRID_VOLTAGE_RMS (36.0f)
-
-/**
- * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
- */
-#define SINV_LEVEL6_GRID_VOLTAGE_RMS (36.0f)
-
-/**
- * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
- */
-#define SINV_LEVEL6_DC_BUS_REF_V (80.0f)
-
-/**
- * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
- */
-#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
-
-/**
- * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
- */
-#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
-
-/**
- * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
- */
-#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
+#define CTRL_GRID_VOLTAGE_RMS (24.0f)
 
 /**
  * @brief Rated RMS AC current.
@@ -135,7 +110,7 @@ extern "C"
 /**
  * @brief Peak voltage PU base.
  */
-#define CTRL_VOLTAGE_BASE (50.91f)
+#define CTRL_VOLTAGE_BASE (34.0f)
 
 /**
  * @brief Peak current PU base.
@@ -210,7 +185,7 @@ extern "C"
 /**
  * @brief AC current sensor sensitivity in V/A.
  */
-#define CTRL_AC_CURRENT_SENSITIVITY (0.150f)
+#define CTRL_AC_CURRENT_SENSITIVITY (-0.150f)
 
 /**
  * @brief AC current ADC bias.
@@ -231,6 +206,61 @@ extern "C"
  * @brief Body-diode forward voltage.
  */
 #define SINV_MODEL_DIODE_VF (0.5f)
+
+/**
+ * @brief DC bus overvoltage threshold for simulation startup transients.
+ */
+#define CTRL_PROT_VBUS_MAX (100.0f)
+
+/**
+ * @brief Fast AC peak-current threshold.
+ */
+#define CTRL_PROT_IAC_PEAK_MAX (18.0f)
+
+/**
+ * @brief Controller divergence threshold; BUILD_LEVEL 5 masks it only during passive-rectifier takeover.
+ */
+#define CTRL_PROT_VCTRL_MAX_PU (1.5f)
+
+/**
+ * @brief Minimum precharged DC bus accepted by startup.
+ */
+#define CTRL_DCBUS_READY_MIN (25.0f)
+
+/**
+ * @brief Maximum DC bus accepted by startup.
+ */
+#define CTRL_DCBUS_READY_MAX (90.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage.
+ */
+#define SINV_LEVEL6_GRID_VOLTAGE_RMS (36.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side.
+ */
+#define SINV_LEVEL6_DC_BUS_REF_V (80.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value.
+ */
+#define SINV_LEVEL6_BOOST_INPUT_REF_V (48.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s.
+ */
+#define SINV_LEVEL6_BOOST_VBUS_SLEW_V_S (120.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
+ */
+#define SINV_LEVEL6_BOOST_START_DELAY_MS (100)
+
+/**
+ * @brief ADC calibration timeout.
+ */
+#define TIMEOUT_ADC_CALIB_MS (3000)
 
 /**
  * @brief Peak current-reference limit in per unit.
@@ -261,36 +291,6 @@ extern "C"
  * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
  */
 #define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
-
-/**
- * @brief DC bus overvoltage threshold for simulation startup transients.
- */
-#define CTRL_PROT_VBUS_MAX (100.0f)
-
-/**
- * @brief Fast AC peak-current threshold.
- */
-#define CTRL_PROT_IAC_PEAK_MAX (18.0f)
-
-/**
- * @brief Controller divergence threshold; BUILD_LEVEL 5 masks it only during passive-rectifier takeover.
- */
-#define CTRL_PROT_VCTRL_MAX_PU (1.5f)
-
-/**
- * @brief Minimum precharged DC bus accepted by startup.
- */
-#define CTRL_DCBUS_READY_MIN (25.0f)
-
-/**
- * @brief Maximum DC bus accepted by startup.
- */
-#define CTRL_DCBUS_READY_MAX (90.0f)
-
-/**
- * @brief ADC calibration timeout.
- */
-#define TIMEOUT_ADC_CALIB_MS (3000)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)
