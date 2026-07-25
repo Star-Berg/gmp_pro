@@ -23,6 +23,7 @@
 #include <ctl/component/digital_power/inv/inv_neg_ctrl.h>
 
 #include "offgrid_voltage_ctrl.h"
+#include "level6_dc_offset_servo.h"
 
 #include <ctl/component/interface/spwm_modulator.h>
 
@@ -127,8 +128,10 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
 #if BUILD_LEVEL == 6
         // Stand-alone voltage source: bypass PLL, negative-sequence and P/Q
         // paths, then send the stationary-frame voltage controller directly
-        // to the SPWM modulator.
+        // to the SPWM modulator.  The slow DC servo removes cycle-average
+        // alpha/beta voltage error before the final modulation is applied.
         ctl_step_offgrid_voltage_ctrl(&offgrid_voltage_ctrl, &inv_ctrl, inv_ctrl.flag_enable_system);
+        ctl_step_level6_dc_offset_servo(&offgrid_voltage_ctrl, inv_ctrl.flag_enable_system);
         spwm.vab0_out.dat[phase_alpha] = offgrid_voltage_ctrl.modulation_ab.dat[phase_alpha];
         spwm.vab0_out.dat[phase_beta] = offgrid_voltage_ctrl.modulation_ab.dat[phase_beta];
         spwm.vab0_out.dat[phase_0] = 0;
