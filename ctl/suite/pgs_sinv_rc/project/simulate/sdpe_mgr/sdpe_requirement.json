@@ -10,7 +10,7 @@
   "hardware": [],
   "code_sections": {
     "after_extern_open": "#include <sdpe_pgs_sinv_rc_common_settings.h>\n#define SPECIFY_PC_ENVIRONMENT",
-    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)\n#error BUILD_LEVEL_must_be_between_1_and_6\n#endif"
+    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)\n#error BUILD_LEVEL_must_be_between_1_and_7\n#endif"
   },
   "feature_macros": [
     {
@@ -44,7 +44,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(6)",
+      "value": "(5)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -52,9 +52,10 @@
         "(3)",
         "(4)",
         "(5)",
-        "(6)"
+        "(6)",
+        "(7)"
       ],
-      "description": "1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 DC-bus rectifier loop; 6 boost-fed grid mode."
+      "description": "1 open-loop R load; 2 current-loop R load; 3 grid current loop; 4 grid power loop; 5 original DC-bus rectifier loop without Buck/Boost PWM; 6 rectifier + Buck extension; 7 boost-fed grid mode."
     }
   ],
   "requirements": [
@@ -400,53 +401,53 @@
     },
     {
       "role": "level6_grid_voltage_rms",
-      "macro": "SINV_LEVEL6_GRID_VOLTAGE_RMS",
+      "macro": "SINV_LEVEL7_GRID_VOLTAGE_RMS",
       "enabled": true,
       "weak": false,
       "binding": {
         "float": "36.0"
       },
-      "description": "BUILD_LEVEL 6 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
+      "description": "BUILD_LEVEL 7 grid RMS voltage reference used by the grid source and RMS protection window. This is a target/nominal value; the PLL still uses the measured grid voltage."
     },
     {
       "role": "level6_dc_bus_ref",
-      "macro": "SINV_LEVEL6_DC_BUS_REF_V",
+      "macro": "SINV_LEVEL7_DC_BUS_REF_V",
       "enabled": true,
       "weak": false,
       "binding": {
         "float": "80.0"
       },
-      "description": "BUILD_LEVEL 6 Boost target DC-bus voltage. In level 6 the DCDC stage regulates Vbus from the low-voltage input side."
+      "description": "BUILD_LEVEL 7 Boost target DC-bus voltage. In level 7 the DCDC stage regulates Vbus from the low-voltage input side."
     },
     {
       "role": "level6_boost_input_ref",
-      "macro": "SINV_LEVEL6_BOOST_INPUT_REF_V",
+      "macro": "SINV_LEVEL7_BOOST_INPUT_REF_V",
       "enabled": true,
       "weak": false,
       "binding": {
         "float": "48.0"
       },
-      "description": "BUILD_LEVEL 6 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value."
+      "description": "BUILD_LEVEL 7 nominal low-voltage DC source value feeding the Boost input side. In simulation, set the external low-side DC source to this value."
     },
     {
       "role": "level6_boost_vbus_slew",
-      "macro": "SINV_LEVEL6_BOOST_VBUS_SLEW_V_S",
+      "macro": "SINV_LEVEL7_BOOST_VBUS_SLEW_V_S",
       "enabled": true,
       "weak": false,
       "binding": {
         "float": "120.0"
       },
-      "description": "BUILD_LEVEL 6 Boost DC-bus reference soft-start slew rate in V/s."
+      "description": "BUILD_LEVEL 7 Boost DC-bus reference soft-start slew rate in V/s."
     },
     {
       "role": "level6_boost_start_delay",
-      "macro": "SINV_LEVEL6_BOOST_START_DELAY_MS",
+      "macro": "SINV_LEVEL7_BOOST_START_DELAY_MS",
       "enabled": true,
       "weak": false,
       "binding": {
         "number": "100"
       },
-      "description": "BUILD_LEVEL 6 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
+      "description": "BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
     },
     {
       "role": "cal_timeout",
@@ -496,7 +497,7 @@
       "binding": {
         "float": "-1.0"
       },
-      "description": "BUILD_LEVEL 5 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction."
+      "description": "BUILD_LEVEL 6 reactive-power direction for PF control. Use +1 or -1 to select the quadrature-current direction."
     },
     {
       "role": "buck_output_ref",

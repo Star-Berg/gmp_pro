@@ -103,6 +103,7 @@ extern vector2_gt phasor;
 //=================================================================================================
 // function prototype
 void clear_all_controllers(void);
+void clear_run_controllers_for_pwm_enable(void);
 void ctl_init(void);
 void ctl_mainloop(void);
 fast_gt ctl_exec_adc_calibration(void);
@@ -180,12 +181,17 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                 ctl_step_sinv_power_loop(&outer_loop, g_p_ref_user, pq_meter.active_power_p),
                 g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #elif BUILD_LEVEL == 5
+            ctl_step_sinv_ref_gen_pq(&ref_gen,
+                ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
+                    adc_v_bus.control_port.value, float2ctrl(-1.0f)),
+                float2ctrl(0.0f), ctl_abs(pll.v_mag), &pll.phasor);
+#elif BUILD_LEVEL == 6
             ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
                 adc_v_bus.control_port.value, float2ctrl(-1.0f));
             ctl_step_sinv_ref_gen_pq(&ref_gen,
                 p_ref, ctl_calc_sinv_q_ref_from_pf(p_ref),
                 ctl_abs(pll.v_mag), &pll.phasor);
-#elif BUILD_LEVEL == 6
+#elif BUILD_LEVEL == 7
             ctl_step_sinv_ref_gen_pq(&ref_gen, g_p_ref_user, g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #endif
         }
@@ -233,16 +239,18 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
             ctl_clear_single_phase_H_modulation(&hpwm);
         }
 
-#if BUILD_LEVEL == 6
+#if BUILD_LEVEL == 7
         ctl_step_sinv_buck(&buck_ctrl, adc_v_buck_out.control_port.value,
                            adc_v_bus.control_port.value, adc_i_buck.control_port.value,
                            cia402_sm.state_word.bits.operation_enabled &&
                                (adc_v_buck_out.control_port.value >= float2ctrl(1.0f / CTRL_VOLTAGE_BASE)));
-#else
+#elif BUILD_LEVEL == 6
         ctl_step_sinv_buck(&buck_ctrl, adc_v_bus.control_port.value,
                            adc_v_buck_out.control_port.value, adc_i_buck.control_port.value,
                            cia402_sm.state_word.bits.operation_enabled &&
                                (adc_v_bus.control_port.value >= float2ctrl(SINV_BUCK_START_VBUS_MIN_V / CTRL_VOLTAGE_BASE)));
+#else
+        ctl_clear_sinv_buck(&buck_ctrl);
 #endif
 
     }

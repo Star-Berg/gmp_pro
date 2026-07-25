@@ -338,23 +338,23 @@
     },
     {
       "role": "level6_power",
-      "macro": "SINV_LEVEL6_ACTIVE_POWER_REF_PU",
+      "macro": "SINV_LEVEL7_ACTIVE_POWER_REF_PU",
       "enabled": true,
       "weak": false,
       "binding": {
         "float": "0.10"
       },
-      "description": "BUILD_LEVEL 6 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction."
+      "description": "BUILD_LEVEL 7 signed grid active-power command for the boost-fed grid mode. Positive exports power with the present P/Q sign convention; use the waveform/PQ meter to confirm hardware sensor direction."
     },
     {
       "role": "level6_reactive",
-      "macro": "SINV_LEVEL6_REACTIVE_POWER_REF_PU",
+      "macro": "SINV_LEVEL7_REACTIVE_POWER_REF_PU",
       "enabled": true,
       "weak": false,
       "binding": {
         "float": "0.0"
       },
-      "description": "BUILD_LEVEL 6 reactive-power command for the boost-fed grid mode."
+      "description": "BUILD_LEVEL 7 reactive-power command for the boost-fed grid mode."
     },
     {
       "role": "power_factor_ref",
@@ -364,7 +364,7 @@
       "binding": {
         "float": "1.0"
       },
-      "description": "BUILD_LEVEL 5 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0."
+      "description": "BUILD_LEVEL 6 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0."
     },
     {
       "role": "power_factor_q_gain",
@@ -374,7 +374,7 @@
       "binding": {
         "float": "1.06"
       },
-      "description": "BUILD_LEVEL 5 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction."
+      "description": "BUILD_LEVEL 6 PF-to-Q calibration gain. It only scales the reactive-power command converted from PF_ref, compensating measured Q/P deviation without changing PF_ref magnitude or Q direction."
     },
     {
       "role": "buck_vref_slew",
