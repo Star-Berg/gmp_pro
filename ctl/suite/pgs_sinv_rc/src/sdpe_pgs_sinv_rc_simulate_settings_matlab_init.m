@@ -165,9 +165,6 @@ SINV_POWER_FACTOR_Q_SIGN = -1.0;
 % Buck output voltage target.
 SINV_BUCK_OUTPUT_REF_V = 60.0;
 
-% BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
-SINV_DC_BUS_REF_V = CTRL_DCBUS_VOLTAGE;
-
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)
 if condition

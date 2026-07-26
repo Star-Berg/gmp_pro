@@ -24,7 +24,7 @@ project\f280039c_Iris_node\sdpe_mgr\sdpe_generate.bat
 
 | 目标 | 仿真修改 | 硬件修改 | 当前值 | 说明 |
 | --- | --- | --- | --- | --- |
-| 单相整流直流母线目标 | `project/simulate/sdpe_mgr/sdpe_requirement.json` 的 `SINV_DC_BUS_REF_V` / `CTRL_DCBUS_VOLTAGE` | `project/f280039c_Iris_node/sdpe_mgr/sdpe_requirement.json` 的 `SINV_DC_BUS_REF_V` / `CTRL_DCBUS_VOLTAGE` | 仿真：`SINV_DC_BUS_REF_V = CTRL_DCBUS_VOLTAGE = 80 V`；硬件：`SINV_DC_BUS_REF_V = CTRL_DCBUS_VOLTAGE = 60 V` | 当前 `SINV_DC_BUS_REF_V` 直接别名到 `CTRL_DCBUS_VOLTAGE`。以后只想改母线目标，优先改平台层 `CTRL_DCBUS_VOLTAGE`。如果将来想“额定母线”和“控制目标”分开，再把 `SINV_DC_BUS_REF_V` 改成单独 float。 |
+| 单相整流直流母线目标 | common 层 `sdpe_general/sdpe_requirement.json` 的 `SINV_DC_BUS_REF_V` | common 层 `sdpe_general/sdpe_requirement.json` 的 `SINV_DC_BUS_REF_V` | 当前默认：`40 V` | level5 整流母线闭环只看 `SINV_DC_BUS_REF_V`。它不再别名到平台层 `CTRL_DCBUS_VOLTAGE`；后者只作为额定/基值/ready/protection 相关参数。 |
 | Buck 输出目标 | `project/simulate/sdpe_mgr/sdpe_requirement.json` 的 `SINV_BUCK_OUTPUT_REF_V` | `project/f280039c_Iris_node/sdpe_mgr/sdpe_requirement.json` 的 `SINV_BUCK_OUTPUT_REF_V` | 仿真：`60 V`；硬件：`48 V` | 这是 Buck 电压环最终目标。Buck 软启动由 common 中 `SINV_BUCK_VREF_SLEW_V_S` 控制，内部参考从 0 慢慢爬到该值。 |
 | 交流输入/并网额定 RMS | `project/simulate/sdpe_mgr/sdpe_requirement.json` 的 `CTRL_GRID_VOLTAGE_RMS`，并同步检查 `CTRL_VOLTAGE_BASE` | `project/f280039c_Iris_node/sdpe_mgr/sdpe_requirement.json` 的 `CTRL_GRID_VOLTAGE_RMS`，并同步检查 `CTRL_VOLTAGE_BASE` | 仿真：`36 Vrms`，`CTRL_VOLTAGE_BASE = 50.91 V`；硬件：`24 Vrms`，`CTRL_VOLTAGE_BASE = 34.0 V` | `CTRL_GRID_VOLTAGE_RMS` 是额定/标幺/保护判断用值，不等于实物输入源旋钮。仿真电压源幅值由模型初始化脚本使用 `sqrt(2) * CTRL_GRID_VOLTAGE_RMS`。 |
 | 交流侧 LC 参数 | `CTRL_AC_INDUCTANCE`、`CTRL_AC_RESISTANCE`、`SINV_FILTER_CAPACITANCE_F`、`SINV_FILTER_CAP_ESR_OHM` | `CTRL_AC_INDUCTANCE`、`CTRL_AC_RESISTANCE` | 仿真见 simulate 平台层；硬件当前 `1.5 mH`、`0.1 Ω` | 换 LC 板或实物串联电感时改这里。LC 参数会影响电流环对象、并网波形和 THD，不属于传感器标定。 |
@@ -71,8 +71,8 @@ project\f280039c_Iris_node\sdpe_mgr\sdpe_generate.bat
 
 | 想调什么 | 优先改哪里 |
 | --- | --- |
-| 仿真母线从 80 V 改到 70 V | simulate 平台层 `CTRL_DCBUS_VOLTAGE`；当前 `SINV_DC_BUS_REF_V` 会自动跟随 |
-| 硬件母线从 60 V 改到 70 V | Iris 平台层 `CTRL_DCBUS_VOLTAGE`；同时检查 `CTRL_PROT_VBUS_MAX` 和 `CTRL_DCBUS_READY_MIN/MAX` |
+| level5 母线目标从 40 V 改到 70 V | common 层 `SINV_DC_BUS_REF_V`；同时检查平台层 `CTRL_PROT_VBUS_MAX` 和 `CTRL_DCBUS_READY_MIN/MAX` |
+| 改额定/基准母线电压 | 对应平台层 `CTRL_DCBUS_VOLTAGE`；它影响 ready/protection/基值相关配置，不再自动改变 level5 母线闭环目标 |
 | Buck 输出从 48 V 改到 60 V | 对应平台层 `SINV_BUCK_OUTPUT_REF_V` |
 | Buck 输出上升太快/超调 | common 层 `SINV_BUCK_VREF_SLEW_V_S`，必要时再看 Buck 电压环/电流环参数 |
 | 仿真交流输入从 36 Vrms 改到 24 Vrms | simulate 平台层 `CTRL_GRID_VOLTAGE_RMS`，同步改 `CTRL_VOLTAGE_BASE ≈ 24*sqrt(2)=33.94`，再重新运行模型初始化或重新打开模型 |

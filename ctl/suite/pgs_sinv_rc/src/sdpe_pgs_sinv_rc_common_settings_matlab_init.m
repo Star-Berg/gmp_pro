@@ -12,7 +12,7 @@ PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
+PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-26';
 
 %% Control Features
 % SINV_ENABLE_REPETITIVE_CONTROL is disabled in the SDPE project requirement.
@@ -39,7 +39,7 @@ CTRL_PLL_TI = 0.08;
 CTRL_PLL_LPF_FC = 5.0;
 
 % PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid.
-CTRL_SPLL_EPSILON = 0.001;
+CTRL_SPLL_EPSILON = 0.005;
 
 % Power measurement low-pass cutoff frequency in Hz.
 CTRL_PQ_LPF_FC = 200.0;
@@ -163,6 +163,9 @@ SINV_BUCK_DUTY_FF_GAIN = 0.15;
 
 % Nominal grid frequency in Hz.
 CTRL_GRID_FREQUENCY = 50.0;
+
+% BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters.
+SINV_DC_BUS_REF_V = 40.0;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

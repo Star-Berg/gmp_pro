@@ -851,16 +851,6 @@
         "float": "48.0"
       },
       "description": "Buck output voltage target."
-    },
-    {
-      "role": "bus_ref",
-      "macro": "SINV_DC_BUS_REF_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "expr": "CTRL_DCBUS_VOLTAGE"
-      },
-      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting."
     }
   ],
   "requirement_groups": [

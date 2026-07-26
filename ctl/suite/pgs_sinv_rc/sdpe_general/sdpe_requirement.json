@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_sinv_rc projects.",
   "suite": "pgs_sinv_rc",
   "version": "1.0.0",
-  "updated_at": "2026-07-25",
+  "updated_at": "2026-07-26",
   "output_header": "sdpe_pgs_sinv_rc_common_settings.h",
   "hardware": [],
   "feature_macros": [
@@ -82,7 +82,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.001"
+        "float": "0.005"
       },
       "description": "PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid."
     },
@@ -495,6 +495,16 @@
         "float": "50.0"
       },
       "description": "Nominal grid frequency in Hz."
+    },
+    {
+      "role": "bus_ref",
+      "macro": "SINV_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "40.0"
+      },
+      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters."
     }
   ],
   "requirement_groups": [
@@ -567,6 +577,12 @@
       "name": "Default Parameters",
       "requirements": [
         "grid_frequency"
+      ]
+    },
+    {
+      "name": "Ungrouped",
+      "requirements": [
+        "bus_ref"
       ]
     }
   ]

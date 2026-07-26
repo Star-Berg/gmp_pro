@@ -23,7 +23,7 @@ extern "C"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_ID "pgs_sinv_rc_common"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define PGS_SINV_RC_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-25"
+#define PGS_SINV_RC_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-26"
 
 //=================================================================================================
 /**
@@ -78,7 +78,7 @@ extern "C"
 /**
  * @brief PLL frequency-error lock threshold in PU. 0.001 pu corresponds to about 0.05 Hz on a 50 Hz grid.
  */
-#define CTRL_SPLL_EPSILON (0.001f)
+#define CTRL_SPLL_EPSILON (0.005f)
 
 /**
  * @brief Power measurement low-pass cutoff frequency in Hz.
@@ -284,6 +284,11 @@ extern "C"
  * @brief Nominal grid frequency in Hz.
  */
 #define CTRL_GRID_FREQUENCY (50.0f)
+
+/**
+ * @brief BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters.
+ */
+#define SINV_DC_BUS_REF_V (40.0f)
 
 // User project tail code
 // SDPE extension point: add before_footer code in the Project Requirement Code page if needed.

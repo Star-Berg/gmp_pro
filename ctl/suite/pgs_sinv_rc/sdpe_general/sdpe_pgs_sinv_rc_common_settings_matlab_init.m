@@ -122,6 +122,9 @@ SINV_LEVEL7_ACTIVE_POWER_REF_PU = 0.10;
 % BUILD_LEVEL 7 reactive-power command for the boost-fed grid mode.
 SINV_LEVEL7_REACTIVE_POWER_REF_PU = 0.0;
 
+% BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters.
+SINV_DC_BUS_REF_V = 40.0;
+
 % BUILD_LEVEL 6 target displacement power-factor magnitude. Valid control range is 0.1 to 1.0.
 SINV_POWER_FACTOR_REF = 1.0;
 
