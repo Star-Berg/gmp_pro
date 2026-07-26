@@ -47,6 +47,10 @@ volatile fast_gt flag_enable_adc_calibrator = 0;
 ctrl_gt g_p_ref_user = float2ctrl(0.0f);
 ctrl_gt g_q_ref_user = float2ctrl(0.0f);
 ctrl_gt g_vbus_ref_user = float2ctrl(0.0f);
+#if BUILD_LEVEL == 5
+ctrl_gt g_vbus_feedback_filtered = float2ctrl(0.0f);
+ctrl_gt g_vbus_feedback_lpf_alpha = float2ctrl(0.0f);
+#endif
 
 ctrl_gt openloop_v_ref = float2ctrl(0.0f);
 vector2_gt phasor;
@@ -102,6 +106,15 @@ void ctl_init(void)
     ctl_init_sinv_outer_loop(&outer_loop, SINV_POWER_LOOP_KP, SINV_POWER_LOOP_KI,
         SINV_DC_BUS_LOOP_KP, SINV_DC_BUS_LOOP_KI, SINV_OUTER_LOOP_FREQUENCY_HZ,
         CONTROLLER_FREQUENCY, SINV_OUTER_LOOP_POWER_LIMIT_PU);
+
+#if BUILD_LEVEL == 5
+    /* Run the bus-feedback LPF at the controller ISR rate.  With a 20 kHz ISR
+       and a 10 Hz cutoff this gives alpha ~= 0.00313, equivalent to about
+       0.061 when observed at the 1 kHz outer-loop rate. */
+    const float vbus_lpf_omega = 6.28318530718f * SINV_LEVEL5_VBUS_FEEDBACK_LPF_HZ;
+    g_vbus_feedback_lpf_alpha =
+        float2ctrl(vbus_lpf_omega / ((float)CONTROLLER_FREQUENCY + vbus_lpf_omega));
+#endif
 
     // freerun angle reference generator, 50Hz, [0, 1] range for pu angle
     ctl_init_ramp_generator_via_freq(&rg, CONTROLLER_FREQUENCY, CTRL_GRID_FREQUENCY, 1, 0);

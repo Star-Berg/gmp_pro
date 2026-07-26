@@ -29,7 +29,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-25"
+#define SDPE_PROJECT_UPDATED_AT "2026-07-26"
 
 //=================================================================================================
 /**
@@ -92,7 +92,7 @@ extern "C"
  *        BUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
  *        Options: (1), (2), (3), (4), (5), (6), (7)
  */
-#define BUILD_LEVEL (3)
+#define BUILD_LEVEL (5)
 
 //=================================================================================================
 /**
@@ -280,12 +280,12 @@ extern "C"
 /**
  * @brief Rated DC bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (40.0f)
+#define CTRL_DCBUS_VOLTAGE (60.0f)
 
 /**
  * @brief Rated AC grid/load RMS voltage.
  */
-#define CTRL_GRID_VOLTAGE_RMS (24.0f)
+#define CTRL_GRID_VOLTAGE_RMS (36.0f)
 
 /**
  * @brief Rated AC output RMS current.
@@ -295,7 +295,7 @@ extern "C"
 /**
  * @brief Voltage per-unit base, using peak value.
  */
-#define CTRL_VOLTAGE_BASE (34.0f)
+#define CTRL_VOLTAGE_BASE (51.0f)
 
 /**
  * @brief Current per-unit base, using peak value.
@@ -388,9 +388,9 @@ extern "C"
 #define CTRL_PROT_VCTRL_MAX_PU (1.5f)
 
 /**
- * @brief Minimum physical DC-bus voltage accepted by the startup state machine.
+ * @brief Minimum physical DC-bus voltage accepted by startup. BUILD_LEVEL 5 accepts passive precharge from the 24 Vrms grid; other build levels retain the 80 percent DC-bus requirement.
  */
-#define CTRL_DCBUS_READY_MIN (CTRL_DCBUS_VOLTAGE * 0.8f)
+#define CTRL_DCBUS_READY_MIN ((BUILD_LEVEL == 5) ? 25.0f : (CTRL_DCBUS_VOLTAGE * 0.8f))
 
 /**
  * @brief Maximum physical DC-bus voltage accepted by the startup state machine.

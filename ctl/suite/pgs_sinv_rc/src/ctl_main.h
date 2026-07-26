@@ -96,6 +96,10 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern ctrl_gt g_p_ref_user;
 extern ctrl_gt g_q_ref_user;
 extern ctrl_gt g_vbus_ref_user;
+#if BUILD_LEVEL == 5
+extern ctrl_gt g_vbus_feedback_filtered;
+extern ctrl_gt g_vbus_feedback_lpf_alpha;
+#endif
 
 extern ctrl_gt openloop_v_ref;
 extern vector2_gt phasor;
@@ -162,6 +166,20 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
         // 2. Real-time PQ Measurement
         ctl_step_sms_pq(&pq_meter, pll.uab.dat[phase_alpha], pll.uab.dat[phase_beta], adc_i_ac.control_port.value);
 
+#if BUILD_LEVEL == 5
+        /* Track the measured precharge voltage while disabled so enabling PWM
+           does not start the 10 Hz filter from zero. */
+        if (cia402_sm.state_word.bits.operation_enabled)
+        {
+            g_vbus_feedback_filtered += ctl_mul(g_vbus_feedback_lpf_alpha,
+                adc_v_bus.control_port.value - g_vbus_feedback_filtered);
+        }
+        else
+        {
+            g_vbus_feedback_filtered = adc_v_bus.control_port.value;
+        }
+#endif
+
         // 3. Command generation for the selected commissioning level.
         if (cia402_sm.state_word.bits.operation_enabled)
         {
@@ -183,7 +201,7 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
 #elif BUILD_LEVEL == 5
             ctl_step_sinv_ref_gen_pq(&ref_gen,
                 ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
-                    adc_v_bus.control_port.value, float2ctrl(-1.0f)),
+                    g_vbus_feedback_filtered, float2ctrl(+1.0f)),
                 float2ctrl(0.0f), ctl_abs(pll.v_mag), &pll.phasor);
 #elif BUILD_LEVEL == 6
             ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,

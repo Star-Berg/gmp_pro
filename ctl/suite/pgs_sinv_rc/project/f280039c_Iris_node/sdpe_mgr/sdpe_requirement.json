@@ -4,7 +4,7 @@
   "description": "Single-phase inverter project requirement prepared from xplt/ctrl_settings.h.\nThis requirement introduces the GMP LVFB 150V 2-phase inverter board as the switching stage and the GMP Harmonia 3-phase LC filter as the grid filter. IRIS F280039C is included as the peripheral option provider.",
   "suite": "pgs_sinv_rc",
   "version": "0.2.0",
-  "updated_at": "2026-07-25",
+  "updated_at": "2026-07-26",
   "output_header": "sdpe_pgs_sinv_rc_iris_bindings.h",
   "hardware": [
     {
@@ -69,7 +69,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(3)",
+      "value": "(5)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -498,7 +498,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "40.0"
+        "float": "60.0"
       },
       "description": "Rated DC bus voltage."
     },
@@ -508,7 +508,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "24.0"
+        "float": "36.0"
       },
       "description": "Rated AC grid/load RMS voltage."
     },
@@ -528,7 +528,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "34.0"
+        "float": "51.0"
       },
       "description": "Voltage per-unit base, using peak value."
     },
@@ -718,9 +718,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(CTRL_DCBUS_VOLTAGE * 0.8f)"
+        "literal": "((BUILD_LEVEL == 5) ? 25.0f : (CTRL_DCBUS_VOLTAGE * 0.8f))"
       },
-      "description": "Minimum physical DC-bus voltage accepted by the startup state machine."
+      "description": "Minimum physical DC-bus voltage accepted by startup. BUILD_LEVEL 5 accepts passive precharge from the 24 Vrms grid; other build levels retain the 80 percent DC-bus requirement."
     },
     {
       "role": "dc_bus_ready_max",

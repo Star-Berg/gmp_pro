@@ -13,7 +13,7 @@ SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 SDPE_PROJECT_VERSION = '0.2.0';
 
-SDPE_PROJECT_UPDATED_AT = '2026-07-25';
+SDPE_PROJECT_UPDATED_AT = '2026-07-26';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -369,7 +369,7 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % BUILD_LEVEL 6: rectifier DC-bus voltage loop with PF-derived Q command and downstream Buck control.
 % BUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
 % Options: (1), (2), (3), (4), (5), (6), (7)
-BUILD_LEVEL = 3;
+BUILD_LEVEL = 5;
 
 %% PWM Modulator
 % Use negative PWM modulator logic.
@@ -469,16 +469,16 @@ DSP_C2000_DSP_TIME_DIV = 120000 / CTRL_PWM_CMP_MAX / 2;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % Rated DC bus voltage.
-CTRL_DCBUS_VOLTAGE = 40.0;
+CTRL_DCBUS_VOLTAGE = 60.0;
 
 % Rated AC grid/load RMS voltage.
-CTRL_GRID_VOLTAGE_RMS = 24.0;
+CTRL_GRID_VOLTAGE_RMS = 36.0;
 
 % Rated AC output RMS current.
 CTRL_RATED_CURRENT_RMS = 10.0;
 
 % Voltage per-unit base, using peak value.
-CTRL_VOLTAGE_BASE = 34.0;
+CTRL_VOLTAGE_BASE = 51.0;
 
 % Current per-unit base, using peak value.
 CTRL_CURRENT_BASE = 14.14;
@@ -534,8 +534,8 @@ CTRL_PROT_IAC_PEAK_MAX = CTRL_MAX_HW_CURRENT * 0.9 * 1.41421356;
 % Maximum unsaturated modulation command before controller-divergence trip.
 CTRL_PROT_VCTRL_MAX_PU = 1.5;
 
-% Minimum physical DC-bus voltage accepted by the startup state machine.
-CTRL_DCBUS_READY_MIN = CTRL_DCBUS_VOLTAGE * 0.8;
+% Minimum physical DC-bus voltage accepted by startup. BUILD_LEVEL 5 accepts passive precharge from the 24 Vrms grid; other build levels retain the 80 percent DC-bus requirement.
+CTRL_DCBUS_READY_MIN = sdpe_select(BUILD_LEVEL == 5, 25.0, CTRL_DCBUS_VOLTAGE * 0.8);
 
 % Maximum physical DC-bus voltage accepted by the startup state machine.
 CTRL_DCBUS_READY_MAX = CTRL_PROT_VBUS_MAX;
