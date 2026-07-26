@@ -69,7 +69,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(5)",
+      "value": "(2)",
       "options_preset": "",
       "options": [
         "(1)",

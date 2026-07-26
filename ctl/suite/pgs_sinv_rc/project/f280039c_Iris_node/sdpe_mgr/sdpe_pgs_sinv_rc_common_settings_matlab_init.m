@@ -108,7 +108,7 @@ SINV_BUCK_CURRENT_LOOP_KP = 0.20;
 SINV_BUCK_CURRENT_LOOP_KI = 500.0;
 
 % BUILD_LEVEL 2 peak current command with a resistive load.
-SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.02;
+SINV_LEVEL2_CURRENT_REF_PEAK_PU = 0.08;
 
 % BUILD_LEVEL 3 signed grid active-power command; positive exports power.
 SINV_LEVEL3_ACTIVE_POWER_REF_PU = 0.02;

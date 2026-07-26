@@ -369,7 +369,7 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % BUILD_LEVEL 6: rectifier DC-bus voltage loop with PF-derived Q command and downstream Buck control.
 % BUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
 % Options: (1), (2), (3), (4), (5), (6), (7)
-BUILD_LEVEL = 5;
+BUILD_LEVEL = 2;
 
 %% PWM Modulator
 % Use negative PWM modulator logic.

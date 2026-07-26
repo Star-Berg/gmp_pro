@@ -193,7 +193,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 2 peak current command with a resistive load.
  */
-#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.02f)
+#define SINV_LEVEL2_CURRENT_REF_PEAK_PU (0.08f)
 
 /**
  * @brief BUILD_LEVEL 3 signed grid active-power command; positive exports power.

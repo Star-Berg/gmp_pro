@@ -312,7 +312,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.02"
+        "float": "0.08"
       },
       "description": "BUILD_LEVEL 2 peak current command with a resistive load."
     },
