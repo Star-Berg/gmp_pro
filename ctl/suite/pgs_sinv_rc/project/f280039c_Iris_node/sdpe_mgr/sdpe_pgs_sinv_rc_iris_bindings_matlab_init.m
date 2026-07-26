@@ -541,7 +541,7 @@ CTRL_DCBUS_READY_MIN = sdpe_select(BUILD_LEVEL == 5, 25.0, CTRL_DCBUS_VOLTAGE * 
 CTRL_DCBUS_READY_MAX = CTRL_PROT_VBUS_MAX;
 
 % Peak current-reference limit in per unit.
-CTRL_CURRENT_LIMIT_PU = 1.5;
+CTRL_CURRENT_LIMIT_PU = 0.6;
 
 % Active-power command slew limit in PU/s.
 CTRL_P_SLEW_PU_S = 10.0;

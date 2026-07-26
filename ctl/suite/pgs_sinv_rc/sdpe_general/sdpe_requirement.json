@@ -112,7 +112,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "600.0"
+        "float": "400.0"
       },
       "description": "QPR current-loop crossover target in Hz."
     },
@@ -242,7 +242,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.65"
+        "float": "0.20"
       },
       "description": "Symmetric outer-loop active-power command limit."
     },

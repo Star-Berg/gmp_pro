@@ -400,7 +400,7 @@ extern "C"
 /**
  * @brief Peak current-reference limit in per unit.
  */
-#define CTRL_CURRENT_LIMIT_PU (1.5f)
+#define CTRL_CURRENT_LIMIT_PU (0.6f)
 
 /**
  * @brief Active-power command slew limit in PU/s.

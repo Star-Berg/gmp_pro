@@ -48,7 +48,7 @@ CTRL_PQ_LPF_FC = 200.0;
 CTRL_CURRENT_DB_PU = 0.01;
 
 % QPR current-loop crossover target in Hz.
-SINV_CURRENT_LOOP_BANDWIDTH_HZ = 600.0;
+SINV_CURRENT_LOOP_BANDWIDTH_HZ = 400.0;
 
 % Minimum fundamental tracked by FDRC in Hz.
 CTRL_FDRC_MIN_FREQ = 45.0;
@@ -87,7 +87,7 @@ SINV_DC_BUS_LOOP_KI = 8.0;
 SINV_LEVEL5_VBUS_FEEDBACK_LPF_HZ = 10.0;
 
 % Symmetric outer-loop active-power command limit.
-SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.65;
+SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.20;
 
 % Power and DC-bus outer-loop execution frequency.
 SINV_OUTER_LOOP_FREQUENCY_HZ = 1000.0;

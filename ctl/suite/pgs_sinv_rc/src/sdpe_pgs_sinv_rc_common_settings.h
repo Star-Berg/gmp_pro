@@ -93,7 +93,7 @@ extern "C"
 /**
  * @brief QPR current-loop crossover target in Hz.
  */
-#define SINV_CURRENT_LOOP_BANDWIDTH_HZ (600.0f)
+#define SINV_CURRENT_LOOP_BANDWIDTH_HZ (400.0f)
 
 /**
  * @brief Minimum fundamental tracked by FDRC in Hz.
@@ -158,7 +158,7 @@ extern "C"
 /**
  * @brief Symmetric outer-loop active-power command limit.
  */
-#define SINV_OUTER_LOOP_POWER_LIMIT_PU (0.65f)
+#define SINV_OUTER_LOOP_POWER_LIMIT_PU (0.20f)
 
 /**
  * @brief Power and DC-bus outer-loop execution frequency.
