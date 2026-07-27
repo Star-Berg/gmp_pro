@@ -949,7 +949,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.02738589"
+        "float": "0.02705"
       },
       "description": "DC-link voltage sensing gain."
     },
@@ -969,7 +969,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.00139154"
+        "float": "0.0013559322"
       },
       "description": "Grid-voltage sensing gain."
     },

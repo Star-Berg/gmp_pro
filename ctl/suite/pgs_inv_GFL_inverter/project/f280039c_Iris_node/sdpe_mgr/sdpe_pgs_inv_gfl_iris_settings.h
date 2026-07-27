@@ -375,7 +375,7 @@ extern "C"
 /**
  * @brief DC-link voltage sensing gain.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02705f)
 
 /**
  * @brief DC-link voltage sensing bias.
@@ -385,7 +385,7 @@ extern "C"
 /**
  * @brief Grid-voltage sensing gain.
  */
-#define CTRL_GRID_VOLTAGE_SENSITIVITY (0.00139154f)
+#define CTRL_GRID_VOLTAGE_SENSITIVITY (0.0013559322f)
 
 /**
  * @brief Grid-voltage sensing bias.
