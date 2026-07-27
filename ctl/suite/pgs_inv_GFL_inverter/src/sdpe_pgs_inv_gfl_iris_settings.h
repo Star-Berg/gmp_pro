@@ -64,7 +64,7 @@ extern "C"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_ID "pgs_inv_gfl_f280039c_iris_node"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-23"
+#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-27"
 
 //=================================================================================================
 /**
@@ -82,8 +82,8 @@ extern "C"
  */
 
 /**
- * @brief Incremental control level; level 5 enables the cascaded P/Q power loop.
- *        Options: (1), (2), (3), (4), (5)
+ * @brief Incremental control level; level 5 enables the cascaded grid-connected P/Q power loop and level 6 selects stand-alone line-voltage control. Level 6 is synchronized from simulation for incremental bench validation and is not hardware-validated.
+ *        Options: (1), (2), (3), (4), (5), (6)
  */
 #define BUILD_LEVEL (3)
 
@@ -230,8 +230,8 @@ extern "C"
 #define CTRL_STARTUP_DELAY (100)
 
 // User project tail code
-#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)
-#error BUILD_LEVEL_must_be_between_1_and_5
+#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)
+#error BUILD_LEVEL_must_be_between_1_and_6
 #endif
 
 #ifdef __cplusplus

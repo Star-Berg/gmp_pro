@@ -12,7 +12,7 @@ PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-23';
+PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-27';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -362,8 +362,8 @@ HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V = TLE4971A025_BIAS_V;
 PWM_MODULATOR_USING_NEGATIVE_LOGIC = 1;
 
 %% Commissioning
-% Incremental control level; level 5 enables the cascaded P/Q power loop.
-% Options: (1), (2), (3), (4), (5)
+% Incremental control level; level 5 enables the cascaded grid-connected P/Q power loop and level 6 selects stand-alone line-voltage control. Level 6 is synchronized from simulation for incremental bench validation and is not hardware-validated.
+% Options: (1), (2), (3), (4), (5), (6)
 BUILD_LEVEL = 3;
 
 %% Sampling

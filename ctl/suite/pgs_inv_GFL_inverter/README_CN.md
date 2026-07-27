@@ -2,7 +2,7 @@
 
 [English](README.md) | **简体中文**
 
-本工程以三相两电平跟网型并网变流器为基础，并在 PC 仿真平台增加 `BUILD_LEVEL=6` 离网稳压控制。控制主体位于 `src`，目前包含 F280039C IRIS、LaunchXL-F280049C、PC 仿真和 STM32G431 四个平台。IRIS 与 F280049C 的原有 Level 1～5 保持不变；Level 6 目前用于 `resload` 模型的软件验证，未经实机验证不得直接下发硬件。
+本工程以三相两电平跟网型并网变流器为基础，并在 PC 仿真平台增加 `BUILD_LEVEL=6` 离网稳压控制。控制主体位于 `src`，目前包含 F280039C IRIS、LaunchXL-F280049C、PC 仿真和 STM32G431 四个平台。IRIS 与 F280049C 的原有 Level 1～5 保持不变；F280039C IRIS 的 SDPE 配置已同步 Level 6 可选项，便于使用同一份源码进行隔离低压台架增量验证，但默认值仍为 Level 3。该同步不代表完成实机验证，在保护、采样、极性和增益确认前不得带功率运行。
 
 ## 两层 SDPE 配置
 
@@ -38,7 +38,7 @@ IRIS 和 LaunchXL-F280049C 平台均在 SDPE 中选择以下功率硬件：
 
 | 平台 | 默认 BUILD_LEVEL | 控制频率 | 状态 |
 |---|---:|---:|---|
-| F280039C IRIS Node | 3 | 20 kHz | 已调通，保持原默认值 |
+| F280039C IRIS Node | 3 | 20 kHz | Level 1～5 保持不变；Level 6 可编译、待隔离低压实机验证 |
 | LaunchXL-F280049C | 1 | 10 kHz | 已调通，保持原默认值 |
 | PC simulate | 6 | 20 kHz | Level 6 离网稳压开发分支 |
 | STM32G431 | 1 | 10 kHz | 待实机增量验证 |
@@ -52,7 +52,7 @@ IRIS 和 LaunchXL-F280049C 平台均在 SDPE 中选择以下功率硬件：
 3. PLL 并网与正/负序电流闭环。
 4. 在级别 3 的基础上启用解耦、主动阻尼和超前补偿。
 5. 完整功率闭环：P/Q 外环生成 dq 电流给定，内层电流环继续按 PWM 频率执行。
-6. 离网输出电压闭环：内部角度发生器、αβ-QPR 电压环、估算电感电流环和 SPWM，仅配合 `DP_STD_MDL_DCAC_3ph_2level_resload.slx` 使用。
+6. 离网输出电压闭环：内部角度发生器、αβ-QPR 电压环、估算电感电流环和 SPWM；已配合 `DP_STD_MDL_DCAC_3ph_2level_resload.slx` 完成软件验证，IRIS 端仅用于隔离低压台架增量验证。
 
 严禁在未完成前一级保护与波形检查时直接切换到更高等级。启用 `SPECIFY_ENABLE_ADC_CALIBRATE` 时，必须保证被校准的功率输入处于已知零状态；并网带电输入下不应进行零偏校准。
 
