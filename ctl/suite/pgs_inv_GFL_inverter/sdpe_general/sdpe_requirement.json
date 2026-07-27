@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-25",
+  "updated_at": "2026-07-27",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -82,7 +82,7 @@
       "macro": "GFL_LEVEL6_ENABLE_DC_OFFSET_SERVO",
       "enabled": true,
       "weak": false,
-      "value": "(1)",
+      "value": "(0)",
       "options_preset": "",
       "options": [
         "(0)",
@@ -97,7 +97,9 @@
       "macro": "GFL_GRID_VOLTAGE_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.33"},
+      "binding": {
+        "float": "0.33"
+      },
       "description": "Nominal grid phase-voltage magnitude in controller per unit."
     },
     {
@@ -105,7 +107,9 @@
       "macro": "GFL_PQ_LOOP_FREQUENCY_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "1000.0"},
+      "binding": {
+        "float": "1000.0"
+      },
       "description": "P/Q outer-loop execution frequency in hertz."
     },
     {
@@ -113,7 +117,9 @@
       "macro": "GFL_PQ_LOOP_DIVIDER",
       "enabled": true,
       "weak": false,
-      "binding": {"literal": "((uint32_t)(CONTROLLER_FREQUENCY / GFL_PQ_LOOP_FREQUENCY_HZ))"},
+      "binding": {
+        "literal": "((uint32_t)(CONTROLLER_FREQUENCY / GFL_PQ_LOOP_FREQUENCY_HZ))"
+      },
       "description": "Current-ISR to P/Q-loop execution divider."
     },
     {
@@ -121,7 +127,9 @@
       "macro": "GFL_PQ_ACTIVE_KP",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.75"},
+      "binding": {
+        "float": "0.75"
+      },
       "description": "Active-power loop proportional gain from P error PU to d-axis current PU."
     },
     {
@@ -129,7 +137,9 @@
       "macro": "GFL_PQ_ACTIVE_KI",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.001"},
+      "binding": {
+        "float": "0.001"
+      },
       "description": "Active-power loop integral gain in inverse seconds."
     },
     {
@@ -137,7 +147,9 @@
       "macro": "GFL_PQ_REACTIVE_KP",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.75"},
+      "binding": {
+        "float": "0.75"
+      },
       "description": "Reactive-power loop proportional gain from Q error PU to q-axis current PU."
     },
     {
@@ -145,7 +157,9 @@
       "macro": "GFL_PQ_REACTIVE_KI",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.001"},
+      "binding": {
+        "float": "0.001"
+      },
       "description": "Reactive-power loop integral gain in inverse seconds."
     },
     {
@@ -153,7 +167,9 @@
       "macro": "GFL_PQ_CURRENT_LIMIT_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "1.0"},
+      "binding": {
+        "float": "1.0"
+      },
       "description": "Circular magnitude limit applied to the d/q current reference produced by the P/Q loop."
     },
     {
@@ -161,7 +177,9 @@
       "macro": "GFL_OPEN_LOOP_VD_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.6"},
+      "binding": {
+        "float": "0.2"
+      },
       "description": "BUILD_LEVEL 1 d-axis open-loop voltage command."
     },
     {
@@ -169,7 +187,9 @@
       "macro": "GFL_OPEN_LOOP_VQ_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.6"},
+      "binding": {
+        "float": "0.2"
+      },
       "description": "BUILD_LEVEL 1 q-axis open-loop voltage command."
     },
     {
@@ -177,7 +197,9 @@
       "macro": "CTRL_SPLL_EPSILON",
       "enabled": true,
       "weak": false,
-      "binding": {"literal": "((float2ctrl(0.005)))"},
+      "binding": {
+        "literal": "((float2ctrl(0.005)))"
+      },
       "description": "PLL lock-error threshold in controller per unit."
     },
     {
@@ -185,7 +207,9 @@
       "macro": "GFL_ACTIVE_POWER_REF_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.1"},
+      "binding": {
+        "float": "0.1"
+      },
       "description": "Default active-power reference. Positive power exports energy to the grid."
     },
     {
@@ -193,7 +217,9 @@
       "macro": "GFL_REACTIVE_POWER_REF_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.0"},
+      "binding": {
+        "float": "0.0"
+      },
       "description": "Default reactive-power reference using Q = vq*id - vd*iq."
     },
     {
@@ -201,7 +227,9 @@
       "macro": "GFL_CURRENT_LEVEL2_ID_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.1"},
+      "binding": {
+        "float": "0.1"
+      },
       "description": "BUILD_LEVEL 2 d-axis current command."
     },
     {
@@ -209,7 +237,9 @@
       "macro": "GFL_CURRENT_LEVEL2_IQ_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.1"},
+      "binding": {
+        "float": "0.1"
+      },
       "description": "BUILD_LEVEL 2 q-axis current command."
     },
     {
@@ -217,7 +247,9 @@
       "macro": "GFL_CURRENT_LEVEL3_ID_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.1"},
+      "binding": {
+        "float": "0.1"
+      },
       "description": "BUILD_LEVEL 3 grid-connected d-axis current command."
     },
     {
@@ -225,7 +257,9 @@
       "macro": "GFL_CURRENT_LEVEL3_IQ_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.0"},
+      "binding": {
+        "float": "0.0"
+      },
       "description": "BUILD_LEVEL 3 grid-connected q-axis current command."
     },
     {
@@ -233,7 +267,9 @@
       "macro": "GFL_CURRENT_LEVEL4_ID_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.6"},
+      "binding": {
+        "float": "0.6"
+      },
       "description": "BUILD_LEVEL 4 d-axis current command."
     },
     {
@@ -241,7 +277,9 @@
       "macro": "GFL_CURRENT_LEVEL4_IQ_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.6"},
+      "binding": {
+        "float": "0.6"
+      },
       "description": "BUILD_LEVEL 4 q-axis current command."
     },
     {
@@ -249,7 +287,9 @@
       "macro": "GFL_LEVEL6_OUTPUT_LINE_RMS_V",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "33.0"},
+      "binding": {
+        "float": "24.0"
+      },
       "description": "BUILD_LEVEL 6 default line-to-line RMS voltage command in volts."
     },
     {
@@ -257,7 +297,9 @@
       "macro": "GFL_LEVEL6_VOLTAGE_MIN_RMS_V",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "24.0"},
+      "binding": {
+        "float": "24.0"
+      },
       "description": "Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface."
     },
     {
@@ -265,7 +307,9 @@
       "macro": "GFL_LEVEL6_VOLTAGE_MAX_RMS_V",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "36.0"},
+      "binding": {
+        "float": "36.0"
+      },
       "description": "Maximum line-to-line RMS voltage accepted by the Level 6 runtime interface."
     },
     {
@@ -273,7 +317,9 @@
       "macro": "GFL_LEVEL6_VOLTAGE_STEP_RMS_V",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.5"},
+      "binding": {
+        "float": "0.5"
+      },
       "description": "Line-to-line RMS voltage command resolution for Level 6."
     },
     {
@@ -281,7 +327,9 @@
       "macro": "GFL_LEVEL6_OUTPUT_FREQUENCY_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "50.0"},
+      "binding": {
+        "float": "50.0"
+      },
       "description": "BUILD_LEVEL 6 default stand-alone output frequency."
     },
     {
@@ -289,7 +337,9 @@
       "macro": "GFL_LEVEL6_FREQUENCY_MIN_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "20.0"},
+      "binding": {
+        "float": "20.0"
+      },
       "description": "Minimum Level 6 output-frequency command."
     },
     {
@@ -297,7 +347,9 @@
       "macro": "GFL_LEVEL6_FREQUENCY_MAX_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "100.0"},
+      "binding": {
+        "float": "100.0"
+      },
       "description": "Maximum Level 6 output-frequency command."
     },
     {
@@ -305,7 +357,9 @@
       "macro": "GFL_LEVEL6_FREQUENCY_STEP_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "1.0"},
+      "binding": {
+        "float": "1.0"
+      },
       "description": "Level 6 output-frequency command resolution."
     },
     {
@@ -313,7 +367,9 @@
       "macro": "GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "100.0"},
+      "binding": {
+        "float": "100.0"
+      },
       "description": "Line-to-line RMS soft-start and command slew rate."
     },
     {
@@ -321,7 +377,9 @@
       "macro": "GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "80.0"},
+      "binding": {
+        "float": "80.0"
+      },
       "description": "Proportional design bandwidth for the Level 6 voltage QPR loop."
     },
     {
@@ -329,7 +387,9 @@
       "macro": "GFL_LEVEL6_CURRENT_LOOP_BW_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "600.0"},
+      "binding": {
+        "float": "600.0"
+      },
       "description": "Proportional design bandwidth for the Level 6 estimated-inductor-current QPR loop."
     },
     {
@@ -337,7 +397,9 @@
       "macro": "GFL_LEVEL6_VOLTAGE_QPR_KR",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "1.00"},
+      "binding": {
+        "float": "1.00"
+      },
       "description": "Resonant gain from voltage error PU to estimated inductor-current reference PU."
     },
     {
@@ -345,7 +407,9 @@
       "macro": "GFL_LEVEL6_CURRENT_QPR_KR",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.80"},
+      "binding": {
+        "float": "0.80"
+      },
       "description": "Resonant gain from estimated inductor-current error PU to SPWM modulation index."
     },
     {
@@ -353,7 +417,9 @@
       "macro": "GFL_LEVEL6_QPR_BANDWIDTH_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "5.0"},
+      "binding": {
+        "float": "5.0"
+      },
       "description": "Half-width of the Level 6 quasi-resonant terms around the commanded frequency."
     },
     {
@@ -361,7 +427,9 @@
       "macro": "GFL_LEVEL6_CURRENT_LIMIT_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.80"},
+      "binding": {
+        "float": "0.80"
+      },
       "description": "Circular limit for the Level 6 estimated inductor-current reference."
     },
     {
@@ -369,7 +437,9 @@
       "macro": "GFL_LEVEL6_MODULATION_LIMIT_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.95"},
+      "binding": {
+        "float": "0.95"
+      },
       "description": "Circular SPWM modulation limit used by Level 6."
     },
     {
@@ -377,7 +447,9 @@
       "macro": "GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "3.5"},
+      "binding": {
+        "float": "3.5"
+      },
       "description": "Virtual resistance applied to estimated capacitor current for LC active damping."
     },
     {
@@ -385,7 +457,9 @@
       "macro": "GFL_LEVEL6_DC_SERVO_KI_PER_S",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "1.0"},
+      "binding": {
+        "float": "1.0"
+      },
       "description": "Cycle-average DC-voltage servo integral gain in modulation per voltage-error PU per second."
     },
     {
@@ -393,7 +467,9 @@
       "macro": "GFL_LEVEL6_DC_SERVO_DEADBAND_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.001"},
+      "binding": {
+        "float": "0.001"
+      },
       "description": "Cycle-average alpha/beta voltage-error deadband in controller per unit."
     },
     {
@@ -401,7 +477,9 @@
       "macro": "GFL_LEVEL6_DC_SERVO_LIMIT_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.08"},
+      "binding": {
+        "float": "0.08"
+      },
       "description": "Independent alpha/beta DC modulation-correction limit."
     },
     {
@@ -409,7 +487,9 @@
       "macro": "GFL_LEVEL6_DC_SERVO_MODULATION_GUARD_PU",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.93"},
+      "binding": {
+        "float": "0.93"
+      },
       "description": "Freeze DC-servo integration when the uncorrected modulation-vector magnitude reaches this threshold."
     },
     {
@@ -417,7 +497,9 @@
       "macro": "GFL_ADC_CALIBRATOR_FC_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "20.0"},
+      "binding": {
+        "float": "20.0"
+      },
       "description": "ADC offset calibrator filter cutoff frequency."
     },
     {
@@ -425,7 +507,9 @@
       "macro": "GFL_ADC_CALIBRATOR_Q",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "0.707"},
+      "binding": {
+        "float": "0.707"
+      },
       "description": "ADC offset calibrator second-order filter quality factor."
     },
     {
@@ -433,7 +517,9 @@
       "macro": "GFL_CIA402_OPERATION_ENABLE_DELAY_MS",
       "enabled": true,
       "weak": false,
-      "binding": {"number": "100"},
+      "binding": {
+        "number": "100"
+      },
       "description": "Minimum CiA402 delay before Operation Enabled."
     },
     {
@@ -441,34 +527,86 @@
       "macro": "GFL_GRID_FREQUENCY_HZ",
       "enabled": true,
       "weak": false,
-      "binding": {"float": "50.0"},
+      "binding": {
+        "float": "50.0"
+      },
       "description": "Nominal grid frequency in hertz."
     }
   ],
   "requirement_groups": [
     {
       "name": "Control Loop Parameters",
-      "requirements": ["grid_voltage_pu","pq_loop_frequency","pq_loop_divider","pq_active_kp","pq_active_ki","pq_reactive_kp","pq_reactive_ki","pq_current_limit","open_loop_vd","open_loop_vq","pll_lock_epsilon"]
+      "requirements": [
+        "grid_voltage_pu",
+        "pq_loop_frequency",
+        "pq_loop_divider",
+        "pq_active_kp",
+        "pq_active_ki",
+        "pq_reactive_kp",
+        "pq_reactive_ki",
+        "pq_current_limit",
+        "open_loop_vd",
+        "open_loop_vq",
+        "pll_lock_epsilon"
+      ]
     },
     {
       "name": "Commissioning Defaults",
-      "requirements": ["active_power_ref","reactive_power_ref","level2_id","level2_iq","level3_id","level3_iq","level4_id","level4_iq"]
+      "requirements": [
+        "active_power_ref",
+        "reactive_power_ref",
+        "level2_id",
+        "level2_iq",
+        "level3_id",
+        "level3_iq",
+        "level4_id",
+        "level4_iq"
+      ]
     },
     {
       "name": "BUILD_LEVEL 6 Off-Grid Voltage Control",
-      "requirements": ["level6_line_voltage_rms","level6_voltage_min_rms","level6_voltage_max_rms","level6_voltage_step_rms","level6_frequency","level6_frequency_min","level6_frequency_max","level6_frequency_step","level6_voltage_slew","level6_voltage_loop_bw","level6_current_loop_bw","level6_voltage_qpr_kr","level6_current_qpr_kr","level6_qpr_bandwidth","level6_current_limit","level6_modulation_limit","level6_active_damping_resistance"]
+      "requirements": [
+        "level6_line_voltage_rms",
+        "level6_voltage_min_rms",
+        "level6_voltage_max_rms",
+        "level6_voltage_step_rms",
+        "level6_frequency",
+        "level6_frequency_min",
+        "level6_frequency_max",
+        "level6_frequency_step",
+        "level6_voltage_slew",
+        "level6_voltage_loop_bw",
+        "level6_current_loop_bw",
+        "level6_voltage_qpr_kr",
+        "level6_current_qpr_kr",
+        "level6_qpr_bandwidth",
+        "level6_current_limit",
+        "level6_modulation_limit",
+        "level6_active_damping_resistance"
+      ]
     },
     {
       "name": "BUILD_LEVEL 6 DC Offset Servo",
-      "requirements": ["level6_dc_servo_ki","level6_dc_servo_deadband","level6_dc_servo_limit","level6_dc_servo_modulation_guard"]
+      "requirements": [
+        "level6_dc_servo_ki",
+        "level6_dc_servo_deadband",
+        "level6_dc_servo_limit",
+        "level6_dc_servo_modulation_guard"
+      ]
     },
     {
       "name": "Runtime Parameters",
-      "requirements": ["adc_calibrator_cutoff","adc_calibrator_q","cia402_enable_delay"]
+      "requirements": [
+        "adc_calibrator_cutoff",
+        "adc_calibrator_q",
+        "cia402_enable_delay"
+      ]
     },
     {
       "name": "Default Parameters",
-      "requirements": ["grid_frequency"]
+      "requirements": [
+        "grid_frequency"
+      ]
     }
   ]
 }

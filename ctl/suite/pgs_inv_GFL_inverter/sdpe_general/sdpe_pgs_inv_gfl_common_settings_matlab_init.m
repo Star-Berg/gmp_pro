@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-15';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-27';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -25,8 +25,8 @@ USE_DEBUG_DISCRETE_PID = true;
 % USING_NPC_MODULATOR = true;
 
 %% Runtime
-% SPECIFY_ENABLE_ADC_CALIBRATE is disabled in the SDPE project requirement.
-% SPECIFY_ENABLE_ADC_CALIBRATE = true;
+% Enable startup ADC offset calibration. Only enable while all calibrated power inputs are in a known zero state.
+SPECIFY_ENABLE_ADC_CALIBRATE = true;
 
 % ENABLE_GMP_DL_PIL_SIM is disabled in the SDPE project requirement.
 % ENABLE_GMP_DL_PIL_SIM = true;
@@ -39,12 +39,14 @@ USE_DEBUG_DISCRETE_PID = true;
 % Options: (1), (2), (3)
 GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
 
+%% Control Algorithm
+% Enable the Level 6 cycle-average alpha/beta DC-voltage suppression servo.
+% Options: (0), (1)
+GFL_LEVEL6_ENABLE_DC_OFFSET_SERVO = 0;
+
 %% Requirement bindings
 % Nominal grid phase-voltage magnitude in controller per unit.
 GFL_GRID_VOLTAGE_PU = 0.33;
-
-% Nominal grid frequency in hertz.
-GFL_GRID_FREQUENCY_HZ = 50.0;
 
 % P/Q outer-loop execution frequency in hertz.
 GFL_PQ_LOOP_FREQUENCY_HZ = 1000.0;
@@ -67,17 +69,20 @@ GFL_PQ_REACTIVE_KI = 0.001;
 % Circular magnitude limit applied to the d/q current reference produced by the P/Q loop.
 GFL_PQ_CURRENT_LIMIT_PU = 1.0;
 
+% BUILD_LEVEL 1 d-axis open-loop voltage command.
+GFL_OPEN_LOOP_VD_PU = 0.2;
+
+% BUILD_LEVEL 1 q-axis open-loop voltage command.
+GFL_OPEN_LOOP_VQ_PU = 0.2;
+
+% PLL lock-error threshold in controller per unit.
+CTRL_SPLL_EPSILON = float2ctrl(0.005);
+
 % Default active-power reference. Positive power exports energy to the grid.
 GFL_ACTIVE_POWER_REF_PU = 0.1;
 
 % Default reactive-power reference using Q = vq*id - vd*iq.
 GFL_REACTIVE_POWER_REF_PU = 0.0;
-
-% BUILD_LEVEL 1 d-axis open-loop voltage command.
-GFL_OPEN_LOOP_VD_PU = 0.6;
-
-% BUILD_LEVEL 1 q-axis open-loop voltage command.
-GFL_OPEN_LOOP_VQ_PU = 0.6;
 
 % BUILD_LEVEL 2 d-axis current command.
 GFL_CURRENT_LEVEL2_ID_PU = 0.1;
@@ -97,6 +102,69 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 % BUILD_LEVEL 4 q-axis current command.
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
+% BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
+GFL_LEVEL6_OUTPUT_LINE_RMS_V = 24.0;
+
+% Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
+GFL_LEVEL6_VOLTAGE_MIN_RMS_V = 24.0;
+
+% Maximum line-to-line RMS voltage accepted by the Level 6 runtime interface.
+GFL_LEVEL6_VOLTAGE_MAX_RMS_V = 36.0;
+
+% Line-to-line RMS voltage command resolution for Level 6.
+GFL_LEVEL6_VOLTAGE_STEP_RMS_V = 0.5;
+
+% BUILD_LEVEL 6 default stand-alone output frequency.
+GFL_LEVEL6_OUTPUT_FREQUENCY_HZ = 50.0;
+
+% Minimum Level 6 output-frequency command.
+GFL_LEVEL6_FREQUENCY_MIN_HZ = 20.0;
+
+% Maximum Level 6 output-frequency command.
+GFL_LEVEL6_FREQUENCY_MAX_HZ = 100.0;
+
+% Level 6 output-frequency command resolution.
+GFL_LEVEL6_FREQUENCY_STEP_HZ = 1.0;
+
+% Line-to-line RMS soft-start and command slew rate.
+GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S = 100.0;
+
+% Proportional design bandwidth for the Level 6 voltage QPR loop.
+GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ = 80.0;
+
+% Proportional design bandwidth for the Level 6 estimated-inductor-current QPR loop.
+GFL_LEVEL6_CURRENT_LOOP_BW_HZ = 600.0;
+
+% Resonant gain from voltage error PU to estimated inductor-current reference PU.
+GFL_LEVEL6_VOLTAGE_QPR_KR = 1.00;
+
+% Resonant gain from estimated inductor-current error PU to SPWM modulation index.
+GFL_LEVEL6_CURRENT_QPR_KR = 0.80;
+
+% Half-width of the Level 6 quasi-resonant terms around the commanded frequency.
+GFL_LEVEL6_QPR_BANDWIDTH_HZ = 5.0;
+
+% Circular limit for the Level 6 estimated inductor-current reference.
+GFL_LEVEL6_CURRENT_LIMIT_PU = 0.80;
+
+% Circular SPWM modulation limit used by Level 6.
+GFL_LEVEL6_MODULATION_LIMIT_PU = 0.95;
+
+% Virtual resistance applied to estimated capacitor current for LC active damping.
+GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM = 3.5;
+
+% Cycle-average DC-voltage servo integral gain in modulation per voltage-error PU per second.
+GFL_LEVEL6_DC_SERVO_KI_PER_S = 1.0;
+
+% Cycle-average alpha/beta voltage-error deadband in controller per unit.
+GFL_LEVEL6_DC_SERVO_DEADBAND_PU = 0.001;
+
+% Independent alpha/beta DC modulation-correction limit.
+GFL_LEVEL6_DC_SERVO_LIMIT_PU = 0.08;
+
+% Freeze DC-servo integration when the uncorrected modulation-vector magnitude reaches this threshold.
+GFL_LEVEL6_DC_SERVO_MODULATION_GUARD_PU = 0.93;
+
 % ADC offset calibrator filter cutoff frequency.
 GFL_ADC_CALIBRATOR_FC_HZ = 20.0;
 
@@ -106,8 +174,8 @@ GFL_ADC_CALIBRATOR_Q = 0.707;
 % Minimum CiA402 delay before Operation Enabled.
 GFL_CIA402_OPERATION_ENABLE_DELAY_MS = 100;
 
-% PLL lock-error threshold in controller per unit.
-CTRL_SPLL_EPSILON = float2ctrl(0.005);
+% Nominal grid frequency in hertz.
+GFL_GRID_FREQUENCY_HZ = 50.0;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

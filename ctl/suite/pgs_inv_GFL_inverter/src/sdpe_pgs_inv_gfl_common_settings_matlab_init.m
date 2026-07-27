@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-25';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-27';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -38,6 +38,11 @@ SPECIFY_ENABLE_ADC_CALIBRATE = true;
 % Capacitor-current source: direct measurement, current difference, or capacitor-voltage derivative.
 % Options: (1), (2), (3)
 GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
+
+%% Control Algorithm
+% Enable the Level 6 cycle-average alpha/beta DC-voltage suppression servo.
+% Options: (0), (1)
+GFL_LEVEL6_ENABLE_DC_OFFSET_SERVO = 0;
 
 %% Requirement bindings
 % Nominal grid phase-voltage magnitude in controller per unit.
@@ -65,10 +70,10 @@ GFL_PQ_REACTIVE_KI = 0.001;
 GFL_PQ_CURRENT_LIMIT_PU = 1.0;
 
 % BUILD_LEVEL 1 d-axis open-loop voltage command.
-GFL_OPEN_LOOP_VD_PU = 0.6;
+GFL_OPEN_LOOP_VD_PU = 0.2;
 
 % BUILD_LEVEL 1 q-axis open-loop voltage command.
-GFL_OPEN_LOOP_VQ_PU = 0.6;
+GFL_OPEN_LOOP_VQ_PU = 0.2;
 
 % PLL lock-error threshold in controller per unit.
 CTRL_SPLL_EPSILON = float2ctrl(0.005);
@@ -98,7 +103,7 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
 % BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
-GFL_LEVEL6_OUTPUT_LINE_RMS_V = 33.0;
+GFL_LEVEL6_OUTPUT_LINE_RMS_V = 24.0;
 
 % Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
 GFL_LEVEL6_VOLTAGE_MIN_RMS_V = 24.0;
@@ -147,6 +152,18 @@ GFL_LEVEL6_MODULATION_LIMIT_PU = 0.95;
 
 % Virtual resistance applied to estimated capacitor current for LC active damping.
 GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM = 3.5;
+
+% Cycle-average DC-voltage servo integral gain in modulation per voltage-error PU per second.
+GFL_LEVEL6_DC_SERVO_KI_PER_S = 1.0;
+
+% Cycle-average alpha/beta voltage-error deadband in controller per unit.
+GFL_LEVEL6_DC_SERVO_DEADBAND_PU = 0.001;
+
+% Independent alpha/beta DC modulation-correction limit.
+GFL_LEVEL6_DC_SERVO_LIMIT_PU = 0.08;
+
+% Freeze DC-servo integration when the uncorrected modulation-vector magnitude reaches this threshold.
+GFL_LEVEL6_DC_SERVO_MODULATION_GUARD_PU = 0.93;
 
 % ADC offset calibrator filter cutoff frequency.
 GFL_ADC_CALIBRATOR_FC_HZ = 20.0;

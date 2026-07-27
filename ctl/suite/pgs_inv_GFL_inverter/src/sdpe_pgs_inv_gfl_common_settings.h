@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-25"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-27"
 
 //=================================================================================================
 /**
@@ -78,6 +78,17 @@ extern "C"
 
 //=================================================================================================
 /**
+ * @brief Control Algorithm.
+ */
+
+/**
+ * @brief Enable the Level 6 cycle-average alpha/beta DC-voltage suppression servo.
+ *        Options: (0), (1)
+ */
+#define GFL_LEVEL6_ENABLE_DC_OFFSET_SERVO (0)
+
+//=================================================================================================
+/**
  * @brief Requirement bindings.
  */
 
@@ -124,12 +135,12 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 1 d-axis open-loop voltage command.
  */
-#define GFL_OPEN_LOOP_VD_PU (0.6f)
+#define GFL_OPEN_LOOP_VD_PU (0.2f)
 
 /**
  * @brief BUILD_LEVEL 1 q-axis open-loop voltage command.
  */
-#define GFL_OPEN_LOOP_VQ_PU (0.6f)
+#define GFL_OPEN_LOOP_VQ_PU (0.2f)
 
 /**
  * @brief PLL lock-error threshold in controller per unit.
@@ -179,7 +190,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6 default line-to-line RMS voltage command in volts.
  */
-#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (33.0f)
+#define GFL_LEVEL6_OUTPUT_LINE_RMS_V (24.0f)
 
 /**
  * @brief Minimum line-to-line RMS voltage accepted by the Level 6 runtime interface.
@@ -260,6 +271,26 @@ extern "C"
  * @brief Virtual resistance applied to estimated capacitor current for LC active damping.
  */
 #define GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM (3.5f)
+
+/**
+ * @brief Cycle-average DC-voltage servo integral gain in modulation per voltage-error PU per second.
+ */
+#define GFL_LEVEL6_DC_SERVO_KI_PER_S (1.0f)
+
+/**
+ * @brief Cycle-average alpha/beta voltage-error deadband in controller per unit.
+ */
+#define GFL_LEVEL6_DC_SERVO_DEADBAND_PU (0.001f)
+
+/**
+ * @brief Independent alpha/beta DC modulation-correction limit.
+ */
+#define GFL_LEVEL6_DC_SERVO_LIMIT_PU (0.08f)
+
+/**
+ * @brief Freeze DC-servo integration when the uncorrected modulation-vector magnitude reaches this threshold.
+ */
+#define GFL_LEVEL6_DC_SERVO_MODULATION_GUARD_PU (0.93f)
 
 /**
  * @brief ADC offset calibrator filter cutoff frequency.

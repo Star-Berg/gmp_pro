@@ -4,7 +4,7 @@
   "display_name": "PGS GFL Inverter F280039C IRIS Node",
   "description": "Validated IRIS platform timing, sensing and resource bindings for the common GFL controller.",
   "suite": "pgs_inv_GFL_inverter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "updated_at": "2026-07-27",
   "output_header": "sdpe_pgs_inv_gfl_iris_settings.h",
   "hardware": [
@@ -19,7 +19,7 @@
     }
   ],
   "code_sections": {
-    "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>\n\n/* Existing IRIS SysConfig resource names assigned to GFL application roles. */\n#define PHASE_U_BASE IRIS_EPWM1_BASE\n#define PHASE_V_BASE IRIS_EPWM2_BASE\n#define PHASE_W_BASE IRIS_EPWM3_BASE\n#define PWM_ENABLE_PORT IRIS_GPIO1\n#define PWM_RESET_PORT IRIS_GPIO3\n#define INV_UA_RESULT_BASE ADC_CH1_RESULT_BASE\n#define INV_UA ADC_CH1\n#define INV_UB_RESULT_BASE ADC_CH2_RESULT_BASE\n#define INV_UB ADC_CH2\n#define INV_UC_RESULT_BASE ADC_CH3_RESULT_BASE\n#define INV_UC ADC_CH3\n#define INV_IA_RESULT_BASE ADC_CH4_RESULT_BASE\n#define INV_IA ADC_CH4\n#define INV_IB_RESULT_BASE ADC_CH5_RESULT_BASE\n#define INV_IB ADC_CH5\n#define INV_IC_RESULT_BASE ADC_CH6_RESULT_BASE\n#define INV_IC ADC_CH6\n#define INV_UU_RESULT_BASE ADC_CH9_RESULT_BASE\n#define INV_UU ADC_CH9\n#define INV_UV_RESULT_BASE ADC_CH10_RESULT_BASE\n#define INV_UV ADC_CH10\n#define INV_UW_RESULT_BASE ADC_CH11_RESULT_BASE\n#define INV_UW ADC_CH11\n#define INV_IU_RESULT_BASE ADC_CH4_RESULT_BASE\n#define INV_IU ADC_CH4\n#define INV_IV_RESULT_BASE ADC_CH5_RESULT_BASE\n#define INV_IV ADC_CH5\n#define INV_IW_RESULT_BASE ADC_CH6_RESULT_BASE\n#define INV_IW ADC_CH6\n#define INV_VBUS_RESULT_BASE ADC_CH7_RESULT_BASE\n#define INV_VBUS ADC_CH7\n#define INV_IBUS_RESULT_BASE ADC_CH8_RESULT_BASE\n#define INV_IBUS ADC_CH8\n#define SYSTEM_LED IRIS_LED1\n#define CONTROLLER_LED IRIS_LED2",
+    "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>",
     "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 6)\n#error BUILD_LEVEL_must_be_between_1_and_6\n#endif"
   },
   "feature_macros": [
@@ -38,7 +38,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(3)",
+      "value": "(6)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -75,6 +75,761 @@
         "(3)"
       ],
       "description": "Number of directly sampled phase voltages."
+    },
+    {
+      "group": "PWM Hardware Binding",
+      "macro": "PHASE_U_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_EPWM1_BASE",
+      "options_preset": "iris_f280039c_node.IRIS_EPWM",
+      "options": [
+        "IRIS_EPWM1_BASE",
+        "IRIS_EPWM2_BASE",
+        "IRIS_EPWM3_BASE",
+        "IRIS_EPWM4_BASE",
+        "IRIS_EPWM5_BASE",
+        "IRIS_EPWM6_BASE"
+      ],
+      "description": "Logical phase-U PWM resource; current SysConfig maps IRIS_EPWM1 to physical ePWM2 on GPIO2/GPIO3."
+    },
+    {
+      "group": "PWM Hardware Binding",
+      "macro": "PHASE_V_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_EPWM2_BASE",
+      "options_preset": "iris_f280039c_node.IRIS_EPWM",
+      "options": [
+        "IRIS_EPWM1_BASE",
+        "IRIS_EPWM2_BASE",
+        "IRIS_EPWM3_BASE",
+        "IRIS_EPWM4_BASE",
+        "IRIS_EPWM5_BASE",
+        "IRIS_EPWM6_BASE"
+      ],
+      "description": "Logical phase-V PWM resource; current SysConfig maps IRIS_EPWM2 to physical ePWM1 on GPIO0/GPIO1."
+    },
+    {
+      "group": "PWM Hardware Binding",
+      "macro": "PHASE_W_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_EPWM3_BASE",
+      "options_preset": "iris_f280039c_node.IRIS_EPWM",
+      "options": [
+        "IRIS_EPWM1_BASE",
+        "IRIS_EPWM2_BASE",
+        "IRIS_EPWM3_BASE",
+        "IRIS_EPWM4_BASE",
+        "IRIS_EPWM5_BASE",
+        "IRIS_EPWM6_BASE"
+      ],
+      "description": "Logical phase-W PWM resource; current SysConfig maps IRIS_EPWM3 to physical ePWM4 on GPIO22/GPIO7."
+    },
+    {
+      "group": "PWM Hardware Binding",
+      "macro": "PWM_ENABLE_PORT",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_GPIO5",
+      "options_preset": "iris_f280039c_node.IRIS_GPIO",
+      "options": [
+        "IRIS_GPIO1",
+        "IRIS_GPIO2",
+        "IRIS_GPIO3",
+        "IRIS_GPIO4",
+        "IRIS_GPIO5",
+        "IRIS_GPIO6"
+      ],
+      "description": "Helios gate-driver enable GPIO; current SysConfig maps IRIS_GPIO1 to GPIO58."
+    },
+    {
+      "group": "PWM Hardware Binding",
+      "macro": "PWM_RESET_PORT",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_GPIO3",
+      "options_preset": "iris_f280039c_node.IRIS_GPIO",
+      "options": [
+        "IRIS_GPIO1",
+        "IRIS_GPIO2",
+        "IRIS_GPIO3",
+        "IRIS_GPIO4",
+        "IRIS_GPIO5",
+        "IRIS_GPIO6"
+      ],
+      "description": "Helios gate-driver reset GPIO; current SysConfig maps IRIS_GPIO3 to GPIO40."
+    },
+    {
+      "group": "Status GPIO Binding",
+      "macro": "SYSTEM_LED",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_LED1",
+      "options_preset": "",
+      "options": [
+        "IRIS_LED1",
+        "IRIS_LED2"
+      ],
+      "description": "System status LED resource."
+    },
+    {
+      "group": "Status GPIO Binding",
+      "macro": "CONTROLLER_LED",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_LED2",
+      "options_preset": "",
+      "options": [
+        "IRIS_LED1",
+        "IRIS_LED2"
+      ],
+      "description": "Controller status LED resource."
+    },
+    {
+      "group": "Output Voltage Sampling",
+      "macro": "INV_UA_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH1_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-A output-voltage ADC result register base; keep paired with INV_UA."
+    },
+    {
+      "group": "Output Voltage Sampling",
+      "macro": "INV_UA",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH1",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-A output-voltage sample; current SysConfig binding is ADCA SOC0 / ADCIN6."
+    },
+    {
+      "group": "Output Voltage Sampling",
+      "macro": "INV_UB_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH2_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-B output-voltage ADC result register base; keep paired with INV_UB."
+    },
+    {
+      "group": "Output Voltage Sampling",
+      "macro": "INV_UB",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH2",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-B output-voltage sample; current SysConfig binding is ADCC SOC0 / ADCIN6."
+    },
+    {
+      "group": "Output Voltage Sampling",
+      "macro": "INV_UC_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH3_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-C output-voltage ADC result register base; keep paired with INV_UC."
+    },
+    {
+      "group": "Output Voltage Sampling",
+      "macro": "INV_UC",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH3",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-C output-voltage sample; current SysConfig binding is ADCB SOC0 / ADCIN3."
+    },
+    {
+      "group": "Output Current Sampling",
+      "macro": "INV_IA_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH4_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-A output-current ADC result register base; keep paired with INV_IA."
+    },
+    {
+      "group": "Output Current Sampling",
+      "macro": "INV_IA",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH4",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-A output-current sample; current SysConfig binding is ADCC SOC1 / ADCIN9."
+    },
+    {
+      "group": "Output Current Sampling",
+      "macro": "INV_IB_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH5_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-B output-current ADC result register base; keep paired with INV_IB."
+    },
+    {
+      "group": "Output Current Sampling",
+      "macro": "INV_IB",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH5",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-B output-current sample; current SysConfig binding is ADCA SOC1 / ADCIN3."
+    },
+    {
+      "group": "Output Current Sampling",
+      "macro": "INV_IC_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH6_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-C output-current ADC result register base; keep paired with INV_IC."
+    },
+    {
+      "group": "Output Current Sampling",
+      "macro": "INV_IC",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH6",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-C output-current sample; current SysConfig binding is ADCC SOC2 / ADCIN4."
+    },
+    {
+      "group": "Bridge Voltage Sampling",
+      "macro": "INV_UU_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH9_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-U bridge-voltage ADC result register base; keep paired with INV_UU."
+    },
+    {
+      "group": "Bridge Voltage Sampling",
+      "macro": "INV_UU",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH9",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-U bridge-voltage sample; current SysConfig binding is ADCA SOC2 / ADCIN12."
+    },
+    {
+      "group": "Bridge Voltage Sampling",
+      "macro": "INV_UV_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH10_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-V bridge-voltage ADC result register base; keep paired with INV_UV."
+    },
+    {
+      "group": "Bridge Voltage Sampling",
+      "macro": "INV_UV",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH10",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-V bridge-voltage sample; current SysConfig binding is ADCC SOC3 / ADCIN1."
+    },
+    {
+      "group": "Bridge Voltage Sampling",
+      "macro": "INV_UW_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH11_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-W bridge-voltage ADC result register base; keep paired with INV_UW."
+    },
+    {
+      "group": "Bridge Voltage Sampling",
+      "macro": "INV_UW",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH11",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-W bridge-voltage sample; current SysConfig binding is ADCB SOC3 / ADCIN11."
+    },
+    {
+      "group": "Bridge Current Sampling",
+      "macro": "INV_IU_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH4_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-U bridge-current ADC result register base; currently aliases output-current channel INV_IA."
+    },
+    {
+      "group": "Bridge Current Sampling",
+      "macro": "INV_IU",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH4",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-U bridge-current sample; currently aliases output-current channel INV_IA."
+    },
+    {
+      "group": "Bridge Current Sampling",
+      "macro": "INV_IV_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH5_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-V bridge-current ADC result register base; currently aliases output-current channel INV_IB."
+    },
+    {
+      "group": "Bridge Current Sampling",
+      "macro": "INV_IV",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH5",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-V bridge-current sample; currently aliases output-current channel INV_IB."
+    },
+    {
+      "group": "Bridge Current Sampling",
+      "macro": "INV_IW_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH6_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "Phase-W bridge-current ADC result register base; currently aliases output-current channel INV_IC."
+    },
+    {
+      "group": "Bridge Current Sampling",
+      "macro": "INV_IW",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH6",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "Phase-W bridge-current sample; currently aliases output-current channel INV_IC."
+    },
+    {
+      "group": "DC Bus Sampling",
+      "macro": "INV_VBUS_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH7_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "DC-bus voltage ADC result register base; keep paired with INV_VBUS."
+    },
+    {
+      "group": "DC Bus Sampling",
+      "macro": "INV_VBUS",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH7",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "DC-bus voltage sample; current SysConfig binding is ADCB SOC1 / ADCIN10."
+    },
+    {
+      "group": "DC Bus Sampling",
+      "macro": "INV_IBUS_RESULT_BASE",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH8_RESULT_BASE",
+      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
+      "options": [
+        "ADC_CH1_RESULT_BASE",
+        "ADC_CH2_RESULT_BASE",
+        "ADC_CH3_RESULT_BASE",
+        "ADC_CH4_RESULT_BASE",
+        "ADC_CH5_RESULT_BASE",
+        "ADC_CH6_RESULT_BASE",
+        "ADC_CH7_RESULT_BASE",
+        "ADC_CH8_RESULT_BASE",
+        "ADC_CH9_RESULT_BASE",
+        "ADC_CH10_RESULT_BASE",
+        "ADC_CH11_RESULT_BASE",
+        "ADC_CH12_RESULT_BASE"
+      ],
+      "description": "DC-bus current ADC result register base; keep paired with INV_IBUS."
+    },
+    {
+      "group": "DC Bus Sampling",
+      "macro": "INV_IBUS",
+      "enabled": true,
+      "weak": false,
+      "value": "ADC_CH8",
+      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
+      "options": [
+        "ADC_CH1",
+        "ADC_CH2",
+        "ADC_CH3",
+        "ADC_CH4",
+        "ADC_CH5",
+        "ADC_CH6",
+        "ADC_CH7",
+        "ADC_CH8",
+        "ADC_CH9",
+        "ADC_CH10",
+        "ADC_CH11",
+        "ADC_CH12"
+      ],
+      "description": "DC-bus current sample; current SysConfig binding is ADCB SOC2 / ADCIN12."
     }
   ],
   "requirements": [
@@ -136,7 +891,7 @@
       "binding": {
         "float": "3.3"
       },
-      "description": "ADC reference voltage."
+      "description": "ADC reference voltage synchronized with the SysConfig external 2.5-V reference selection."
     },
     {
       "role": "dc_bus_voltage_base",
@@ -144,7 +899,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "80.0"
+        "float": "60.0"
       },
       "description": "DC-bus per-unit voltage base."
     },
@@ -224,7 +979,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.62"
+        "float": "1.65"
       },
       "description": "Grid-voltage sensing bias."
     },
@@ -254,7 +1009,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.02475"
+        "float": "0.15"
       },
       "description": "DC-link current sensitivity in volts per ampere."
     },
@@ -274,7 +1029,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)"
+        "float": "0.15"
       },
       "description": "Grid-current sensitivity in volts per ampere."
     },

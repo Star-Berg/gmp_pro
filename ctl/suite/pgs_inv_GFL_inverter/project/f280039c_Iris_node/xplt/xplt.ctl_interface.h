@@ -55,6 +55,21 @@ GMP_STATIC_INLINE void ctl_input_callback(void)
     ctl_step_ptr_adc_channel(&udc);
 }
 
+// Map a signed per-unit monitor signal to the 12-bit on-chip DAC range.
+// Clamp before conversion because DAC_setShadowValue() otherwise keeps only
+// the low 12 bits, which makes an over-range value appear to wrap to zero.
+GMP_STATIC_INLINE uint16_t ctl_monitor_pu_to_dac(ctrl_gt value)
+{
+    parameter_gt value_pu = ctrl2float(value);
+
+    if (value_pu > 1.0f)
+        value_pu = 1.0f;
+    else if (value_pu < -1.0f)
+        value_pu = -1.0f;
+
+    return (uint16_t)(((value_pu + 1.0f) * 0.5f * 4095.0f) + 0.5f);
+}
+
 // Output Callback
 GMP_STATIC_INLINE void ctl_output_callback(void)
 {
@@ -111,8 +126,14 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
 
 #elif BUILD_LEVEL == 2
 
-    DAC_setShadowValue(IRIS_DACA_BASE, inv_ctrl.vab0.dat[phase_A] * 2048 + 2048);
-    DAC_setShadowValue(IRIS_DACB_BASE, inv_ctrl.pll.srf_pll.phasor.dat[phasor_cos] * 2048 + 2048);
+    // U-phase current reference reconstructed from the d/q command. With no
+    // zero-sequence current, phase U is the stationary alpha component.
+    ctrl_gt current_ref_alpha =
+        ctl_mul(inv_ctrl.idq_set.dat[phase_d], inv_ctrl.phasor.dat[phasor_cos]) -
+        ctl_mul(inv_ctrl.idq_set.dat[phase_q], inv_ctrl.phasor.dat[phasor_sin]);
+
+    DAC_setShadowValue(IRIS_DACA_BASE, ctl_monitor_pu_to_dac(current_ref_alpha));
+    DAC_setShadowValue(IRIS_DACB_BASE, ctl_monitor_pu_to_dac(inv_ctrl.iab0.dat[phase_alpha]));
 
 #elif BUILD_LEVEL == 3
 
@@ -122,6 +143,17 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     DAC_setShadowValue(IRIS_DACB_BASE, inv_ctrl.pll.phasor.dat[phasor_cos] * 2048 + 2048);
     //    DAC_setShadowValue(IRIS_DACB_BASE, inv_ctrl.pll.v_pos_seq.dat[0] * 2048 + 2048);
     //    DAC_setShadowValue(IRIS_DACB_BASE, inv_ctrl.pll.srf_pll.theta * 2048 + 2048);
+
+#elif BUILD_LEVEL == 6
+
+    // For a zero-sequence-free three-phase system, the alpha component is
+    // the U-phase quantity. Map 0 pu to the 12-bit DAC midpoint.
+    DAC_setShadowValue(
+        IRIS_DACA_BASE,
+        offgrid_voltage_ctrl.voltage_ref_ab.dat[phase_alpha] * 2048 + 2048);
+    DAC_setShadowValue(
+        IRIS_DACB_BASE,
+        offgrid_voltage_ctrl.inductor_current_ref_ab.dat[phase_alpha] * 2048 + 2048);
 
 #endif // BUILD_LEVEL
 }
