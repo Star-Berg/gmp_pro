@@ -373,6 +373,26 @@
       "description": "Line-to-line RMS soft-start and command slew rate."
     },
     {
+      "role": "level6_voltage_adc_filter",
+      "macro": "GFL_LEVEL6_VOLTAGE_ADC_FILTER_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "3000.0"
+      },
+      "description": "Voltage ADC low-pass cutoff used by the Level 6 feedback path."
+    },
+    {
+      "role": "level6_capacitor_current_filter",
+      "macro": "GFL_LEVEL6_CAPACITOR_CURRENT_FILTER_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "3000.0"
+      },
+      "description": "Low-pass cutoff applied after the Level 6 C*dv/dt capacitor-current estimate."
+    },
+    {
       "role": "level6_voltage_loop_bw",
       "macro": "GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ",
       "enabled": true,
@@ -575,6 +595,8 @@
         "level6_frequency_max",
         "level6_frequency_step",
         "level6_voltage_slew",
+        "level6_voltage_adc_filter",
+        "level6_capacitor_current_filter",
         "level6_voltage_loop_bw",
         "level6_current_loop_bw",
         "level6_voltage_qpr_kr",

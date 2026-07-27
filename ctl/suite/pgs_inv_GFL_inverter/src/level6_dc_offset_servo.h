@@ -94,7 +94,6 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl_with_dc_servo(
     ctrl_gt voltage_step;
     ctrl_gt voltage_correction;
     ctrl_gt current_correction;
-    ctrl_gt delta_voltage;
     ctrl_gt dc_bus_gain_ctrl;
     parameter_gt quantized_command;
     parameter_gt dc_bus_gain_delta;
@@ -233,14 +232,11 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl_with_dc_servo(
     /* Estimate capacitor current, then iL = iLoad + iC. */
     for (axis = 0; axis < 2; ++axis)
     {
-        delta_voltage =
-            core->vab0.dat[axis] - ctrl->voltage_ab_last.dat[axis];
-        ctrl->capacitor_current_est_ab.dat[axis] =
-            ctl_mul(ctrl->capacitor_derivative_gain, delta_voltage);
+        ctl_offgrid_step_capacitor_current_estimate(
+            ctrl, axis, core->vab0.dat[axis]);
         ctrl->inductor_current_est_ab.dat[axis] =
             core->iab0.dat[axis] +
             ctrl->capacitor_current_est_ab.dat[axis];
-        ctrl->voltage_ab_last.dat[axis] = core->vab0.dat[axis];
     }
 
     /* Analytic capacitor-current feed-forward for the sinusoidal reference. */

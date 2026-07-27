@@ -233,6 +233,16 @@ extern "C"
 #define GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S (100.0f)
 
 /**
+ * @brief Voltage ADC low-pass cutoff used by the Level 6 feedback path.
+ */
+#define GFL_LEVEL6_VOLTAGE_ADC_FILTER_HZ (3000.0f)
+
+/**
+ * @brief Low-pass cutoff applied after the Level 6 C*dv/dt capacitor-current estimate.
+ */
+#define GFL_LEVEL6_CAPACITOR_CURRENT_FILTER_HZ (3000.0f)
+
+/**
  * @brief Proportional design bandwidth for the Level 6 voltage QPR loop.
  */
 #define GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ (80.0f)

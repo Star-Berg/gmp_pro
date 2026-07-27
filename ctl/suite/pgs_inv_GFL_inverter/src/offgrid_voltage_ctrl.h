@@ -84,6 +84,7 @@ typedef struct _tag_offgrid_voltage_ctrl_init
     parameter_gt modulation_limit_pu;
     parameter_gt active_damping_resistance_ohm;
     parameter_gt voltage_slew_v_per_s;
+    parameter_gt capacitor_current_filter_hz;
 
     parameter_gt default_line_voltage_rms_v;
     parameter_gt default_frequency_hz;
@@ -123,6 +124,7 @@ typedef struct _tag_offgrid_voltage_ctrl
 
     /* Previous capacitor voltage for C*dv/dt current estimation. */
     ctl_vector2_t voltage_ab_last;
+    ctl_filter_IIR1_t capacitor_current_filter[2];
 
     /* Normalized coefficients used by the ISR. */
     parameter_gt fs;
@@ -184,6 +186,28 @@ GMP_STATIC_INLINE void ctl_offgrid_limit_vector(ctl_vector2_t* vector, ctrl_gt l
     }
 }
 
+/**
+ * @brief Estimate one capacitor-current axis with a band-limited derivative.
+ *
+ * The voltage feedback has already passed through the GFL ADC filter. This
+ * second filter is applied after C*dv/dt so PWM ripple and ADC count-to-count
+ * noise do not directly enter the estimated-inductor-current loop.
+ */
+GMP_STATIC_INLINE ctrl_gt ctl_offgrid_step_capacitor_current_estimate(
+    offgrid_voltage_ctrl_t* ctrl, fast_gt axis, ctrl_gt voltage)
+{
+    ctrl_gt delta_voltage = voltage - ctrl->voltage_ab_last.dat[axis];
+    ctrl_gt capacitor_current_raw =
+        ctl_mul(ctrl->capacitor_derivative_gain, delta_voltage);
+
+    ctrl->voltage_ab_last.dat[axis] = voltage;
+    ctrl->capacitor_current_est_ab.dat[axis] =
+        ctl_step_filter_iir1(&ctrl->capacitor_current_filter[axis],
+                             capacitor_current_raw);
+
+    return ctrl->capacitor_current_est_ab.dat[axis];
+}
+
 /** Update both voltage- and current-loop resonant coefficients without clearing state. */
 GMP_STATIC_INLINE void ctl_update_offgrid_frequency(offgrid_voltage_ctrl_t* ctrl, parameter_gt frequency_hz)
 {
@@ -232,6 +256,7 @@ GMP_STATIC_INLINE void ctl_clear_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ct
     {
         ctl_clear_qpr_controller(&ctrl->voltage_qpr[axis]);
         ctl_clear_qpr_controller(&ctrl->current_qpr[axis]);
+        ctl_clear_filter_iir1(&ctrl->capacitor_current_filter[axis]);
     }
 
     ctrl->line_voltage_rms_active_v = 0.0f;
@@ -266,6 +291,8 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     gmp_base_assert(init->dc_bus_voltage > 0.0f);
     gmp_base_assert(init->voltage_base > 0.0f);
     gmp_base_assert(init->current_base > 0.0f);
+    gmp_base_assert(init->capacitor_current_filter_hz > 0.0f);
+    gmp_base_assert(init->capacitor_current_filter_hz < init->fs * 0.5f);
 
     ctrl->fs = init->fs;
     ctrl->voltage_base = init->voltage_base;
@@ -292,6 +319,8 @@ GMP_STATIC_INLINE void ctl_init_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
                                 init->default_frequency_hz, init->qpr_bandwidth_hz, init->fs);
         ctl_init_qpr_controller(&ctrl->current_qpr[axis], current_kp, init->current_qpr_kr,
                                 init->default_frequency_hz, init->qpr_bandwidth_hz, init->fs);
+        ctl_init_filter_iir1_lpf(&ctrl->capacitor_current_filter[axis], init->fs,
+                                 init->capacitor_current_filter_hz);
     }
 
     ctrl->voltage_slew_step_v = float2ctrl(init->voltage_slew_v_per_s / init->fs);
@@ -320,7 +349,6 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     ctrl_gt voltage_step;
     ctrl_gt voltage_correction;
     ctrl_gt current_correction;
-    ctrl_gt delta_voltage;
     ctrl_gt dc_bus_gain_ctrl;
     parameter_gt quantized_command;
     parameter_gt dc_bus_gain_delta;
@@ -431,11 +459,10 @@ GMP_STATIC_INLINE void ctl_step_offgrid_voltage_ctrl(offgrid_voltage_ctrl_t* ctr
     /* Estimate capacitor current, then iL = iLoad + iC. */
     for (axis = 0; axis < 2; ++axis)
     {
-        delta_voltage = core->vab0.dat[axis] - ctrl->voltage_ab_last.dat[axis];
-        ctrl->capacitor_current_est_ab.dat[axis] = ctl_mul(ctrl->capacitor_derivative_gain, delta_voltage);
+        ctl_offgrid_step_capacitor_current_estimate(
+            ctrl, axis, core->vab0.dat[axis]);
         ctrl->inductor_current_est_ab.dat[axis] =
             core->iab0.dat[axis] + ctrl->capacitor_current_est_ab.dat[axis];
-        ctrl->voltage_ab_last.dat[axis] = core->vab0.dat[axis];
     }
 
     /* Analytic capacitor-current feed-forward for the sinusoidal reference. */

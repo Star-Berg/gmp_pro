@@ -385,7 +385,7 @@ extern "C"
 /**
  * @brief Grid-voltage sensing gain.
  */
-#define CTRL_GRID_VOLTAGE_SENSITIVITY (0.0013559322f)
+#define CTRL_GRID_VOLTAGE_SENSITIVITY (0.013559322f)
 
 /**
  * @brief Grid-voltage sensing bias.

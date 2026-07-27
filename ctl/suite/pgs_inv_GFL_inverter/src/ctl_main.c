@@ -84,6 +84,12 @@ void ctl_init()
     gfl_init.grid_filter_C = GFL_GRID_FILTER_CAPACITANCE_F;
 
     ctl_auto_tuning_gfl_inv(&gfl_init);
+#if BUILD_LEVEL == 6
+    // The default auto-tuned voltage ADC cutoff is fs/3 (6.67 kHz at
+    // 20 kHz). Level 6 differentiates this voltage to estimate capacitor
+    // current, so use a lower configurable cutoff before the differentiator.
+    gfl_init.voltage_adc_fc = GFL_LEVEL6_VOLTAGE_ADC_FILTER_HZ;
+#endif
     ctl_init_gfl_inv(&inv_ctrl, &gfl_init);
 
     ctl_auto_tuning_neg_inv(&gfl_neg_init, &gfl_init);
@@ -127,6 +133,7 @@ void ctl_init()
     offgrid_voltage_init.modulation_limit_pu = GFL_LEVEL6_MODULATION_LIMIT_PU;
     offgrid_voltage_init.active_damping_resistance_ohm = GFL_LEVEL6_ACTIVE_DAMPING_RESISTANCE_OHM;
     offgrid_voltage_init.voltage_slew_v_per_s = GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S;
+    offgrid_voltage_init.capacitor_current_filter_hz = GFL_LEVEL6_CAPACITOR_CURRENT_FILTER_HZ;
     offgrid_voltage_init.default_line_voltage_rms_v = GFL_LEVEL6_OUTPUT_LINE_RMS_V;
     offgrid_voltage_init.default_frequency_hz = GFL_LEVEL6_OUTPUT_FREQUENCY_HZ;
     ctl_init_offgrid_voltage_ctrl(&offgrid_voltage_ctrl, &offgrid_voltage_init);

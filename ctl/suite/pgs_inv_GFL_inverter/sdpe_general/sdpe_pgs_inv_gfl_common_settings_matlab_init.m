@@ -129,6 +129,12 @@ GFL_LEVEL6_FREQUENCY_STEP_HZ = 1.0;
 % Line-to-line RMS soft-start and command slew rate.
 GFL_LEVEL6_VOLTAGE_SLEW_V_PER_S = 100.0;
 
+% Voltage ADC low-pass cutoff used by the Level 6 feedback path.
+GFL_LEVEL6_VOLTAGE_ADC_FILTER_HZ = 3000.0;
+
+% Low-pass cutoff applied after the Level 6 C*dv/dt capacitor-current estimate.
+GFL_LEVEL6_CAPACITOR_CURRENT_FILTER_HZ = 3000.0;
+
 % Proportional design bandwidth for the Level 6 voltage QPR loop.
 GFL_LEVEL6_VOLTAGE_LOOP_BW_HZ = 80.0;
 
