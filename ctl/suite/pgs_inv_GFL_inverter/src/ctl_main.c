@@ -100,6 +100,7 @@ void ctl_init()
     ctl_init_spwm_modulator(&spwm, CTRL_PWM_CMP_MAX, CTRL_PWM_DEADBAND_CMP, &inv_ctrl.adc_iabc->value, float2ctrl(0.02),
                             float2ctrl(0.005));
 #endif // USING_NPC_MODULATOR
+    spwm.flag_enable_deadband_compensator = 1;
 
     //
     // Power controller

@@ -61,8 +61,10 @@ const spi2           = spi.addInstance();
  */
 adc1.$name                          = "IRIS_ADCA";
 adc1.adcClockPrescaler              = "ADC_CLK_DIV_2_0";
+adc1.interruptPulseMode             = "ADC_PULSE_END_OF_CONV";
 adc1.enabledInts                    = ["ADC_INT_NUMBER1"];
 adc1.enableInterrupt1               = true;
+adc1.interrupt1SOCSource            = "ADC_SOC_NUMBER3";
 adc1.enableInterrupt1ContinuousMode = true;
 adc1.registerInterrupts             = ["1"];
 adc1.soc0SampleWindow               = 75;

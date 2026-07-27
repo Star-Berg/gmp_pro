@@ -969,7 +969,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0013559322"
+        "float": "0.013559322"
       },
       "description": "Grid-voltage sensing gain."
     },
