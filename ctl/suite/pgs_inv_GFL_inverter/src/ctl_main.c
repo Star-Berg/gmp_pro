@@ -35,6 +35,9 @@ inv_neg_ctrl_init_t gfl_neg_init;
 inv_neg_ctrl_t neg_current_ctrl;
 gfl_inv_ctrl_init_t gfl_init;
 gfl_inv_ctrl_t inv_ctrl;
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+gfl_level67_voltage_ctrl_t voltage_ctrl;
+#endif
 
 // Input channel
 
@@ -85,8 +88,37 @@ void ctl_init()
     ctl_init_gfl_inv(&inv_ctrl, &gfl_init);
 
     ctl_auto_tuning_neg_inv(&gfl_neg_init, &gfl_init);
+
+#if BUILD_LEVEL == 6
+    gfl_neg_init.seq_filter_q = GFL_LEVEL6_NEG_NOTCH_Q;
+    gfl_neg_init.kp_current = GFL_LEVEL6_NEG_CURRENT_KP;
+    gfl_neg_init.ki_current = GFL_LEVEL6_NEG_CURRENT_KI;
+    gfl_neg_init.limit_current_out = GFL_LEVEL6_NEG_CURRENT_LIMIT_PU;
+    gfl_neg_init.kp_voltage = GFL_LEVEL6_NEG_VOLTAGE_KP;
+    gfl_neg_init.ki_voltage = GFL_LEVEL6_NEG_VOLTAGE_KI;
+    gfl_neg_init.limit_voltage_out = GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU;
+#elif BUILD_LEVEL == 7
+    gfl_neg_init.seq_filter_q = GFL_LEVEL6_NEG_NOTCH_Q;
+    gfl_neg_init.kp_current = GFL_LEVEL7_NEG_CURRENT_KP;
+    gfl_neg_init.ki_current = GFL_LEVEL7_NEG_CURRENT_KI;
+    gfl_neg_init.limit_current_out = GFL_LEVEL7_NEG_CURRENT_LIMIT_PU;
+    gfl_neg_init.kp_voltage = GFL_LEVEL7_NEG_VOLTAGE_KP;
+    gfl_neg_init.ki_voltage = GFL_LEVEL7_NEG_VOLTAGE_KI;
+    gfl_neg_init.limit_voltage_out = GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU;
+#endif
+
     ctl_init_neg_inv(&neg_current_ctrl, &gfl_neg_init);
     ctl_attach_neg_inv_to_gfl(&neg_current_ctrl, &inv_ctrl);
+
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    ctl_init_level67_voltage(&voltage_ctrl, CONTROLLER_FREQUENCY, GFL_GRID_FREQUENCY_HZ,
+                             GFL_LEVEL6_VOLTAGE_D_KP, GFL_LEVEL6_VOLTAGE_D_KI,
+                             GFL_LEVEL6_VOLTAGE_Q_KP, GFL_LEVEL6_VOLTAGE_Q_KI,
+                             GFL_LEVEL6_CURRENT_LIMIT_PU, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q,
+                             GFL_LEVEL7_DDSRF_FILTER_FC_HZ);
+    voltage_ctrl.vdq_set.dat[phase_d] = float2ctrl(GFL_LEVEL6_VD_REF_PU);
+    voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
+#endif
 
     //
     // init SPWM modulator
@@ -154,6 +186,21 @@ void ctl_init()
     ctl_enable_gfl_inv_active_damp(&inv_ctrl);
     ctl_enable_gfl_inv_lead_compensator(&inv_ctrl);
     ctl_enable_gfl_pq_ctrl(&pq_ctrl);
+
+#elif BUILD_LEVEL == 6
+    // Cascaded positive voltage/current loops with the existing notch-based negative sequence loops.
+    ctl_set_gfl_inv_current_mode(&inv_ctrl);
+    ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
+    inv_ctrl.flag_enable_decouple = 1;
+    ctl_enable_neg_voltage_inv(&neg_current_ctrl);
+
+#elif BUILD_LEVEL == 7
+    // Level 6 voltage control with DDSRF positive/negative sequence separation.
+    ctl_set_gfl_inv_current_mode(&inv_ctrl);
+    ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
+    inv_ctrl.flag_enable_current_ctrl = 0;
+    inv_ctrl.flag_enable_decouple = 1;
+    ctl_enable_neg_voltage_inv(&neg_current_ctrl);
 
 #endif // BUILD_LEVEL
 
@@ -228,11 +275,18 @@ void ctl_enable_pwm()
 void ctl_disable_pwm()
 {
     ctl_fast_disable_output();
+    ctl_disable_gfl_inv(&inv_ctrl);
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
+#endif
 
     // clear controller here
     ctl_clear_gfl_inv(&inv_ctrl);
     ctl_clear_neg_inv(&neg_current_ctrl);
     ctl_clear_gfl_pq(&pq_ctrl);
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    ctl_clear_level67_voltage(&voltage_ctrl);
+#endif
     pq_loop_tick = 0;
 }
 

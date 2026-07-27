@@ -177,6 +177,116 @@ extern "C"
 #define GFL_CURRENT_LEVEL4_IQ_PU (0.6f)
 
 /**
+ * @brief BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
+ */
+#define GFL_LEVEL6_VD_REF_PU (0.33f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
+ */
+#define GFL_LEVEL6_VQ_REF_PU (0.0f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 d-axis voltage-loop proportional gain.
+ */
+#define GFL_LEVEL6_VOLTAGE_D_KP (0.0029f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 d-axis series-PI integral frequency in radians per second.
+ */
+#define GFL_LEVEL6_VOLTAGE_D_KI (25.132741f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 q-axis voltage-loop proportional gain.
+ */
+#define GFL_LEVEL6_VOLTAGE_Q_KP (0.0029f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 q-axis series-PI integral frequency in radians per second.
+ */
+#define GFL_LEVEL6_VOLTAGE_Q_KI (25.132741f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 circular positive d/q current-reference limit in per unit.
+ */
+#define GFL_LEVEL6_CURRENT_LIMIT_PU (0.3f)
+
+/**
+ * @brief BUILD_LEVEL 6 positive voltage-feedback 2-omega notch quality factor.
+ */
+#define GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q (5.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative-sequence 2-omega notch quality factor.
+ */
+#define GFL_LEVEL6_NEG_NOTCH_Q (5.0f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative-sequence current-loop proportional gain.
+ */
+#define GFL_LEVEL6_NEG_CURRENT_KP (0.2040f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative-sequence current-loop series-PI integral frequency in radians per second.
+ */
+#define GFL_LEVEL6_NEG_CURRENT_KI (62.831853f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative current-loop voltage-output limit in per unit.
+ */
+#define GFL_LEVEL6_NEG_CURRENT_LIMIT_PU (0.3f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative-sequence voltage-loop proportional gain.
+ */
+#define GFL_LEVEL6_NEG_VOLTAGE_KP (0.0029f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative-sequence voltage-loop series-PI integral frequency in radians per second.
+ */
+#define GFL_LEVEL6_NEG_VOLTAGE_KI (25.132741f)
+
+/**
+ * @brief BUILD_LEVEL 6 negative voltage-loop current-reference limit in per unit.
+ */
+#define GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU (0.2f)
+
+/**
+ * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
+ */
+#define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (35.355339f)
+
+/**
+ * @brief BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
+ */
+#define GFL_LEVEL7_NEG_CURRENT_KP (GFL_LEVEL6_NEG_CURRENT_KP)
+
+/**
+ * @brief BUILD_LEVEL 7 negative current-loop Ki; defaults to the Level 6 value.
+ */
+#define GFL_LEVEL7_NEG_CURRENT_KI (GFL_LEVEL6_NEG_CURRENT_KI)
+
+/**
+ * @brief BUILD_LEVEL 7 negative current-loop output limit; defaults to Level 6.
+ */
+#define GFL_LEVEL7_NEG_CURRENT_LIMIT_PU (GFL_LEVEL6_NEG_CURRENT_LIMIT_PU)
+
+/**
+ * @brief BUILD_LEVEL 7 negative voltage-loop Kp; defaults to the Level 6 value.
+ */
+#define GFL_LEVEL7_NEG_VOLTAGE_KP (GFL_LEVEL6_NEG_VOLTAGE_KP)
+
+/**
+ * @brief BUILD_LEVEL 7 negative voltage-loop Ki; defaults to the Level 6 value.
+ */
+#define GFL_LEVEL7_NEG_VOLTAGE_KI (GFL_LEVEL6_NEG_VOLTAGE_KI)
+
+/**
+ * @brief BUILD_LEVEL 7 negative voltage-loop output limit; defaults to Level 6.
+ */
+#define GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU (GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU)
+
+/**
  * @brief ADC offset calibrator filter cutoff frequency.
  */
 #define GFL_ADC_CALIBRATOR_FC_HZ (20.0f)

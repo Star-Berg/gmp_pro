@@ -224,6 +224,182 @@
       "description": "BUILD_LEVEL 4 q-axis current command."
     },
     {
+      "role": "level6_vd_ref",
+      "macro": "GFL_LEVEL6_VD_REF_PU",
+      "binding": {
+        "float": "0.33"
+      },
+      "description": "BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit."
+    },
+    {
+      "role": "level6_vq_ref",
+      "macro": "GFL_LEVEL6_VQ_REF_PU",
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit."
+    },
+    {
+      "role": "level6_voltage_d_kp",
+      "macro": "GFL_LEVEL6_VOLTAGE_D_KP",
+      "binding": {
+        "float": "0.0029"
+      },
+      "description": "BUILD_LEVEL 6/7 d-axis voltage-loop proportional gain."
+    },
+    {
+      "role": "level6_voltage_d_ki",
+      "macro": "GFL_LEVEL6_VOLTAGE_D_KI",
+      "binding": {
+        "float": "25.132741"
+      },
+      "description": "BUILD_LEVEL 6/7 d-axis series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_voltage_q_kp",
+      "macro": "GFL_LEVEL6_VOLTAGE_Q_KP",
+      "binding": {
+        "float": "0.0029"
+      },
+      "description": "BUILD_LEVEL 6/7 q-axis voltage-loop proportional gain."
+    },
+    {
+      "role": "level6_voltage_q_ki",
+      "macro": "GFL_LEVEL6_VOLTAGE_Q_KI",
+      "binding": {
+        "float": "25.132741"
+      },
+      "description": "BUILD_LEVEL 6/7 q-axis series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_current_limit",
+      "macro": "GFL_LEVEL6_CURRENT_LIMIT_PU",
+      "binding": {
+        "float": "0.3"
+      },
+      "description": "BUILD_LEVEL 6/7 circular positive d/q current-reference limit in per unit."
+    },
+    {
+      "role": "level6_pos_voltage_notch_q",
+      "macro": "GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q",
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "BUILD_LEVEL 6 positive voltage-feedback 2-omega notch quality factor."
+    },
+    {
+      "role": "level6_neg_notch_q",
+      "macro": "GFL_LEVEL6_NEG_NOTCH_Q",
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence 2-omega notch quality factor."
+    },
+    {
+      "role": "level6_neg_current_kp",
+      "macro": "GFL_LEVEL6_NEG_CURRENT_KP",
+      "binding": {
+        "float": "0.2040"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence current-loop proportional gain."
+    },
+    {
+      "role": "level6_neg_current_ki",
+      "macro": "GFL_LEVEL6_NEG_CURRENT_KI",
+      "binding": {
+        "float": "62.831853"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence current-loop series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_neg_current_limit",
+      "macro": "GFL_LEVEL6_NEG_CURRENT_LIMIT_PU",
+      "binding": {
+        "float": "0.3"
+      },
+      "description": "BUILD_LEVEL 6 negative current-loop voltage-output limit in per unit."
+    },
+    {
+      "role": "level6_neg_voltage_kp",
+      "macro": "GFL_LEVEL6_NEG_VOLTAGE_KP",
+      "binding": {
+        "float": "0.0029"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence voltage-loop proportional gain."
+    },
+    {
+      "role": "level6_neg_voltage_ki",
+      "macro": "GFL_LEVEL6_NEG_VOLTAGE_KI",
+      "binding": {
+        "float": "25.132741"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence voltage-loop series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_neg_voltage_limit",
+      "macro": "GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU",
+      "binding": {
+        "float": "0.2"
+      },
+      "description": "BUILD_LEVEL 6 negative voltage-loop current-reference limit in per unit."
+    },
+    {
+      "role": "level7_ddsrf_filter_fc",
+      "macro": "GFL_LEVEL7_DDSRF_FILTER_FC_HZ",
+      "binding": {
+        "float": "35.355339"
+      },
+      "description": "BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz."
+    },
+    {
+      "role": "level7_neg_current_kp",
+      "macro": "GFL_LEVEL7_NEG_CURRENT_KP",
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_CURRENT_KP)"
+      },
+      "description": "BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_current_ki",
+      "macro": "GFL_LEVEL7_NEG_CURRENT_KI",
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_CURRENT_KI)"
+      },
+      "description": "BUILD_LEVEL 7 negative current-loop Ki; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_current_limit",
+      "macro": "GFL_LEVEL7_NEG_CURRENT_LIMIT_PU",
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_CURRENT_LIMIT_PU)"
+      },
+      "description": "BUILD_LEVEL 7 negative current-loop output limit; defaults to Level 6."
+    },
+    {
+      "role": "level7_neg_voltage_kp",
+      "macro": "GFL_LEVEL7_NEG_VOLTAGE_KP",
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_VOLTAGE_KP)"
+      },
+      "description": "BUILD_LEVEL 7 negative voltage-loop Kp; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_voltage_ki",
+      "macro": "GFL_LEVEL7_NEG_VOLTAGE_KI",
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_VOLTAGE_KI)"
+      },
+      "description": "BUILD_LEVEL 7 negative voltage-loop Ki; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_voltage_limit",
+      "macro": "GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU",
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU)"
+      },
+      "description": "BUILD_LEVEL 7 negative voltage-loop output limit; defaults to Level 6."
+    },
+    {
       "role": "adc_calibrator_cutoff",
       "macro": "GFL_ADC_CALIBRATOR_FC_HZ",
       "binding": {
@@ -284,6 +460,38 @@
         "level3_iq",
         "level4_id",
         "level4_iq"
+      ]
+    },
+    {
+      "name": "BUILD LEVEL 6/7 Common Voltage Control",
+      "requirements": [
+        "level6_vd_ref",
+        "level6_vq_ref",
+        "level6_voltage_d_kp",
+        "level6_voltage_d_ki",
+        "level6_voltage_q_kp",
+        "level6_voltage_q_ki",
+        "level6_current_limit",
+        "level6_pos_voltage_notch_q",
+        "level6_neg_notch_q",
+        "level6_neg_current_kp",
+        "level6_neg_current_ki",
+        "level6_neg_current_limit",
+        "level6_neg_voltage_kp",
+        "level6_neg_voltage_ki",
+        "level6_neg_voltage_limit"
+      ]
+    },
+    {
+      "name": "BUILD LEVEL 7 DDSRF Control",
+      "requirements": [
+        "level7_ddsrf_filter_fc",
+        "level7_neg_current_kp",
+        "level7_neg_current_ki",
+        "level7_neg_current_limit",
+        "level7_neg_voltage_kp",
+        "level7_neg_voltage_ki",
+        "level7_neg_voltage_limit"
       ]
     },
     {

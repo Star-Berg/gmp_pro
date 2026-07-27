@@ -22,6 +22,10 @@
 #include <ctl/component/digital_power/inv/inv_hcm.h>
 #include <ctl/component/digital_power/inv/inv_neg_ctrl.h>
 
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+#include "ctl_level67_voltage.h"
+#endif
+
 #include <ctl/component/interface/spwm_modulator.h>
 
 #include <ctl/framework/cia402_state_machine.h>
@@ -46,6 +50,9 @@ extern gfl_inv_ctrl_t inv_ctrl;
 extern gfl_pq_ctrl_t pq_ctrl;
 extern inv_neg_ctrl_init_t gfl_neg_init;
 extern inv_neg_ctrl_t neg_current_ctrl;
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+extern gfl_level67_voltage_ctrl_t voltage_ctrl;
+#endif
 
 // Input channel
 
@@ -94,7 +101,37 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
     {
         // run controller body
         ctl_step_gfl_inv_ctrl(&inv_ctrl);
+
+#if BUILD_LEVEL == 6
+        if (inv_ctrl.flag_enable_system)
+        {
+            ctl_step_level6_voltage(&voltage_ctrl, &inv_ctrl.vdq);
+            ctl_set_gfl_inv_current(&inv_ctrl, voltage_ctrl.idq_ref.dat[phase_d],
+                                    voltage_ctrl.idq_ref.dat[phase_q]);
+            ctl_step_neg_inv_ctrl(&neg_current_ctrl);
+        }
+        else
+        {
+            ctl_vector2_clear(&neg_current_ctrl.vab_out);
+        }
+#elif BUILD_LEVEL == 7
+        if (inv_ctrl.flag_enable_system)
+        {
+            ctl_step_level7_voltage(&voltage_ctrl, (ctl_vector2_t*)&inv_ctrl.vab0,
+                                    (ctl_vector2_t*)&inv_ctrl.iab0, &inv_ctrl.phasor);
+            ctl_set_gfl_inv_current(&inv_ctrl, voltage_ctrl.idq_ref.dat[phase_d],
+                                    voltage_ctrl.idq_ref.dat[phase_q]);
+            ctl_step_level7_positive_current(&inv_ctrl, &voltage_ctrl.current_seq.pos_decoupled);
+            ctl_step_neg_inv_ctrl_dq(&neg_current_ctrl, &voltage_ctrl.current_seq.neg_decoupled,
+                                     &voltage_ctrl.voltage_seq.neg_dc);
+        }
+        else
+        {
+            ctl_vector2_clear(&neg_current_ctrl.vab_out);
+        }
+#else
         ctl_step_neg_inv_ctrl(&neg_current_ctrl);
+#endif
 
         // Run the P/Q outer loop at its own lower rate. The current loop keeps
         // executing every ISR and consumes the most recent current reference.
