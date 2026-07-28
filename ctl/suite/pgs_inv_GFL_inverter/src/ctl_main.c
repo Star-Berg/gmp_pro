@@ -85,6 +85,12 @@ void ctl_init()
     gfl_init.grid_filter_C = GFL_GRID_FILTER_CAPACITANCE_F;
 
     ctl_auto_tuning_gfl_inv(&gfl_init);
+#if BUILD_LEVEL == 2
+    // Level 2 is the first hardware current-loop test. Use a lower input
+    // bandwidth to reject PWM-related ADC noise without materially reducing
+    // phase margin at the auto-tuned current-loop crossover.
+    gfl_init.current_adc_fc = GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ;
+#endif
     ctl_init_gfl_inv(&inv_ctrl, &gfl_init);
 
     ctl_auto_tuning_neg_inv(&gfl_neg_init, &gfl_init);

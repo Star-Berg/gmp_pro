@@ -64,7 +64,7 @@ extern "C"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_ID "pgs_inv_gfl_f280039c_iris_node"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-15"
+#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-28"
 
 //=================================================================================================
 /**
@@ -110,11 +110,6 @@ extern "C"
  */
 
 /**
- * @brief Startup delay in milliseconds.
- */
-#define CTRL_STARTUP_DELAY (100)
-
-/**
  * @brief Current-loop and PWM update frequency in hertz.
  */
 #define CONTROLLER_FREQUENCY (20e3)
@@ -147,7 +142,7 @@ extern "C"
 /**
  * @brief DC-bus per-unit voltage base.
  */
-#define CTRL_DCBUS_VOLTAGE (80.0f)
+#define CTRL_DCBUS_VOLTAGE (60.0f)
 
 /**
  * @brief SVPWM phase-voltage base.
@@ -170,14 +165,14 @@ extern "C"
 #define GFL_GRID_FILTER_CAPACITANCE_F (HARMONIA_3PH_LC_FILTER_CAPACITANCE_F)
 
 /**
- * @brief Grid-current sensitivity in volts per ampere.
+ * @brief DC-link voltage sensing gain.
  */
-#define CTRL_GRID_CURRENT_SENSITIVITY (HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
 
 /**
- * @brief Grid-current zero bias.
+ * @brief DC-link voltage sensing bias.
  */
-#define CTRL_GRID_CURRENT_BIAS (HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)
+#define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
  * @brief Grid-voltage sensing gain.
@@ -188,16 +183,6 @@ extern "C"
  * @brief Grid-voltage sensing bias.
  */
 #define CTRL_GRID_VOLTAGE_BIAS (HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V)
-
-/**
- * @brief Validated Helios phase-current sensitivity in volts per ampere.
- */
-#define CTRL_INVERTER_CURRENT_SENSITIVITY (0.05f)
-
-/**
- * @brief Helios phase-current zero bias.
- */
-#define CTRL_INVERTER_CURRENT_BIAS (1.65f)
 
 /**
  * @brief Helios phase-voltage sensing gain.
@@ -212,7 +197,7 @@ extern "C"
 /**
  * @brief DC-link current sensitivity in volts per ampere.
  */
-#define CTRL_DC_CURRENT_SENSITIVITY (0.02475f)
+#define CTRL_DC_CURRENT_SENSITIVITY (0.15f)
 
 /**
  * @brief DC-link current zero bias.
@@ -220,14 +205,29 @@ extern "C"
 #define CTRL_DC_CURRENT_BIAS (1.65f)
 
 /**
- * @brief DC-link voltage sensing gain.
+ * @brief Grid-current sensitivity in volts per ampere.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
+#define CTRL_GRID_CURRENT_SENSITIVITY (0.15f)
 
 /**
- * @brief DC-link voltage sensing bias.
+ * @brief Grid-current zero bias.
  */
-#define CTRL_DC_VOLTAGE_BIAS (0.0f)
+#define CTRL_GRID_CURRENT_BIAS (HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)
+
+/**
+ * @brief Validated Helios phase-current sensitivity in volts per ampere.
+ */
+#define CTRL_INVERTER_CURRENT_SENSITIVITY (0.05f)
+
+/**
+ * @brief Helios phase-current zero bias.
+ */
+#define CTRL_INVERTER_CURRENT_BIAS (1.65f)
+
+/**
+ * @brief Startup delay in milliseconds.
+ */
+#define CTRL_STARTUP_DELAY (100)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)

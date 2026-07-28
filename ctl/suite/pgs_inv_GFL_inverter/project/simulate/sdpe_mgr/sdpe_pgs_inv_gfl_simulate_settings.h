@@ -26,7 +26,7 @@ extern "C"
 #define PGS_INV_GFL_SIM_SDPE_PROJECT_ID "pgs_inv_gfl_simulate"
 #define PGS_INV_GFL_SIM_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_SIM_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-15"
+#define PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT "2026-07-28"
 
 //=================================================================================================
 /**
@@ -62,11 +62,6 @@ extern "C"
  */
 
 /**
- * @brief Startup delay in milliseconds.
- */
-#define CTRL_STARTUP_DELAY (50)
-
-/**
  * @brief Simulation control step frequency.
  */
 #define CONTROLLER_FREQUENCY (20e3)
@@ -89,7 +84,7 @@ extern "C"
 /**
  * @brief DC-bus voltage base.
  */
-#define CTRL_DCBUS_VOLTAGE (80.0f)
+#define CTRL_DCBUS_VOLTAGE (60.0f)
 
 /**
  * @brief SVPWM phase-voltage base.
@@ -112,14 +107,14 @@ extern "C"
 #define GFL_GRID_FILTER_CAPACITANCE_F (HARMONIA_3PH_LC_FILTER_CAPACITANCE_F)
 
 /**
- * @brief Grid-current sensitivity.
+ * @brief DC voltage gain.
  */
-#define CTRL_GRID_CURRENT_SENSITIVITY (HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
 
 /**
- * @brief Grid-current bias.
+ * @brief DC voltage bias.
  */
-#define CTRL_GRID_CURRENT_BIAS (HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)
+#define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
  * @brief Grid-voltage gain.
@@ -130,16 +125,6 @@ extern "C"
  * @brief Grid-voltage bias.
  */
 #define CTRL_GRID_VOLTAGE_BIAS (HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V)
-
-/**
- * @brief Converter current sensitivity.
- */
-#define CTRL_INVERTER_CURRENT_SENSITIVITY (0.05f)
-
-/**
- * @brief Converter current bias.
- */
-#define CTRL_INVERTER_CURRENT_BIAS (1.65f)
 
 /**
  * @brief Converter voltage gain.
@@ -162,14 +147,29 @@ extern "C"
 #define CTRL_DC_CURRENT_BIAS (1.65f)
 
 /**
- * @brief DC voltage gain.
+ * @brief Grid-current sensitivity.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
+#define CTRL_GRID_CURRENT_SENSITIVITY (HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)
 
 /**
- * @brief DC voltage bias.
+ * @brief Grid-current bias.
  */
-#define CTRL_DC_VOLTAGE_BIAS (0.0f)
+#define CTRL_GRID_CURRENT_BIAS (HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)
+
+/**
+ * @brief Converter current sensitivity.
+ */
+#define CTRL_INVERTER_CURRENT_SENSITIVITY (0.05f)
+
+/**
+ * @brief Converter current bias.
+ */
+#define CTRL_INVERTER_CURRENT_BIAS (1.65f)
+
+/**
+ * @brief Startup delay in milliseconds.
+ */
+#define CTRL_STARTUP_DELAY (50)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)
