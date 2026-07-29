@@ -415,11 +415,23 @@ CTRL_DC_VOLTAGE_SENSITIVITY = 0.02738589;
 % DC-link voltage sensing bias.
 CTRL_DC_VOLTAGE_BIAS = 0.0;
 
-% Grid-voltage sensing gain.
-CTRL_GRID_VOLTAGE_SENSITIVITY = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN;
+% LC-board phase-A (U) voltage sensitivity in volts per volt.
+CTRL_GRID_VOLTAGE_A_SENSITIVITY = 0.0133760665;
 
-% Grid-voltage sensing bias.
-CTRL_GRID_VOLTAGE_BIAS = HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V;
+% LC-board phase-A (U) voltage-sensor bias in volts.
+CTRL_GRID_VOLTAGE_A_BIAS = 1.6608797884;
+
+% LC-board phase-B (V) voltage sensitivity in volts per volt.
+CTRL_GRID_VOLTAGE_B_SENSITIVITY = 0.0134189286;
+
+% LC-board phase-B (V) voltage-sensor bias in volts.
+CTRL_GRID_VOLTAGE_B_BIAS = 1.6542464286;
+
+% LC-board phase-C (W) voltage sensitivity in volts per volt.
+CTRL_GRID_VOLTAGE_C_SENSITIVITY = 0.0134290098;
+
+% LC-board phase-C (W) voltage-sensor bias in volts.
+CTRL_GRID_VOLTAGE_C_BIAS = 1.6549623557;
 
 % Helios phase-voltage sensing gain.
 CTRL_INVERTER_VOLTAGE_SENSITIVITY = 0.02738589;
@@ -433,11 +445,23 @@ CTRL_DC_CURRENT_SENSITIVITY = 0.15;
 % DC-link current zero bias.
 CTRL_DC_CURRENT_BIAS = 1.65;
 
-% Grid-current sensitivity in volts per ampere.
-CTRL_GRID_CURRENT_SENSITIVITY = 0.15;
+% LC-board phase-A (U) current sensitivity in volts per ampere.
+CTRL_GRID_CURRENT_A_SENSITIVITY = 0.1503832007;
 
-% Grid-current zero bias.
-CTRL_GRID_CURRENT_BIAS = HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V;
+% LC-board phase-A (U) current-sensor zero bias in volts.
+CTRL_GRID_CURRENT_A_BIAS = 1.6531446197;
+
+% LC-board phase-B (V) current sensitivity in volts per ampere.
+CTRL_GRID_CURRENT_B_SENSITIVITY = 0.1501000000;
+
+% LC-board phase-B (V) current-sensor zero bias in volts.
+CTRL_GRID_CURRENT_B_BIAS = 1.6534500000;
+
+% LC-board phase-C (W) current sensitivity in volts per ampere.
+CTRL_GRID_CURRENT_C_SENSITIVITY = 0.1503476190;
+
+% LC-board phase-C (W) current-sensor zero bias in volts.
+CTRL_GRID_CURRENT_C_BIAS = 1.6539083333;
 
 % Validated Helios phase-current sensitivity in volts per ampere.
 CTRL_INVERTER_CURRENT_SENSITIVITY = 0.05;

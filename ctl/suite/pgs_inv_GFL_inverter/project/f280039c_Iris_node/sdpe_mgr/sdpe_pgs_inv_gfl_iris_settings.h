@@ -175,14 +175,34 @@ extern "C"
 #define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 /**
- * @brief Grid-voltage sensing gain.
+ * @brief LC-board phase-A (U) voltage sensitivity in volts per volt.
  */
-#define CTRL_GRID_VOLTAGE_SENSITIVITY (HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN)
+#define CTRL_GRID_VOLTAGE_A_SENSITIVITY (0.0133760665f)
 
 /**
- * @brief Grid-voltage sensing bias.
+ * @brief LC-board phase-A (U) voltage-sensor bias in volts.
  */
-#define CTRL_GRID_VOLTAGE_BIAS (HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V)
+#define CTRL_GRID_VOLTAGE_A_BIAS (1.6608797884f)
+
+/**
+ * @brief LC-board phase-B (V) voltage sensitivity in volts per volt.
+ */
+#define CTRL_GRID_VOLTAGE_B_SENSITIVITY (0.0134189286f)
+
+/**
+ * @brief LC-board phase-B (V) voltage-sensor bias in volts.
+ */
+#define CTRL_GRID_VOLTAGE_B_BIAS (1.6542464286f)
+
+/**
+ * @brief LC-board phase-C (W) voltage sensitivity in volts per volt.
+ */
+#define CTRL_GRID_VOLTAGE_C_SENSITIVITY (0.0134290098f)
+
+/**
+ * @brief LC-board phase-C (W) voltage-sensor bias in volts.
+ */
+#define CTRL_GRID_VOLTAGE_C_BIAS (1.6549623557f)
 
 /**
  * @brief Helios phase-voltage sensing gain.
@@ -205,14 +225,34 @@ extern "C"
 #define CTRL_DC_CURRENT_BIAS (1.65f)
 
 /**
- * @brief Grid-current sensitivity in volts per ampere.
+ * @brief LC-board phase-A (U) current sensitivity in volts per ampere.
  */
-#define CTRL_GRID_CURRENT_SENSITIVITY (0.15f)
+#define CTRL_GRID_CURRENT_A_SENSITIVITY (0.1503832007f)
 
 /**
- * @brief Grid-current zero bias.
+ * @brief LC-board phase-A (U) current-sensor zero bias in volts.
  */
-#define CTRL_GRID_CURRENT_BIAS (HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)
+#define CTRL_GRID_CURRENT_A_BIAS (1.6531446197f)
+
+/**
+ * @brief LC-board phase-B (V) current sensitivity in volts per ampere.
+ */
+#define CTRL_GRID_CURRENT_B_SENSITIVITY (0.1501000000f)
+
+/**
+ * @brief LC-board phase-B (V) current-sensor zero bias in volts.
+ */
+#define CTRL_GRID_CURRENT_B_BIAS (1.6534500000f)
+
+/**
+ * @brief LC-board phase-C (W) current sensitivity in volts per ampere.
+ */
+#define CTRL_GRID_CURRENT_C_SENSITIVITY (0.1503476190f)
+
+/**
+ * @brief LC-board phase-C (W) current-sensor zero bias in volts.
+ */
+#define CTRL_GRID_CURRENT_C_BIAS (1.6539083333f)
 
 /**
  * @brief Validated Helios phase-current sensitivity in volts per ampere.

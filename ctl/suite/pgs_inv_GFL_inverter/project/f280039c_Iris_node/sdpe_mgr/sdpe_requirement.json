@@ -210,24 +210,64 @@
       "description": "DC-link voltage sensing bias."
     },
     {
-      "role": "grid_voltage_sensitivity",
-      "macro": "CTRL_GRID_VOLTAGE_SENSITIVITY",
+      "role": "grid_voltage_a_sensitivity",
+      "macro": "CTRL_GRID_VOLTAGE_A_SENSITIVITY",
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN)"
+        "float": "0.0133760665"
       },
-      "description": "Grid-voltage sensing gain."
+      "description": "LC-board phase-A (U) voltage sensitivity in volts per volt."
     },
     {
-      "role": "grid_voltage_bias",
-      "macro": "CTRL_GRID_VOLTAGE_BIAS",
+      "role": "grid_voltage_a_bias",
+      "macro": "CTRL_GRID_VOLTAGE_A_BIAS",
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V)"
+        "float": "1.6608797884"
       },
-      "description": "Grid-voltage sensing bias."
+      "description": "LC-board phase-A (U) voltage-sensor bias in volts."
+    },
+    {
+      "role": "grid_voltage_b_sensitivity",
+      "macro": "CTRL_GRID_VOLTAGE_B_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0134189286"
+      },
+      "description": "LC-board phase-B (V) voltage sensitivity in volts per volt."
+    },
+    {
+      "role": "grid_voltage_b_bias",
+      "macro": "CTRL_GRID_VOLTAGE_B_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.6542464286"
+      },
+      "description": "LC-board phase-B (V) voltage-sensor bias in volts."
+    },
+    {
+      "role": "grid_voltage_c_sensitivity",
+      "macro": "CTRL_GRID_VOLTAGE_C_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0134290098"
+      },
+      "description": "LC-board phase-C (W) voltage sensitivity in volts per volt."
+    },
+    {
+      "role": "grid_voltage_c_bias",
+      "macro": "CTRL_GRID_VOLTAGE_C_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.6549623557"
+      },
+      "description": "LC-board phase-C (W) voltage-sensor bias in volts."
     },
     {
       "role": "inverter_voltage_sensitivity",
@@ -270,24 +310,64 @@
       "description": "DC-link current zero bias."
     },
     {
-      "role": "grid_current_sensitivity",
-      "macro": "CTRL_GRID_CURRENT_SENSITIVITY",
+      "role": "grid_current_a_sensitivity",
+      "macro": "CTRL_GRID_CURRENT_A_SENSITIVITY",
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.15"
+        "float": "0.1503832007"
       },
-      "description": "Grid-current sensitivity in volts per ampere."
+      "description": "LC-board phase-A (U) current sensitivity in volts per ampere."
     },
     {
-      "role": "grid_current_bias",
-      "macro": "CTRL_GRID_CURRENT_BIAS",
+      "role": "grid_current_a_bias",
+      "macro": "CTRL_GRID_CURRENT_A_BIAS",
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)"
+        "float": "1.6531446197"
       },
-      "description": "Grid-current zero bias."
+      "description": "LC-board phase-A (U) current-sensor zero bias in volts."
+    },
+    {
+      "role": "grid_current_b_sensitivity",
+      "macro": "CTRL_GRID_CURRENT_B_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.1501000000"
+      },
+      "description": "LC-board phase-B (V) current sensitivity in volts per ampere."
+    },
+    {
+      "role": "grid_current_b_bias",
+      "macro": "CTRL_GRID_CURRENT_B_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.6534500000"
+      },
+      "description": "LC-board phase-B (V) current-sensor zero bias in volts."
+    },
+    {
+      "role": "grid_current_c_sensitivity",
+      "macro": "CTRL_GRID_CURRENT_C_SENSITIVITY",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.1503476190"
+      },
+      "description": "LC-board phase-C (W) current sensitivity in volts per ampere."
+    },
+    {
+      "role": "grid_current_c_bias",
+      "macro": "CTRL_GRID_CURRENT_C_BIAS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.6539083333"
+      },
+      "description": "LC-board phase-C (W) current-sensor zero bias in volts."
     },
     {
       "role": "inverter_current_sensitivity",
@@ -355,10 +435,14 @@
       ]
     },
     {
-      "name": "Grid Voltage Sensor",
+      "name": "ABC-side Voltage Sensors",
       "requirements": [
-        "grid_voltage_sensitivity",
-        "grid_voltage_bias"
+        "grid_voltage_a_sensitivity",
+        "grid_voltage_a_bias",
+        "grid_voltage_b_sensitivity",
+        "grid_voltage_b_bias",
+        "grid_voltage_c_sensitivity",
+        "grid_voltage_c_bias"
       ]
     },
     {
@@ -376,10 +460,14 @@
       ]
     },
     {
-      "name": "Grid Current Sensor",
+      "name": "ABC-side Current Sensors",
       "requirements": [
-        "grid_current_sensitivity",
-        "grid_current_bias"
+        "grid_current_a_sensitivity",
+        "grid_current_a_bias",
+        "grid_current_b_sensitivity",
+        "grid_current_b_bias",
+        "grid_current_c_sensitivity",
+        "grid_current_c_bias"
       ]
     },
     {
