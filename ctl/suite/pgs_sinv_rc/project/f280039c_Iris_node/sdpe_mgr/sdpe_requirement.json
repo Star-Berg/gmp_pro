@@ -33,7 +33,7 @@
     {
       "group": "Sensing and Calibration",
       "macro": "SPECIFY_ENABLE_ADC_CALIBRATE",
-      "enabled": true,
+      "enabled": false,
       "weak": false,
       "value": "",
       "description": "Enable ADC calibration."
@@ -611,7 +611,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "export": "gmp_lvfb_150_2ph_v2.voltage_sensitivity"
+        "float": "0.02674418"
       },
       "description": "DC bus voltage sensing gain from the LVFB inverter voltage sensor."
     },

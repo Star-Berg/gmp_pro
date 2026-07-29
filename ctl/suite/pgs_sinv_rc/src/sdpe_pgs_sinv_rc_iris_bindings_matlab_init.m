@@ -345,8 +345,8 @@ HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V = TLE4971A025_BIAS_V;
 USE_DEBUG_DISCRETE_PID = true;
 
 %% Sensing and Calibration
-% Enable ADC calibration.
-SPECIFY_ENABLE_ADC_CALIBRATE = true;
+% SPECIFY_ENABLE_ADC_CALIBRATE is disabled in the SDPE project requirement.
+% SPECIFY_ENABLE_ADC_CALIBRATE = true;
 
 %% Control Features
 % Allow ENABLE_OPERATION to advance through the complete CiA402 startup sequence.
@@ -503,7 +503,7 @@ CTRL_AC_INDUCTANCE = 0.0015;
 CTRL_AC_RESISTANCE = 0.1;
 
 % DC bus voltage sensing gain from the LVFB inverter voltage sensor.
-CTRL_DC_VOLTAGE_SENSITIVITY = GMP_LVFB_VOLTAGE_SENSITIVITY;
+CTRL_DC_VOLTAGE_SENSITIVITY = 0.02674418;
 
 % DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
 CTRL_DC_VOLTAGE_BIAS = GMP_LVFB_VOLTAGE_BIAS_V;

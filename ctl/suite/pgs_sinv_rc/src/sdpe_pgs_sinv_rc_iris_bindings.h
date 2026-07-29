@@ -49,7 +49,7 @@ extern "C"
 /**
  * @brief Enable ADC calibration.
  */
-#define SPECIFY_ENABLE_ADC_CALIBRATE
+// #define SPECIFY_ENABLE_ADC_CALIBRATE
 
 //=================================================================================================
 /**
@@ -338,7 +338,7 @@ extern "C"
 /**
  * @brief DC bus voltage sensing gain from the LVFB inverter voltage sensor.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY GMP_LVFB_VOLTAGE_SENSITIVITY
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02674418f)
 
 /**
  * @brief DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
