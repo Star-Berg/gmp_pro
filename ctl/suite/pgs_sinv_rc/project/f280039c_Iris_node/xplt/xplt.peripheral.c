@@ -56,6 +56,16 @@ void setup_peripheral(void)
 
     user_led = SYSTEM_LED;
 
+#if SINV_INVERTER_READY_OUTPUT_ENABLE
+#if SINV_INVERTER_READY_ACTIVE_LEVEL == 0U
+    GPIO_writePin(SINV_INVERTER_READY_GPIO, 1U);
+#else
+    GPIO_writePin(SINV_INVERTER_READY_GPIO, 0U);
+#endif
+    GPIO_setPadConfig(SINV_INVERTER_READY_GPIO, GPIO_PIN_TYPE_STD);
+    GPIO_setDirectionMode(SINV_INVERTER_READY_GPIO, GPIO_DIR_MODE_OUT);
+#endif
+
     // ---------------------------------------------------------
     // 1. Initialize AC Grid Voltage ADC Channel
     // ---------------------------------------------------------
@@ -158,6 +168,17 @@ void reset_controller(void)
         ;
 
     GPIO_WritePin(PWM_RESET_PORT, 1);
+}
+
+void xplt_set_inverter_ready_output(fast_gt ready)
+{
+#if SINV_INVERTER_READY_OUTPUT_ENABLE
+    uint32_t output_level = ready ? SINV_INVERTER_READY_ACTIVE_LEVEL
+                                  : (SINV_INVERTER_READY_ACTIVE_LEVEL ^ 1U);
+    GPIO_writePin(SINV_INVERTER_READY_GPIO, output_level);
+#else
+    GMP_UNUSED_VAR(ready);
+#endif
 }
 
 //=================================================================================================

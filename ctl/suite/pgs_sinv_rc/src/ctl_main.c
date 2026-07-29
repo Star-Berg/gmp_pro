@@ -200,6 +200,31 @@ void ctl_init(void)
 //=================================================================================================
 // CTL endless loop routine
 
+void ctl_update_inverter_ready_output(void)
+{
+#if SINV_INVERTER_READY_OUTPUT_ENABLE
+    static uint32_t stable_ms = 0U;
+    ctrl_gt vbus_error = ctl_abs(adc_v_bus.control_port.value -
+                                 float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE));
+    fast_gt ready_condition = cia402_sm.state_word.bits.operation_enabled &&
+                              (protection.active_errors == 0) &&
+                              (vbus_error <= float2ctrl(SINV_INVERTER_READY_VBUS_TOLERANCE_V /
+                                                       CTRL_VOLTAGE_BASE));
+
+    if (ready_condition)
+    {
+        if (stable_ms < SINV_INVERTER_READY_STABLE_MS)
+            ++stable_ms;
+    }
+    else
+    {
+        stable_ms = 0U;
+    }
+
+    xplt_set_inverter_ready_output(stable_ms >= SINV_INVERTER_READY_STABLE_MS);
+#endif
+}
+
 void ctl_mainloop(void)
 {
     // gmp_base_loop() may spin much faster than 1 kHz. Run state-machine and
@@ -211,6 +236,7 @@ void ctl_mainloop(void)
     last_tick = current_tick;
 
     cia402_dispatch(&cia402_sm);
+    ctl_update_inverter_ready_output();
 
 #if (BUILD_LEVEL >= 2) && defined(SINV_ENABLE_REPETITIVE_CONTROL)
     if (cia402_sm.state_word.bits.operation_enabled &&

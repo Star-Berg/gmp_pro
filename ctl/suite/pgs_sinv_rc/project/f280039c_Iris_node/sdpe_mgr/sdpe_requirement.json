@@ -83,6 +83,49 @@
       "description": "Single-phase converter commissioning build level, aligned with the simulation controller branches.\nBUILD_LEVEL 1: open-loop H-bridge modulation for resistive-load validation.\nBUILD_LEVEL 2: sinusoidal current command for resistive-load current-loop validation.\nBUILD_LEVEL 3: grid current loop with signed P/Q command.\nBUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.\nBUILD_LEVEL 5: original rectifier DC-bus voltage loop with Q_ref = 0 and no Buck/Boost PWM.\nBUILD_LEVEL 6: rectifier DC-bus voltage loop with PF-derived Q command and downstream Buck control.\nBUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q."
     },
     {
+      "group": "Inverter Ready Interlock",
+      "macro": "SINV_INVERTER_READY_OUTPUT_ENABLE",
+      "enabled": true,
+      "weak": false,
+      "value": "(0)",
+      "options_preset": "",
+      "options": [
+        "(0)",
+        "(1)"
+      ],
+      "description": "Enable the active-low inverter READY interlock output."
+    },
+    {
+      "group": "Inverter Ready Interlock",
+      "macro": "SINV_INVERTER_READY_GPIO",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_GPIO2",
+      "options_preset": "iris_f280039c_node.IRIS_GPIO",
+      "options": [
+        "IRIS_GPIO1",
+        "IRIS_GPIO2",
+        "IRIS_GPIO3",
+        "IRIS_GPIO4",
+        "IRIS_GPIO5",
+        "IRIS_GPIO6"
+      ],
+      "description": "GPIO used to signal that the rectifier DC bus is ready."
+    },
+    {
+      "group": "Inverter Ready Interlock",
+      "macro": "SINV_INVERTER_READY_ACTIVE_LEVEL",
+      "enabled": true,
+      "weak": false,
+      "value": "(0U)",
+      "options_preset": "",
+      "options": [
+        "(0U)",
+        "(1U)"
+      ],
+      "description": "Active logic level of the inverter READY output."
+    },
+    {
       "group": "PWM Modulator",
       "macro": "PWM_MODULATOR_USING_NEGATIVE_LOGIC",
       "enabled": true,
@@ -588,7 +631,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0134704805"
+        "float": "0.0132421429"
       },
       "description": "AC voltage sensing gain from the grid LC filter voltage sense path."
     },
@@ -598,7 +641,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.6599712993"
+        "float": "1.6582785714"
       },
       "description": "AC voltage sensing ADC bias from the grid LC filter."
     },
@@ -608,9 +651,9 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "-0.1504533333"
+        "float": "-0.1481912172"
       },
-      "description": "AC current sensing sensitivity from the LVFB inverter current sensor."
+      "description": "AC current sensing sensitivity from the LVFB inverter current sensor. The negative sign matches the installed sensor direction."
     },
     {
       "role": "ac_current_bias",
@@ -618,7 +661,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.6514133333"
+        "float": "1.6568447327"
       },
       "description": "AC current sensing ADC bias from the LVFB inverter current sensor."
     },
@@ -833,6 +876,26 @@
       "description": "BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
     },
     {
+      "role": "inverter_ready_stable_ms",
+      "macro": "SINV_INVERTER_READY_STABLE_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(100U)"
+      },
+      "description": "Time that all inverter READY conditions must remain valid."
+    },
+    {
+      "role": "inverter_ready_vbus_tolerance",
+      "macro": "SINV_INVERTER_READY_VBUS_TOLERANCE_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(1.0f)"
+      },
+      "description": "Allowed physical DC-bus voltage error before asserting inverter READY."
+    },
+    {
       "role": "startup_delay",
       "macro": "CTRL_STARTUP_DELAY",
       "enabled": true,
@@ -956,6 +1019,13 @@
         "level6_boost_input_ref",
         "level6_boost_vbus_slew",
         "level6_boost_start_delay"
+      ]
+    },
+    {
+      "name": "Inverter Ready Interlock",
+      "requirements": [
+        "inverter_ready_stable_ms",
+        "inverter_ready_vbus_tolerance"
       ]
     },
     {

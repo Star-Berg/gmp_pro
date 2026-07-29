@@ -145,6 +145,24 @@ extern "C"
  */
 #define PWM_RESET_PORT IRIS_GPIO3
 
+/**
+ * @brief Enable the active-low inverter READY interlock output.
+ *        Options: (0), (1)
+ */
+#define SINV_INVERTER_READY_OUTPUT_ENABLE (0)
+
+/**
+ * @brief GPIO used to signal that the rectifier DC bus is ready.
+ *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
+ */
+#define SINV_INVERTER_READY_GPIO IRIS_GPIO2
+
+/**
+ * @brief Active logic level of the inverter READY output.
+ *        Options: (0U), (1U)
+ */
+#define SINV_INVERTER_READY_ACTIVE_LEVEL (0U)
+
 //=================================================================================================
 /**
  * @brief Status GPIO.
@@ -325,22 +343,22 @@ extern "C"
 /**
  * @brief AC voltage sensing gain from the grid LC filter voltage sense path.
  */
-#define CTRL_AC_VOLTAGE_SENSITIVITY (0.0134704805f)
+#define CTRL_AC_VOLTAGE_SENSITIVITY (0.0132421429f)
 
 /**
  * @brief AC voltage sensing ADC bias from the grid LC filter.
  */
-#define CTRL_AC_VOLTAGE_BIAS (1.6599712993f)
+#define CTRL_AC_VOLTAGE_BIAS (1.6582785714f)
 
 /**
- * @brief AC current sensing sensitivity from the LVFB inverter current sensor.
+ * @brief AC current sensing sensitivity from the LVFB inverter current sensor. The negative sign matches the installed sensor direction.
  */
-#define CTRL_AC_CURRENT_SENSITIVITY (-0.1504533333f)
+#define CTRL_AC_CURRENT_SENSITIVITY (-0.1481912172f)
 
 /**
  * @brief AC current sensing ADC bias from the LVFB inverter current sensor.
  */
-#define CTRL_AC_CURRENT_BIAS (1.6514133333f)
+#define CTRL_AC_CURRENT_BIAS (1.6568447327f)
 
 /**
  * @brief Buck inductor-current sensing sensitivity from the lower LVFB half-bridge B5A current sensor.
@@ -461,6 +479,12 @@ extern "C"
  * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
  */
 #define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
+
+/** @brief Time that all inverter READY conditions must remain valid. */
+#define SINV_INVERTER_READY_STABLE_MS (100U)
+
+/** @brief Allowed physical DC-bus voltage error before asserting inverter READY. */
+#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (1.0f)
 
 // User project tail code
 /* Compatibility with framework revisions that use the historical misspelling. */

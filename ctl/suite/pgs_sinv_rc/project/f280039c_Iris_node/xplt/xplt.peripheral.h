@@ -56,6 +56,7 @@ extern ctrl_gt dlog_mem2[DLOG_MEM_LENGTH];
 void reset_controller(void);
 void flush_dl_tx_buffer(void);
 void flush_dl_rx_buffer(void);
+void xplt_set_inverter_ready_output(fast_gt ready);
 
 #ifdef __cplusplus
 }
