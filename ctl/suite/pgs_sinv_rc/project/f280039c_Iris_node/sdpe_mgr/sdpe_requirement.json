@@ -100,7 +100,7 @@
       "macro": "SINV_INVERTER_READY_GPIO",
       "enabled": true,
       "weak": false,
-      "value": "IRIS_GPIO2",
+      "value": "IRIS_GPIO4",
       "options_preset": "iris_f280039c_node.IRIS_GPIO",
       "options": [
         "IRIS_GPIO1",

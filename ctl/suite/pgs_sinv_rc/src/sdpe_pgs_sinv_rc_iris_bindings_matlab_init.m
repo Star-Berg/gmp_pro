@@ -378,7 +378,7 @@ SINV_INVERTER_READY_OUTPUT_ENABLE = 0;
 
 % GPIO used to signal that the rectifier DC bus is ready.
 % Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
-SINV_INVERTER_READY_GPIO = 'IRIS_GPIO2';
+SINV_INVERTER_READY_GPIO = 'IRIS_GPIO4';
 
 % Active logic level of the inverter READY output.
 % Options: (0U), (1U)
