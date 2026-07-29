@@ -237,6 +237,16 @@
       "description": "BUILD_LEVEL 5 DC-bus feedback first-order low-pass cutoff frequency in Hz."
     },
     {
+      "role": "vbus_ref_slew",
+      "macro": "SINV_VBUS_REF_SLEW_V_S",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "20.0"
+      },
+      "description": "BUILD_LEVEL 5/6 DC-bus voltage-reference soft-start slew rate in V/s."
+    },
+    {
       "role": "outer_limit",
       "macro": "SINV_OUTER_LOOP_POWER_LIMIT_PU",
       "enabled": true,
@@ -536,6 +546,7 @@
         "bus_kp",
         "bus_ki",
         "bus_feedback_lpf",
+        "vbus_ref_slew",
         "outer_limit",
         "outer_frequency",
         "buck_voltage_loop_frequency",

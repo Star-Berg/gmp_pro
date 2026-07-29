@@ -156,6 +156,11 @@ extern "C"
 #define SINV_LEVEL5_VBUS_FEEDBACK_LPF_HZ (10.0f)
 
 /**
+ * @brief BUILD_LEVEL 5/6 DC-bus voltage-reference soft-start slew rate in V/s.
+ */
+#define SINV_VBUS_REF_SLEW_V_S (20.0f)
+
+/**
  * @brief Symmetric outer-loop active-power command limit.
  */
 #define SINV_OUTER_LOOP_POWER_LIMIT_PU (0.20f)

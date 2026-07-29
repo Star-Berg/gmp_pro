@@ -86,6 +86,9 @@ SINV_DC_BUS_LOOP_KI = 8.0;
 % BUILD_LEVEL 5 DC-bus feedback first-order low-pass cutoff frequency in Hz.
 SINV_LEVEL5_VBUS_FEEDBACK_LPF_HZ = 10.0;
 
+% BUILD_LEVEL 5/6 DC-bus voltage-reference soft-start slew rate in V/s.
+SINV_VBUS_REF_SLEW_V_S = 20.0;
+
 % Symmetric outer-loop active-power command limit.
 SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.65;
 

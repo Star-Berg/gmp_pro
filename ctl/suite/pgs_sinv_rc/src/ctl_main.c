@@ -47,6 +47,10 @@ volatile fast_gt flag_enable_adc_calibrator = 0;
 ctrl_gt g_p_ref_user = float2ctrl(0.0f);
 ctrl_gt g_q_ref_user = float2ctrl(0.0f);
 ctrl_gt g_vbus_ref_user = float2ctrl(0.0f);
+#if BUILD_LEVEL == 5 || BUILD_LEVEL == 6
+ctrl_gt g_vbus_ref_ramped = float2ctrl(0.0f);
+ctrl_gt g_vbus_ref_step = float2ctrl(0.0f);
+#endif
 #if BUILD_LEVEL == 5
 ctrl_gt g_vbus_feedback_filtered = float2ctrl(0.0f);
 ctrl_gt g_vbus_feedback_lpf_alpha = float2ctrl(0.0f);
@@ -106,6 +110,11 @@ void ctl_init(void)
     ctl_init_sinv_outer_loop(&outer_loop, SINV_POWER_LOOP_KP, SINV_POWER_LOOP_KI,
         SINV_DC_BUS_LOOP_KP, SINV_DC_BUS_LOOP_KI, SINV_OUTER_LOOP_FREQUENCY_HZ,
         CONTROLLER_FREQUENCY, SINV_OUTER_LOOP_POWER_LIMIT_PU);
+
+#if BUILD_LEVEL == 5 || BUILD_LEVEL == 6
+    g_vbus_ref_step = float2ctrl(SINV_VBUS_REF_SLEW_V_S / CTRL_VOLTAGE_BASE
+                                 / CONTROLLER_FREQUENCY);
+#endif
 
 #if BUILD_LEVEL == 5
     /* Run the bus-feedback LPF at the controller ISR rate.  With a 20 kHz ISR

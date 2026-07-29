@@ -96,6 +96,10 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern ctrl_gt g_p_ref_user;
 extern ctrl_gt g_q_ref_user;
 extern ctrl_gt g_vbus_ref_user;
+#if BUILD_LEVEL == 5 || BUILD_LEVEL == 6
+extern ctrl_gt g_vbus_ref_ramped;
+extern ctrl_gt g_vbus_ref_step;
+#endif
 #if BUILD_LEVEL == 5
 extern ctrl_gt g_vbus_feedback_filtered;
 extern ctrl_gt g_vbus_feedback_lpf_alpha;
@@ -181,6 +185,24 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
         }
 #endif
 
+#if BUILD_LEVEL == 5
+        ctrl_gt vbus_loop_feedback = g_vbus_feedback_filtered;
+#elif BUILD_LEVEL == 6
+        ctrl_gt vbus_loop_feedback = adc_v_bus.control_port.value;
+#endif
+
+#if BUILD_LEVEL == 5 || BUILD_LEVEL == 6
+        if (cia402_sm.state_word.bits.operation_enabled)
+        {
+            g_vbus_ref_ramped += ctl_sat(
+                g_vbus_ref_user - g_vbus_ref_ramped, g_vbus_ref_step, -g_vbus_ref_step);
+        }
+        else
+        {
+            g_vbus_ref_ramped = vbus_loop_feedback;
+        }
+#endif
+
         // 3. Command generation for the selected commissioning level.
         if (cia402_sm.state_word.bits.operation_enabled)
         {
@@ -201,12 +223,12 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                 g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #elif BUILD_LEVEL == 5
             ctl_step_sinv_ref_gen_pq(&ref_gen,
-                ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
-                    g_vbus_feedback_filtered, float2ctrl(+1.0f)),
+                ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_ramped,
+                    vbus_loop_feedback, float2ctrl(+1.0f)),
                 float2ctrl(0.0f), ctl_abs(pll.v_mag), &pll.phasor);
 #elif BUILD_LEVEL == 6
-            ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
-                adc_v_bus.control_port.value, float2ctrl(-1.0f));
+            ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_ramped,
+                vbus_loop_feedback, float2ctrl(-1.0f));
             ctl_step_sinv_ref_gen_pq(&ref_gen,
                 p_ref, ctl_calc_sinv_q_ref_from_pf(p_ref),
                 ctl_abs(pll.v_mag), &pll.phasor);
