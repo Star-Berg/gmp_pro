@@ -478,7 +478,7 @@ extern "C"
 /**
  * @brief Allowed physical DC-bus voltage error before asserting inverter READY.
  */
-#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (1.0f)
+#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (3.0f)
 
 /**
  * @brief Startup delay in ms.

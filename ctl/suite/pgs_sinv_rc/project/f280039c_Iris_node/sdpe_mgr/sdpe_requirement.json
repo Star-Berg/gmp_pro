@@ -891,7 +891,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(1.0f)"
+        "literal": "(3.0f)"
       },
       "description": "Allowed physical DC-bus voltage error before asserting inverter READY."
     },
