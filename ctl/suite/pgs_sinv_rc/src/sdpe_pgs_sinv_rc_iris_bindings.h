@@ -115,7 +115,7 @@ extern "C"
  * @brief Active logic level of the inverter READY output.
  *        Options: (0U), (1U)
  */
-#define SINV_INVERTER_READY_ACTIVE_LEVEL (0U)
+#define SINV_INVERTER_READY_ACTIVE_LEVEL (1U)
 
 //=================================================================================================
 /**

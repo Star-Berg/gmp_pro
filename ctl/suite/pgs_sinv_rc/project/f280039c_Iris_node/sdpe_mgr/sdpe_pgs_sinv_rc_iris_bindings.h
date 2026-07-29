@@ -103,19 +103,19 @@ extern "C"
  * @brief Enable the active-low inverter READY interlock output.
  *        Options: (0), (1)
  */
-#define SINV_INVERTER_READY_OUTPUT_ENABLE (0)
+#define SINV_INVERTER_READY_OUTPUT_ENABLE (1)
 
 /**
  * @brief GPIO used to signal that the rectifier DC bus is ready.
  *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
  */
-#define SINV_INVERTER_READY_GPIO IRIS_GPIO2
+#define SINV_INVERTER_READY_GPIO IRIS_GPIO4
 
 /**
  * @brief Active logic level of the inverter READY output.
  *        Options: (0U), (1U)
  */
-#define SINV_INVERTER_READY_ACTIVE_LEVEL (0U)
+#define SINV_INVERTER_READY_ACTIVE_LEVEL (1U)
 
 //=================================================================================================
 /**

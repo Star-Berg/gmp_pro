@@ -117,7 +117,7 @@
       "macro": "SINV_INVERTER_READY_ACTIVE_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(0U)",
+      "value": "(1U)",
       "options_preset": "",
       "options": [
         "(0U)",

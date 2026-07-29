@@ -382,7 +382,7 @@ SINV_INVERTER_READY_GPIO = 'IRIS_GPIO4';
 
 % Active logic level of the inverter READY output.
 % Options: (0U), (1U)
-SINV_INVERTER_READY_ACTIVE_LEVEL = 0;
+SINV_INVERTER_READY_ACTIVE_LEVEL = 1;
 
 %% PWM Modulator
 % Use negative PWM modulator logic.
