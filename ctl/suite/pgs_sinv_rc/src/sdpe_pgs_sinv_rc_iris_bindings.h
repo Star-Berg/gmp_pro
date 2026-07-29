@@ -325,22 +325,22 @@ extern "C"
 /**
  * @brief AC voltage sensing gain from the grid LC filter voltage sense path.
  */
-#define CTRL_AC_VOLTAGE_SENSITIVITY (0.013559322f)
+#define CTRL_AC_VOLTAGE_SENSITIVITY (0.0134704805f)
 
 /**
  * @brief AC voltage sensing ADC bias from the grid LC filter.
  */
-#define CTRL_AC_VOLTAGE_BIAS (1.65f)
+#define CTRL_AC_VOLTAGE_BIAS (1.6599712993f)
 
 /**
  * @brief AC current sensing sensitivity from the LVFB inverter current sensor.
  */
-#define CTRL_AC_CURRENT_SENSITIVITY (-0.15f)
+#define CTRL_AC_CURRENT_SENSITIVITY (0.1504533333f)
 
 /**
  * @brief AC current sensing ADC bias from the LVFB inverter current sensor.
  */
-#define CTRL_AC_CURRENT_BIAS GMP_LVFB_CURRENT_BIAS_V
+#define CTRL_AC_CURRENT_BIAS (1.6514133333f)
 
 /**
  * @brief Buck inductor-current sensing sensitivity from the lower LVFB half-bridge B5A current sensor.

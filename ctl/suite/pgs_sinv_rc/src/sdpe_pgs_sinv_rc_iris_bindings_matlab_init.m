@@ -496,16 +496,16 @@ CTRL_DC_VOLTAGE_SENSITIVITY = GMP_LVFB_VOLTAGE_SENSITIVITY;
 CTRL_DC_VOLTAGE_BIAS = GMP_LVFB_VOLTAGE_BIAS_V;
 
 % AC voltage sensing gain from the grid LC filter voltage sense path.
-CTRL_AC_VOLTAGE_SENSITIVITY = 0.013559322;
+CTRL_AC_VOLTAGE_SENSITIVITY = 0.0134704805;
 
 % AC voltage sensing ADC bias from the grid LC filter.
-CTRL_AC_VOLTAGE_BIAS = 1.65;
+CTRL_AC_VOLTAGE_BIAS = 1.6599712993;
 
 % AC current sensing sensitivity from the LVFB inverter current sensor.
-CTRL_AC_CURRENT_SENSITIVITY = -0.15;
+CTRL_AC_CURRENT_SENSITIVITY = 0.1504533333;
 
 % AC current sensing ADC bias from the LVFB inverter current sensor.
-CTRL_AC_CURRENT_BIAS = GMP_LVFB_CURRENT_BIAS_V;
+CTRL_AC_CURRENT_BIAS = 1.6514133333;
 
 % Buck inductor-current sensing sensitivity from the lower LVFB half-bridge B5A current sensor.
 CTRL_BUCK_CURRENT_SENSITIVITY = GMP_LVFB_CURRENT_SENSITIVITY;
