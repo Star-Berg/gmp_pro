@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-28"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-29"
 
 //=================================================================================================
 /**
@@ -53,7 +53,7 @@ extern "C"
 /**
  * @brief Enable startup ADC offset calibration. Only enable while all calibrated power inputs are in a known zero state.
  */
-#define SPECIFY_ENABLE_ADC_CALIBRATE
+// #define SPECIFY_ENABLE_ADC_CALIBRATE
 
 /**
  * @brief Enable processor-in-the-loop input/output handling.
@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
  */
-#define GFL_LEVEL6_VD_REF_PU (0.33f)
+#define GFL_LEVEL6_VD_REF_PU (0.754247f)
 
 /**
  * @brief BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
@@ -209,7 +209,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6/7 circular positive d/q current-reference limit in per unit.
  */
-#define GFL_LEVEL6_CURRENT_LIMIT_PU (0.3f)
+#define GFL_LEVEL6_CURRENT_LIMIT_PU (0.35f)
 
 /**
  * @brief BUILD_LEVEL 6 positive voltage-feedback 2-omega notch quality factor.
@@ -254,7 +254,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
  */
-#define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (35.355339f)
+#define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (42.426407f)
 
 /**
  * @brief BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
@@ -304,7 +304,7 @@ extern "C"
 /**
  * @brief Nominal grid frequency in hertz.
  */
-#define GFL_GRID_FREQUENCY_HZ (50.0f)
+#define GFL_GRID_FREQUENCY_HZ (60.0f)
 
 /**
  * @brief BUILD_LEVEL 2 phase-current ADC low-pass cutoff frequency in hertz.

@@ -12,7 +12,7 @@ PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-28';
+PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-29';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -364,7 +364,7 @@ PWM_MODULATOR_USING_NEGATIVE_LOGIC = 1;
 %% Commissioning
 % Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation.
 % Options: (1), (2), (3), (4), (5), (6), (7)
-BUILD_LEVEL = 6;
+BUILD_LEVEL = 7;
 
 %% Sampling
 % Number of directly sampled phase currents.

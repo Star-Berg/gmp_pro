@@ -64,7 +64,7 @@ extern "C"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_ID "pgs_inv_gfl_f280039c_iris_node"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-28"
+#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-29"
 
 //=================================================================================================
 /**
@@ -85,7 +85,7 @@ extern "C"
  * @brief Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation.
  *        Options: (1), (2), (3), (4), (5), (6), (7)
  */
-#define BUILD_LEVEL (6)
+#define BUILD_LEVEL (7)
 
 //=================================================================================================
 /**

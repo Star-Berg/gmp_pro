@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-28",
+  "updated_at": "2026-07-29",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -40,7 +40,7 @@
     {
       "group": "Runtime",
       "macro": "SPECIFY_ENABLE_ADC_CALIBRATE",
-      "enabled": true,
+      "enabled": false,
       "weak": false,
       "value": "",
       "description": "Enable startup ADC offset calibration. Only enable while all calibrated power inputs are in a known zero state."
@@ -275,7 +275,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.33"
+        "float": "0.754247"
       },
       "description": "BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit."
     },
@@ -335,7 +335,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.3"
+        "float": "0.35"
       },
       "description": "BUILD_LEVEL 6/7 circular positive d/q current-reference limit in per unit."
     },
@@ -425,7 +425,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "35.355339"
+        "float": "42.426407"
       },
       "description": "BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz."
     },
@@ -525,7 +525,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "50.0"
+        "float": "60.0"
       },
       "description": "Nominal grid frequency in hertz."
     },
