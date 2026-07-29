@@ -56,7 +56,7 @@
       "macro": "GFL_RECTIFIER_READY_INPUT_ENABLE",
       "enabled": true,
       "weak": false,
-      "value": "(0)",
+      "value": "(1)",
       "options_preset": "",
       "options": [
         "(0)",
@@ -188,7 +188,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "60.0"
+        "float": "65.0"
       },
       "description": "DC-bus per-unit voltage base."
     },

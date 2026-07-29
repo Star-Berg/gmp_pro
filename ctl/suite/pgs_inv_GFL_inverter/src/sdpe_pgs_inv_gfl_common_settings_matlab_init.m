@@ -145,9 +145,6 @@ GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU = 0.2;
 % BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
 GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.70710678;
 
-% BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
-GFL_LEVEL67_SOFT_START_TIME_MS = 1000.0;
-
 % BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
 GFL_LEVEL7_NEG_CURRENT_KP = GFL_LEVEL6_NEG_CURRENT_KP;
 

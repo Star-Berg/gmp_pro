@@ -121,7 +121,7 @@ void ctl_init()
                              GFL_LEVEL6_VOLTAGE_D_KP, GFL_LEVEL6_VOLTAGE_D_KI,
                              GFL_LEVEL6_VOLTAGE_Q_KP, GFL_LEVEL6_VOLTAGE_Q_KI,
                              GFL_LEVEL6_CURRENT_LIMIT_PU, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q,
-                             GFL_LEVEL7_DDSRF_FILTER_FC_HZ);
+                             GFL_LEVEL7_DDSRF_FILTER_FC_HZ, GFL_LEVEL67_SOFT_START_TIME_MS);
     voltage_ctrl.vdq_set.dat[phase_d] = float2ctrl(GFL_LEVEL6_VD_REF_PU);
     voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
 #endif

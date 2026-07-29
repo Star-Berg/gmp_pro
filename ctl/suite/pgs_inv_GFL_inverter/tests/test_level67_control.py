@@ -8,6 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 LEVEL67_HEADER = PROJECT_ROOT / "src" / "ctl_level67_voltage.h"
 CTL_MAIN_C = PROJECT_ROOT / "src" / "ctl_main.c"
 CTL_MAIN_H = PROJECT_ROOT / "src" / "ctl_main.h"
+COMMON_REQUIREMENT = PROJECT_ROOT / "sdpe_general" / "sdpe_requirement.json"
 
 
 class IIR1:
@@ -141,6 +142,64 @@ class Level67ControlTests(unittest.TestCase):
         limited = (raw[0] * scale, raw[1] * scale)
         self.assertAlmostEqual(math.hypot(*limited), limit)
         self.assertAlmostEqual(limited[0] / limited[1], raw[0] / raw[1])
+
+    def test_soft_start_ramps_applied_reference_to_target(self):
+        source = LEVEL67_HEADER.read_text(encoding="utf-8")
+        self.assertIn("ctl_vector2_t vdq_set_applied;", source)
+        self.assertIn("ctrl_gt soft_start_gain;", source)
+        self.assertIn("ctrl_gt soft_start_step;", source)
+
+        function = re.search(
+            r"ctl_step_level67_soft_start\(.*?\n}\n",
+            source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(function)
+        body = function.group(0)
+        self.assertIn("ctrl->soft_start_gain += ctrl->soft_start_step;", body)
+        self.assertIn("ctrl->soft_start_gain = float2ctrl(1.0f);", body)
+        self.assertIn("ctl_mul(ctrl->vdq_set.dat[phase_d], ctrl->soft_start_gain)", body)
+
+        voltage_pi = re.search(
+            r"ctl_step_level67_voltage_pi\(.*?\n}\n",
+            source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(voltage_pi)
+        self.assertIn("ctl_step_level67_soft_start(ctrl);", voltage_pi.group(0))
+        self.assertIn("ctrl->vdq_set_applied.dat[phase_d]", voltage_pi.group(0))
+
+        fs = 20_000.0
+        ramp_ms = 1000.0
+        target = 0.7
+        step = 1000.0 / (fs * ramp_ms)
+        gain = 0.0
+        applied = []
+        for _ in range(round(fs * ramp_ms / 1000.0)):
+            gain = min(1.0, gain + step)
+            applied.append(target * gain)
+        self.assertAlmostEqual(applied[len(applied) // 2 - 1], target * 0.5, delta=1e-6)
+        self.assertAlmostEqual(applied[-1], target, delta=1e-6)
+
+    def test_soft_start_is_configurable_and_resets_on_disable(self):
+        import json
+
+        requirement = json.loads(COMMON_REQUIREMENT.read_text(encoding="utf-8"))
+        parameters = {item["macro"]: item for item in requirement["requirements"]}
+        self.assertEqual(parameters["GFL_LEVEL67_SOFT_START_TIME_MS"]["binding"]["float"], "1000.0")
+
+        header = LEVEL67_HEADER.read_text(encoding="utf-8")
+        clear_function = re.search(
+            r"ctl_clear_level67_voltage\(.*?\n}\n",
+            header,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(clear_function)
+        self.assertIn("ctl_vector2_clear(&ctrl->vdq_set_applied);", clear_function.group(0))
+        self.assertIn("ctrl->soft_start_gain = 0;", clear_function.group(0))
+
+        main_source = CTL_MAIN_C.read_text(encoding="utf-8")
+        self.assertIn("GFL_LEVEL67_SOFT_START_TIME_MS", main_source)
 
     def test_level67_code_is_conditionally_isolated(self):
         header = CTL_MAIN_H.read_text(encoding="utf-8")

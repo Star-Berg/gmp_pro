@@ -24,10 +24,13 @@ typedef struct _tag_gfl_ddsrf_channel_t
 typedef struct _tag_gfl_level67_voltage_ctrl_t
 {
     ctl_vector2_t vdq_set;
+    ctl_vector2_t vdq_set_applied;
     ctl_vector2_t vdq_feedback;
     ctl_vector2_t idq_ref;
     ctl_pid_t pid_vdq[2];
     ctl_filter_IIR2_t notch_vdq[2];
+    ctrl_gt soft_start_gain;
+    ctrl_gt soft_start_step;
     ctrl_gt current_limit;
     ctrl_gt current_limit_sq;
     gfl_ddsrf_channel_t voltage_seq;
@@ -115,8 +118,10 @@ GMP_STATIC_INLINE void ctl_step_ddsrf_channel(gfl_ddsrf_channel_t* seq, const ct
 
 GMP_STATIC_INLINE void ctl_clear_level67_voltage(gfl_level67_voltage_ctrl_t* ctrl)
 {
+    ctl_vector2_clear(&ctrl->vdq_set_applied);
     ctl_vector2_clear(&ctrl->vdq_feedback);
     ctl_vector2_clear(&ctrl->idq_ref);
+    ctrl->soft_start_gain = 0;
     ctl_clear_pid(&ctrl->pid_vdq[phase_d]);
     ctl_clear_pid(&ctrl->pid_vdq[phase_q]);
     ctl_clear_biquad_filter(&ctrl->notch_vdq[phase_d]);
@@ -129,7 +134,7 @@ GMP_STATIC_INLINE void ctl_init_level67_voltage(gfl_level67_voltage_ctrl_t* ctrl
                                                  parameter_gt grid_frequency, parameter_gt vd_kp,
                                                  parameter_gt vd_ki, parameter_gt vq_kp, parameter_gt vq_ki,
                                                  parameter_gt current_limit, parameter_gt notch_q,
-                                                 parameter_gt ddsrf_fc)
+                                                 parameter_gt ddsrf_fc, parameter_gt soft_start_time_ms)
 {
     ctl_init_pid(&ctrl->pid_vdq[phase_d], vd_kp, vd_ki, 0, fs);
     ctl_init_pid(&ctrl->pid_vdq[phase_q], vq_kp, vq_ki, 0, fs);
@@ -144,6 +149,21 @@ GMP_STATIC_INLINE void ctl_init_level67_voltage(gfl_level67_voltage_ctrl_t* ctrl
     ctrl->current_limit = float2ctrl(current_limit);
     ctrl->current_limit_sq = ctl_mul(ctrl->current_limit, ctrl->current_limit);
     ctl_clear_level67_voltage(ctrl);
+
+    if (soft_start_time_ms > 0)
+        ctrl->soft_start_step = float2ctrl(1000.0f / (fs * soft_start_time_ms));
+    else
+        ctrl->soft_start_step = float2ctrl(1.0f);
+}
+
+GMP_STATIC_INLINE void ctl_step_level67_soft_start(gfl_level67_voltage_ctrl_t* ctrl)
+{
+    ctrl->soft_start_gain += ctrl->soft_start_step;
+    if (ctrl->soft_start_gain > float2ctrl(1.0f))
+        ctrl->soft_start_gain = float2ctrl(1.0f);
+
+    ctrl->vdq_set_applied.dat[phase_d] = ctl_mul(ctrl->vdq_set.dat[phase_d], ctrl->soft_start_gain);
+    ctrl->vdq_set_applied.dat[phase_q] = ctl_mul(ctrl->vdq_set.dat[phase_q], ctrl->soft_start_gain);
 }
 
 GMP_STATIC_INLINE void ctl_step_level67_voltage_pi(gfl_level67_voltage_ctrl_t* ctrl)
@@ -151,8 +171,9 @@ GMP_STATIC_INLINE void ctl_step_level67_voltage_pi(gfl_level67_voltage_ctrl_t* c
     ctl_pid_t* pid_d = &ctrl->pid_vdq[phase_d];
     ctl_pid_t* pid_q = &ctrl->pid_vdq[phase_q];
 
-    ctl_step_pid_ser(pid_d, ctrl->vdq_set.dat[phase_d] - ctrl->vdq_feedback.dat[phase_d]);
-    ctl_step_pid_ser(pid_q, ctrl->vdq_set.dat[phase_q] - ctrl->vdq_feedback.dat[phase_q]);
+    ctl_step_level67_soft_start(ctrl);
+    ctl_step_pid_ser(pid_d, ctrl->vdq_set_applied.dat[phase_d] - ctrl->vdq_feedback.dat[phase_d]);
+    ctl_step_pid_ser(pid_q, ctrl->vdq_set_applied.dat[phase_q] - ctrl->vdq_feedback.dat[phase_q]);
 
     // Use the unsaturated PI terms so the vector limiter preserves the d/q direction.
     ctrl_gt id_ref = pid_d->p_term + pid_d->i_term + pid_d->d_term;

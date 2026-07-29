@@ -275,7 +275,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.754247"
+        "float": "0.696228"
       },
       "description": "BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit."
     },
@@ -428,6 +428,16 @@
         "literal": "(GFL_GRID_FREQUENCY_HZ * 0.70710678f)"
       },
       "description": "BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz."
+    },
+    {
+      "role": "level67_soft_start_time_ms",
+      "macro": "GFL_LEVEL67_SOFT_START_TIME_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1000.0"
+      },
+      "description": "BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp."
     },
     {
       "role": "level7_neg_current_kp",

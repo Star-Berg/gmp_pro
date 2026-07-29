@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
  */
-#define GFL_LEVEL6_VD_REF_PU (0.754247f)
+#define GFL_LEVEL6_VD_REF_PU (0.696228f)
 
 /**
  * @brief BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
@@ -255,6 +255,11 @@ extern "C"
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
  */
 #define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.70710678f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
+ */
+#define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
 
 /**
  * @brief BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
