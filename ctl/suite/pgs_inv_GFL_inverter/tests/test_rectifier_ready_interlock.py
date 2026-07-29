@@ -14,19 +14,19 @@ XPLT_C = HARDWARE_ROOT / "xplt" / "xplt.peripheral.c"
 
 
 class RectifierReadyInterlockTests(unittest.TestCase):
-    def test_sdpe_exposes_enabled_active_low_ready_input(self):
+    def test_sdpe_exposes_enabled_active_high_ready_input(self):
         header = SDPE_HEADER.read_text(encoding="utf-8")
         requirement = json.loads(SDPE_REQUIREMENT.read_text(encoding="utf-8"))
 
         self.assertIn("#define GFL_RECTIFIER_READY_INPUT_ENABLE (1)", header)
         self.assertIn("#define GFL_RECTIFIER_READY_GPIO IRIS_GPIO4", header)
-        self.assertIn("#define GFL_RECTIFIER_READY_ACTIVE_LEVEL (0U)", header)
+        self.assertIn("#define GFL_RECTIFIER_READY_ACTIVE_LEVEL (1U)", header)
         self.assertIn("#define GFL_RECTIFIER_READY_DEBOUNCE_MS (20U)", header)
 
         options = {item["macro"]: item for item in requirement["option_macros"]}
         self.assertEqual(options["GFL_RECTIFIER_READY_INPUT_ENABLE"]["value"], "(1)")
         self.assertEqual(options["GFL_RECTIFIER_READY_GPIO"]["value"], "IRIS_GPIO4")
-        self.assertEqual(options["GFL_RECTIFIER_READY_ACTIVE_LEVEL"]["value"], "(0U)")
+        self.assertEqual(options["GFL_RECTIFIER_READY_ACTIVE_LEVEL"]["value"], "(1U)")
 
     def test_gpio4_name_does_not_conflict_with_physical_gpio4_pwm(self):
         three_phase_syscfg = SYSCFG.read_text(encoding="utf-8")
@@ -38,23 +38,32 @@ class RectifierReadyInterlockTests(unittest.TestCase):
 
         for syscfg in (three_phase_syscfg, single_phase_syscfg):
             self.assertIn('epwm4.epwm.epwm_aPin.$assign                                     = "GPIO4";', syscfg)
-            self.assertIn('gpio4.$name           = "IRIS_GPIO4";', syscfg)
-            self.assertIn('gpio4.gpioPin.$assign = "GPIO44";', syscfg)
+            self.assertRegex(syscfg, r'gpio4\.\$name\s*=\s*"IRIS_GPIO4";')
+            self.assertRegex(syscfg, r'gpio4\.gpioPin\.\$assign\s*=\s*"GPIO44";')
 
         self.assertIn("#define PHASE_N_BASE IRIS_EPWM4_BASE", single_phase_bindings)
         self.assertIn("#define PWM_ENABLE_PORT IRIS_GPIO1", single_phase_bindings)
         self.assertIn("#define PWM_RESET_PORT IRIS_GPIO3", single_phase_bindings)
 
-    def test_input_uses_internal_pullup(self):
+    def test_ready_input_is_floating_not_internally_pulled_high(self):
         syscfg = SYSCFG.read_text(encoding="utf-8")
-        self.assertIn('gpio4.padConfig      = "PULLUP";', syscfg)
+        self.assertIn('gpio4.direction       = "GPIO_DIR_MODE_IN";', syscfg)
+        self.assertNotIn("gpio4.writeInitialValue", syscfg)
+        self.assertNotIn('gpio4.padConfig      = "PULLUP";', syscfg)
 
         source = XPLT_C.read_text(encoding="utf-8", errors="ignore")
-        self.assertIn("GPIO_PIN_TYPE_PULLUP", source)
-        self.assertIn("GPIO_DIR_MODE_IN", source)
+        ready_init = re.search(
+            r"#if GFL_RECTIFIER_READY_INPUT_ENABLE.*?#endif",
+            source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(ready_init)
+        self.assertIn("GPIO_PIN_TYPE_STD", ready_init.group(0))
+        self.assertNotIn("GPIO_PIN_TYPE_PULLUP", ready_init.group(0))
+        self.assertIn("GPIO_DIR_MODE_IN", ready_init.group(0))
         self.assertIn("fast_gt xplt_get_rectifier_ready_input", source)
 
-    def test_low_level_enables_after_debounce_and_high_disables_immediately(self):
+    def test_high_level_enables_after_debounce_and_low_disables_immediately(self):
         source = CTL_MAIN_C.read_text(encoding="utf-8", errors="ignore")
         function = re.search(
             r"ctl_update_rectifier_ready_command\(.*?\n}\n",

@@ -143,7 +143,7 @@ void setup_peripheral(void)
     user_led = SYSTEM_LED;
 
 #if GFL_RECTIFIER_READY_INPUT_ENABLE
-    GPIO_setPadConfig(GFL_RECTIFIER_READY_GPIO, GPIO_PIN_TYPE_PULLUP);
+    GPIO_setPadConfig(GFL_RECTIFIER_READY_GPIO, GPIO_PIN_TYPE_STD);
     GPIO_setDirectionMode(GFL_RECTIFIER_READY_GPIO, GPIO_DIR_MODE_IN);
 #endif
 }
