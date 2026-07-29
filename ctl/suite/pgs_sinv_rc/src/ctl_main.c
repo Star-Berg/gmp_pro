@@ -213,8 +213,17 @@ void ctl_update_inverter_ready_output(void)
 {
 #if SINV_INVERTER_READY_OUTPUT_ENABLE
     static uint32_t stable_ms = 0U;
-    ctrl_gt vbus_error = ctl_abs(adc_v_bus.control_port.value -
-                                 float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE));
+    ctrl_gt vbus_ready_feedback = adc_v_bus.control_port.value;
+    ctrl_gt vbus_error;
+#if BUILD_LEVEL == 5
+    /* Use the same 10 Hz feedback used by the Level 5 DC-bus loop. This
+       evaluates the regulated DC level instead of rejecting READY on every
+       normal 100 Hz single-phase power-ripple peak. Fast raw-sample OVP
+       remains active in the ISR protection path. */
+    vbus_ready_feedback = g_vbus_feedback_filtered;
+#endif
+    vbus_error = ctl_abs(vbus_ready_feedback -
+                         float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE));
     fast_gt ready_condition = cia402_sm.state_word.bits.operation_enabled &&
                               (protection.active_errors == 0) &&
                               (vbus_error <= float2ctrl(SINV_INVERTER_READY_VBUS_TOLERANCE_V /

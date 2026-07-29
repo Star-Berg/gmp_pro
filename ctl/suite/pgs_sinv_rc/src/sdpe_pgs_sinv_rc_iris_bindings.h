@@ -100,7 +100,7 @@ extern "C"
  */
 
 /**
- * @brief Enable the active-low inverter READY interlock output.
+ * @brief Enable the active-high rectifier READY interlock output.
  *        Options: (0), (1)
  */
 #define SINV_INVERTER_READY_OUTPUT_ENABLE (1)
@@ -338,12 +338,12 @@ extern "C"
 /**
  * @brief DC bus voltage sensing gain from the LVFB inverter voltage sensor.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02674418f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.0271f)
 
 /**
  * @brief DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
  */
-#define CTRL_DC_VOLTAGE_BIAS GMP_LVFB_VOLTAGE_BIAS_V
+#define CTRL_DC_VOLTAGE_BIAS (0.01f)
 
 /**
  * @brief AC voltage sensing gain from the grid LC filter voltage sense path.
@@ -478,7 +478,7 @@ extern "C"
 /**
  * @brief Allowed physical DC-bus voltage error before asserting inverter READY.
  */
-#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (1.0f)
+#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (3.0f)
 
 /**
  * @brief Startup delay in ms.

@@ -372,7 +372,7 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 BUILD_LEVEL = 5;
 
 %% Inverter Ready Interlock
-% Enable the active-low inverter READY interlock output.
+% Enable the active-high rectifier READY interlock output.
 % Options: (0), (1)
 SINV_INVERTER_READY_OUTPUT_ENABLE = 1;
 
@@ -503,10 +503,10 @@ CTRL_AC_INDUCTANCE = 0.0015;
 CTRL_AC_RESISTANCE = 0.1;
 
 % DC bus voltage sensing gain from the LVFB inverter voltage sensor.
-CTRL_DC_VOLTAGE_SENSITIVITY = 0.02674418;
+CTRL_DC_VOLTAGE_SENSITIVITY = 0.0271;
 
 % DC bus voltage sensing ADC bias from the LVFB inverter voltage sensor.
-CTRL_DC_VOLTAGE_BIAS = GMP_LVFB_VOLTAGE_BIAS_V;
+CTRL_DC_VOLTAGE_BIAS = 0.01;
 
 % AC voltage sensing gain from the grid LC filter voltage sense path.
 CTRL_AC_VOLTAGE_SENSITIVITY = 0.0132421429;
@@ -587,7 +587,7 @@ SINV_LEVEL7_BOOST_START_DELAY_MS = 100;
 SINV_INVERTER_READY_STABLE_MS = 100;
 
 % Allowed physical DC-bus voltage error before asserting inverter READY.
-SINV_INVERTER_READY_VBUS_TOLERANCE_V = 1.0;
+SINV_INVERTER_READY_VBUS_TOLERANCE_V = 3.0;
 
 % Startup delay in ms.
 CTRL_STARTUP_DELAY = 100;
