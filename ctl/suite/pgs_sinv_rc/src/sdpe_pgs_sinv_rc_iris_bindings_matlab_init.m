@@ -374,7 +374,7 @@ BUILD_LEVEL = 5;
 %% Inverter Ready Interlock
 % Enable the active-low inverter READY interlock output.
 % Options: (0), (1)
-SINV_INVERTER_READY_OUTPUT_ENABLE = 0;
+SINV_INVERTER_READY_OUTPUT_ENABLE = 1;
 
 % GPIO used to signal that the rectifier DC bus is ready.
 % Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6

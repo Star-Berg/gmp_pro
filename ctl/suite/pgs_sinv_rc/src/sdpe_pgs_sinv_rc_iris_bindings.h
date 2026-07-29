@@ -103,7 +103,7 @@ extern "C"
  * @brief Enable the active-low inverter READY interlock output.
  *        Options: (0), (1)
  */
-#define SINV_INVERTER_READY_OUTPUT_ENABLE (0)
+#define SINV_INVERTER_READY_OUTPUT_ENABLE (1)
 
 /**
  * @brief GPIO used to signal that the rectifier DC bus is ready.

@@ -87,7 +87,7 @@
       "macro": "SINV_INVERTER_READY_OUTPUT_ENABLE",
       "enabled": true,
       "weak": false,
-      "value": "(0)",
+      "value": "(1)",
       "options_preset": "",
       "options": [
         "(0)",
