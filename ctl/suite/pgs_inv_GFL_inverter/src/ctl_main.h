@@ -71,6 +71,8 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern volatile fast_gt index_adc_calibrator;
 extern uint32_t pq_loop_tick;
 
+void ctl_update_rectifier_ready_command(void);
+
 // User commands
 
 //=================================================================================================

@@ -52,6 +52,49 @@
       "description": "Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation."
     },
     {
+      "group": "Rectifier Ready Interlock",
+      "macro": "GFL_RECTIFIER_READY_INPUT_ENABLE",
+      "enabled": true,
+      "weak": false,
+      "value": "(0)",
+      "options_preset": "",
+      "options": [
+        "(0)",
+        "(1)"
+      ],
+      "description": "Enable the rectifier READY input interlock."
+    },
+    {
+      "group": "Rectifier Ready Interlock",
+      "macro": "GFL_RECTIFIER_READY_GPIO",
+      "enabled": true,
+      "weak": false,
+      "value": "IRIS_GPIO4",
+      "options_preset": "iris_f280039c_node.IRIS_GPIO",
+      "options": [
+        "IRIS_GPIO1",
+        "IRIS_GPIO2",
+        "IRIS_GPIO3",
+        "IRIS_GPIO4",
+        "IRIS_GPIO5",
+        "IRIS_GPIO6"
+      ],
+      "description": "GPIO used to receive the rectifier READY signal."
+    },
+    {
+      "group": "Rectifier Ready Interlock",
+      "macro": "GFL_RECTIFIER_READY_ACTIVE_LEVEL",
+      "enabled": true,
+      "weak": false,
+      "value": "(0U)",
+      "options_preset": "",
+      "options": [
+        "(0U)",
+        "(1U)"
+      ],
+      "description": "Active logic level of the rectifier READY input."
+    },
+    {
       "group": "Sampling",
       "macro": "GFL_CURRENT_SAMPLE_PHASE_MODE",
       "enabled": true,
@@ -390,6 +433,16 @@
       "description": "Helios phase-current zero bias."
     },
     {
+      "role": "rectifier_ready_debounce_ms",
+      "macro": "GFL_RECTIFIER_READY_DEBOUNCE_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(20U)"
+      },
+      "description": "Continuous READY time required before enabling the inverter."
+    },
+    {
       "role": "startup_delay",
       "macro": "CTRL_STARTUP_DELAY",
       "enabled": true,
@@ -475,6 +528,12 @@
       "requirements": [
         "inverter_current_sensitivity",
         "inverter_current_bias"
+      ]
+    },
+    {
+      "name": "Rectifier Ready Interlock",
+      "requirements": [
+        "rectifier_ready_debounce_ms"
       ]
     },
     {

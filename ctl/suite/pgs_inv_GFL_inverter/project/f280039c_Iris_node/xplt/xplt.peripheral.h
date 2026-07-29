@@ -53,6 +53,7 @@ extern adc_gt idc_src;
 void flush_dl_tx_buffer(void);
 void flush_dl_rx_buffer(void);
 void reset_controller(void);
+fast_gt xplt_get_rectifier_ready_input(void);
 
 #ifdef __cplusplus
 }

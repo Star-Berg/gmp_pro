@@ -141,6 +141,11 @@ void setup_peripheral(void)
         &iabc.control_port, &vabc.control_port);
 
     user_led = SYSTEM_LED;
+
+#if GFL_RECTIFIER_READY_INPUT_ENABLE
+    GPIO_setPadConfig(GFL_RECTIFIER_READY_GPIO, GPIO_PIN_TYPE_PULLUP);
+    GPIO_setDirectionMode(GFL_RECTIFIER_READY_GPIO, GPIO_DIR_MODE_IN);
+#endif
 }
 
 //=================================================================================================
@@ -197,6 +202,15 @@ void reset_controller(void)
 
     GPIO_WritePin(PWM_RESET_PORT, 1);
 
+}
+
+fast_gt xplt_get_rectifier_ready_input(void)
+{
+#if GFL_RECTIFIER_READY_INPUT_ENABLE
+    return (fast_gt)GPIO_readPin(GFL_RECTIFIER_READY_GPIO);
+#else
+    return 0;
+#endif
 }
 
 //=================================================================================================

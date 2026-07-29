@@ -216,6 +216,10 @@ void ctl_init()
     init_cia402_state_machine(&cia402_sm);
     cia402_sm.minimum_transit_delay[3] = GFL_CIA402_OPERATION_ENABLE_DELAY_MS;
 
+#if GFL_RECTIFIER_READY_INPUT_ENABLE
+    cia402_sm.flag_enable_control_word = 0;
+#endif
+
 #if defined SPECIFY_PC_ENVIRONMENT
     cia402_sm.flag_enable_control_word = 0;
     cia402_sm.current_cmd = CIA402_CMD_ENABLE_OPERATION;
@@ -245,8 +249,38 @@ void ctl_init()
 //=================================================================================================
 // CTL endless loop routine
 
+void ctl_update_rectifier_ready_command(void)
+{
+#if GFL_RECTIFIER_READY_INPUT_ENABLE
+    static time_gt last_tick = (time_gt)-1;
+    static uint32_t ready_ms = 0U;
+    time_gt current_tick = gmp_base_get_ctrl_tick();
+
+    if (current_tick == last_tick)
+        return;
+    last_tick = current_tick;
+
+    if (xplt_get_rectifier_ready_input() == GFL_RECTIFIER_READY_ACTIVE_LEVEL)
+    {
+        if (ready_ms < GFL_RECTIFIER_READY_DEBOUNCE_MS)
+            ++ready_ms;
+
+        if (ready_ms >= GFL_RECTIFIER_READY_DEBOUNCE_MS)
+            cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
+        else
+            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
+    }
+    else
+    {
+        ready_ms = 0U;
+        cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
+    }
+#endif
+}
+
 void ctl_mainloop(void)
 {
+    ctl_update_rectifier_ready_command();
     cia402_dispatch(&cia402_sm);
 
     return;
