@@ -377,7 +377,7 @@ GFL_RECTIFIER_READY_GPIO = 'IRIS_GPIO4';
 
 % Active logic level of the rectifier READY input.
 % Options: (0U), (1U)
-GFL_RECTIFIER_READY_ACTIVE_LEVEL = 0;
+GFL_RECTIFIER_READY_ACTIVE_LEVEL = 1;
 
 %% Sampling
 % Number of directly sampled phase currents.

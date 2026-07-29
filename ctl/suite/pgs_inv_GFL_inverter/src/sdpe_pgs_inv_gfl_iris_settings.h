@@ -108,7 +108,7 @@ extern "C"
  * @brief Active logic level of the rectifier READY input.
  *        Options: (0U), (1U)
  */
-#define GFL_RECTIFIER_READY_ACTIVE_LEVEL (0U)
+#define GFL_RECTIFIER_READY_ACTIVE_LEVEL (1U)
 
 //=================================================================================================
 /**
