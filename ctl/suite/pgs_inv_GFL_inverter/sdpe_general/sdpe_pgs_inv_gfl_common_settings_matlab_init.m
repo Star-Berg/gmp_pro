@@ -104,13 +104,13 @@ GFL_LEVEL6_VD_REF_PU = 0.754247;
 GFL_LEVEL6_VQ_REF_PU = 0.0;
 
 % BUILD_LEVEL 6/7 d-axis voltage-loop proportional gain.
-GFL_LEVEL6_VOLTAGE_D_KP = 0.0029;
+GFL_LEVEL6_VOLTAGE_D_KP = 0.03;
 
 % BUILD_LEVEL 6/7 d-axis series-PI integral frequency in radians per second.
 GFL_LEVEL6_VOLTAGE_D_KI = 25.132741;
 
 % BUILD_LEVEL 6/7 q-axis voltage-loop proportional gain.
-GFL_LEVEL6_VOLTAGE_Q_KP = 0.0029;
+GFL_LEVEL6_VOLTAGE_Q_KP = 0.03;
 
 % BUILD_LEVEL 6/7 q-axis series-PI integral frequency in radians per second.
 GFL_LEVEL6_VOLTAGE_Q_KI = 25.132741;
@@ -134,7 +134,7 @@ GFL_LEVEL6_NEG_CURRENT_KI = 62.831853;
 GFL_LEVEL6_NEG_CURRENT_LIMIT_PU = 0.3;
 
 % BUILD_LEVEL 6 negative-sequence voltage-loop proportional gain.
-GFL_LEVEL6_NEG_VOLTAGE_KP = 0.0029;
+GFL_LEVEL6_NEG_VOLTAGE_KP = 0.03;
 
 % BUILD_LEVEL 6 negative-sequence voltage-loop series-PI integral frequency in radians per second.
 GFL_LEVEL6_NEG_VOLTAGE_KI = 25.132741;
@@ -143,7 +143,7 @@ GFL_LEVEL6_NEG_VOLTAGE_KI = 25.132741;
 GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU = 0.2;
 
 % BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
-GFL_LEVEL7_DDSRF_FILTER_FC_HZ = 42.426407;
+GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.70710678;
 
 % BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
 GFL_LEVEL7_NEG_CURRENT_KP = GFL_LEVEL6_NEG_CURRENT_KP;

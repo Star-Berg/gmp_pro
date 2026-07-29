@@ -295,7 +295,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0029"
+        "float": "0.03"
       },
       "description": "BUILD_LEVEL 6/7 d-axis voltage-loop proportional gain."
     },
@@ -315,7 +315,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0029"
+        "float": "0.03"
       },
       "description": "BUILD_LEVEL 6/7 q-axis voltage-loop proportional gain."
     },
@@ -395,7 +395,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0029"
+        "float": "0.03"
       },
       "description": "BUILD_LEVEL 6 negative-sequence voltage-loop proportional gain."
     },
@@ -425,7 +425,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "42.426407"
+        "literal": "(GFL_GRID_FREQUENCY_HZ * 0.70710678f)"
       },
       "description": "BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz."
     },

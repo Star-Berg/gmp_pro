@@ -190,13 +190,25 @@ GMP_STATIC_INLINE void ctl_step_level7_voltage(gfl_level67_voltage_ctrl_t* ctrl,
     ctl_step_level67_voltage_pi(ctrl);
 }
 
-GMP_STATIC_INLINE void ctl_step_level7_positive_current(gfl_inv_ctrl_t* gfl, const ctl_vector2_t* idq_feedback)
+GMP_STATIC_INLINE void ctl_step_level7_positive_current(gfl_inv_ctrl_t* gfl, const ctl_vector2_t* idq_feedback,
+                                                        const ctl_vector2_t* vdq_feedforward)
 {
+    ctl_pid_t* pid_d = &gfl->pid_idq[phase_d];
+    ctl_pid_t* pid_q = &gfl->pid_idq[phase_q];
+
     ctl_vector2_copy(&gfl->idq, idq_feedback);
+
+    // The inner current controller regulates the voltage across the filter
+    // inductor. Feed the measured output voltage forward so that the PI only
+    // has to generate the inductor voltage drop instead of the full
+    // fundamental output voltage.
+    ctl_vector2_copy(&gfl->vdq_ff_external, vdq_feedforward);
     gfl->vdq_out.dat[phase_d] =
-        ctl_step_pid_ser(&gfl->pid_idq[phase_d], gfl->idq_set.dat[phase_d] - gfl->idq.dat[phase_d]);
+        ctl_step_pid_ser(pid_d, gfl->idq_set.dat[phase_d] - gfl->idq.dat[phase_d]) +
+        gfl->vdq_ff_external.dat[phase_d];
     gfl->vdq_out.dat[phase_q] =
-        ctl_step_pid_ser(&gfl->pid_idq[phase_q], gfl->idq_set.dat[phase_q] - gfl->idq.dat[phase_q]);
+        ctl_step_pid_ser(pid_q, gfl->idq_set.dat[phase_q] - gfl->idq.dat[phase_q]) +
+        gfl->vdq_ff_external.dat[phase_q];
 
     if (gfl->flag_enable_decouple)
     {
@@ -204,6 +216,31 @@ GMP_STATIC_INLINE void ctl_step_level7_positive_current(gfl_inv_ctrl_t* gfl, con
         gfl->vdq_ff_decouple.dat[phase_q] = -ctl_mul(gfl->coef_ff_decouple, gfl->idq.dat[phase_d]);
         gfl->vdq_out.dat[phase_d] += gfl->vdq_ff_decouple.dat[phase_d];
         gfl->vdq_out.dat[phase_q] += gfl->vdq_ff_decouple.dat[phase_q];
+    }
+    else
+    {
+        ctl_vector2_clear(&gfl->vdq_ff_decouple);
+    }
+
+    // Keep the positive-sequence voltage command inside the SVPWM circle.
+    // If limiting occurs, back-calculate the PI contribution after removing
+    // feed-forward and decoupling to prevent integrator windup.
+    ctrl_gt magnitude_sq = ctl_mul(gfl->vdq_out.dat[phase_d], gfl->vdq_out.dat[phase_d]) +
+                           ctl_mul(gfl->vdq_out.dat[phase_q], gfl->vdq_out.dat[phase_q]);
+    if (magnitude_sq > float2ctrl(1.0f))
+    {
+        ctrl_gt scale = ctl_div(float2ctrl(1.0f), ctl_sqrt(magnitude_sq));
+        gfl->vdq_out.dat[phase_d] = ctl_mul(gfl->vdq_out.dat[phase_d], scale);
+        gfl->vdq_out.dat[phase_q] = ctl_mul(gfl->vdq_out.dat[phase_q], scale);
+
+        ctrl_gt vd_pid_real =
+            gfl->vdq_out.dat[phase_d] - gfl->vdq_ff_external.dat[phase_d] - gfl->vdq_ff_decouple.dat[phase_d];
+        ctrl_gt vq_pid_real =
+            gfl->vdq_out.dat[phase_q] - gfl->vdq_ff_external.dat[phase_q] - gfl->vdq_ff_decouple.dat[phase_q];
+        ctl_pid_clamping_correction_using_real_output(pid_d, vd_pid_real);
+        ctl_pid_clamping_correction_using_real_output(pid_q, vq_pid_real);
+        pid_d->out = vd_pid_real;
+        pid_q->out = vq_pid_real;
     }
 
     ctl_vector2_copy(&gfl->vdq_out_comp, &gfl->vdq_out);

@@ -121,7 +121,8 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                                     (ctl_vector2_t*)&inv_ctrl.iab0, &inv_ctrl.phasor);
             ctl_set_gfl_inv_current(&inv_ctrl, voltage_ctrl.idq_ref.dat[phase_d],
                                     voltage_ctrl.idq_ref.dat[phase_q]);
-            ctl_step_level7_positive_current(&inv_ctrl, &voltage_ctrl.current_seq.pos_decoupled);
+            ctl_step_level7_positive_current(&inv_ctrl, &voltage_ctrl.current_seq.pos_decoupled,
+                                             &voltage_ctrl.voltage_seq.pos_dc);
             ctl_step_neg_inv_ctrl_dq(&neg_current_ctrl, &voltage_ctrl.current_seq.neg_decoupled,
                                      &voltage_ctrl.voltage_seq.neg_dc);
         }
