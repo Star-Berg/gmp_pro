@@ -369,7 +369,20 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % BUILD_LEVEL 6: rectifier DC-bus voltage loop with PF-derived Q command and downstream Buck control.
 % BUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
 % Options: (1), (2), (3), (4), (5), (6), (7)
-BUILD_LEVEL = 2;
+BUILD_LEVEL = 5;
+
+%% Inverter Ready Interlock
+% Enable the active-low inverter READY interlock output.
+% Options: (0), (1)
+SINV_INVERTER_READY_OUTPUT_ENABLE = 0;
+
+% GPIO used to signal that the rectifier DC bus is ready.
+% Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
+SINV_INVERTER_READY_GPIO = 'IRIS_GPIO2';
+
+% Active logic level of the inverter READY output.
+% Options: (0U), (1U)
+SINV_INVERTER_READY_ACTIVE_LEVEL = 0;
 
 %% PWM Modulator
 % Use negative PWM modulator logic.
@@ -469,7 +482,7 @@ DSP_C2000_DSP_TIME_DIV = 120000 / CTRL_PWM_CMP_MAX / 2;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % Rated DC bus voltage.
-CTRL_DCBUS_VOLTAGE = 60.0;
+CTRL_DCBUS_VOLTAGE = 65.0;
 
 % Rated AC grid/load RMS voltage.
 CTRL_GRID_VOLTAGE_RMS = 36.0;
@@ -569,6 +582,12 @@ SINV_LEVEL7_BOOST_VBUS_SLEW_V_S = 120.0;
 
 % BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
 SINV_LEVEL7_BOOST_START_DELAY_MS = 100;
+
+% Time that all inverter READY conditions must remain valid.
+SINV_INVERTER_READY_STABLE_MS = 100;
+
+% Allowed physical DC-bus voltage error before asserting inverter READY.
+SINV_INVERTER_READY_VBUS_TOLERANCE_V = 1.0;
 
 % Startup delay in ms.
 CTRL_STARTUP_DELAY = 100;

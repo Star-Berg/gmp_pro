@@ -92,7 +92,30 @@ extern "C"
  *        BUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q.
  *        Options: (1), (2), (3), (4), (5), (6), (7)
  */
-#define BUILD_LEVEL (2)
+#define BUILD_LEVEL (5)
+
+//=================================================================================================
+/**
+ * @brief Inverter Ready Interlock.
+ */
+
+/**
+ * @brief Enable the active-low inverter READY interlock output.
+ *        Options: (0), (1)
+ */
+#define SINV_INVERTER_READY_OUTPUT_ENABLE (0)
+
+/**
+ * @brief GPIO used to signal that the rectifier DC bus is ready.
+ *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
+ */
+#define SINV_INVERTER_READY_GPIO IRIS_GPIO2
+
+/**
+ * @brief Active logic level of the inverter READY output.
+ *        Options: (0U), (1U)
+ */
+#define SINV_INVERTER_READY_ACTIVE_LEVEL (0U)
 
 //=================================================================================================
 /**
@@ -144,24 +167,6 @@ extern "C"
  *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
  */
 #define PWM_RESET_PORT IRIS_GPIO3
-
-/**
- * @brief Enable the active-low inverter READY interlock output.
- *        Options: (0), (1)
- */
-#define SINV_INVERTER_READY_OUTPUT_ENABLE (0)
-
-/**
- * @brief GPIO used to signal that the rectifier DC bus is ready.
- *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
- */
-#define SINV_INVERTER_READY_GPIO IRIS_GPIO2
-
-/**
- * @brief Active logic level of the inverter READY output.
- *        Options: (0U), (1U)
- */
-#define SINV_INVERTER_READY_ACTIVE_LEVEL (0U)
 
 //=================================================================================================
 /**
@@ -298,7 +303,7 @@ extern "C"
 /**
  * @brief Rated DC bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (60.0f)
+#define CTRL_DCBUS_VOLTAGE (65.0f)
 
 /**
  * @brief Rated AC grid/load RMS voltage.
@@ -466,6 +471,16 @@ extern "C"
 #define SINV_LEVEL7_BOOST_START_DELAY_MS (100)
 
 /**
+ * @brief Time that all inverter READY conditions must remain valid.
+ */
+#define SINV_INVERTER_READY_STABLE_MS (100U)
+
+/**
+ * @brief Allowed physical DC-bus voltage error before asserting inverter READY.
+ */
+#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (1.0f)
+
+/**
  * @brief Startup delay in ms.
  */
 #define CTRL_STARTUP_DELAY (100)
@@ -479,12 +494,6 @@ extern "C"
  * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
  */
 #define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
-
-/** @brief Time that all inverter READY conditions must remain valid. */
-#define SINV_INVERTER_READY_STABLE_MS (100U)
-
-/** @brief Allowed physical DC-bus voltage error before asserting inverter READY. */
-#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (1.0f)
 
 // User project tail code
 /* Compatibility with framework revisions that use the historical misspelling. */

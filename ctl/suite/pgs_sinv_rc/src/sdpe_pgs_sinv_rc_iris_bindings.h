@@ -29,7 +29,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-26"
+#define SDPE_PROJECT_UPDATED_AT "2026-07-29"
 
 //=================================================================================================
 /**
@@ -93,6 +93,29 @@ extern "C"
  *        Options: (1), (2), (3), (4), (5), (6), (7)
  */
 #define BUILD_LEVEL (5)
+
+//=================================================================================================
+/**
+ * @brief Inverter Ready Interlock.
+ */
+
+/**
+ * @brief Enable the active-low inverter READY interlock output.
+ *        Options: (0), (1)
+ */
+#define SINV_INVERTER_READY_OUTPUT_ENABLE (0)
+
+/**
+ * @brief GPIO used to signal that the rectifier DC bus is ready.
+ *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
+ */
+#define SINV_INVERTER_READY_GPIO IRIS_GPIO2
+
+/**
+ * @brief Active logic level of the inverter READY output.
+ *        Options: (0U), (1U)
+ */
+#define SINV_INVERTER_READY_ACTIVE_LEVEL (0U)
 
 //=================================================================================================
 /**
@@ -280,7 +303,7 @@ extern "C"
 /**
  * @brief Rated DC bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (60.0f)
+#define CTRL_DCBUS_VOLTAGE (65.0f)
 
 /**
  * @brief Rated AC grid/load RMS voltage.
@@ -400,7 +423,7 @@ extern "C"
 /**
  * @brief Peak current-reference limit in per unit.
  */
-#define CTRL_CURRENT_LIMIT_PU (1.5f)
+#define CTRL_CURRENT_LIMIT_PU (0.6f)
 
 /**
  * @brief Active-power command slew limit in PU/s.
@@ -446,6 +469,16 @@ extern "C"
  * @brief BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
  */
 #define SINV_LEVEL7_BOOST_START_DELAY_MS (100)
+
+/**
+ * @brief Time that all inverter READY conditions must remain valid.
+ */
+#define SINV_INVERTER_READY_STABLE_MS (100U)
+
+/**
+ * @brief Allowed physical DC-bus voltage error before asserting inverter READY.
+ */
+#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (1.0f)
 
 /**
  * @brief Startup delay in ms.

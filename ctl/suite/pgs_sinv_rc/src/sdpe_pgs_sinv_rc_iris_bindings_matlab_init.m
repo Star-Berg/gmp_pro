@@ -13,7 +13,7 @@ SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 SDPE_PROJECT_VERSION = '0.2.0';
 
-SDPE_PROJECT_UPDATED_AT = '2026-07-26';
+SDPE_PROJECT_UPDATED_AT = '2026-07-29';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -371,6 +371,19 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % Options: (1), (2), (3), (4), (5), (6), (7)
 BUILD_LEVEL = 5;
 
+%% Inverter Ready Interlock
+% Enable the active-low inverter READY interlock output.
+% Options: (0), (1)
+SINV_INVERTER_READY_OUTPUT_ENABLE = 0;
+
+% GPIO used to signal that the rectifier DC bus is ready.
+% Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
+SINV_INVERTER_READY_GPIO = 'IRIS_GPIO2';
+
+% Active logic level of the inverter READY output.
+% Options: (0U), (1U)
+SINV_INVERTER_READY_ACTIVE_LEVEL = 0;
+
 %% PWM Modulator
 % Use negative PWM modulator logic.
 % Options: (0), (1)
@@ -469,7 +482,7 @@ DSP_C2000_DSP_TIME_DIV = 120000 / CTRL_PWM_CMP_MAX / 2;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % Rated DC bus voltage.
-CTRL_DCBUS_VOLTAGE = 60.0;
+CTRL_DCBUS_VOLTAGE = 65.0;
 
 % Rated AC grid/load RMS voltage.
 CTRL_GRID_VOLTAGE_RMS = 36.0;
@@ -541,7 +554,7 @@ CTRL_DCBUS_READY_MIN = sdpe_select(BUILD_LEVEL == 5, 25.0, CTRL_DCBUS_VOLTAGE * 
 CTRL_DCBUS_READY_MAX = CTRL_PROT_VBUS_MAX;
 
 % Peak current-reference limit in per unit.
-CTRL_CURRENT_LIMIT_PU = 1.5;
+CTRL_CURRENT_LIMIT_PU = 0.6;
 
 % Active-power command slew limit in PU/s.
 CTRL_P_SLEW_PU_S = 10.0;
@@ -569,6 +582,12 @@ SINV_LEVEL7_BOOST_VBUS_SLEW_V_S = 120.0;
 
 % BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
 SINV_LEVEL7_BOOST_START_DELAY_MS = 100;
+
+% Time that all inverter READY conditions must remain valid.
+SINV_INVERTER_READY_STABLE_MS = 100;
+
+% Allowed physical DC-bus voltage error before asserting inverter READY.
+SINV_INVERTER_READY_VBUS_TOLERANCE_V = 1.0;
 
 % Startup delay in ms.
 CTRL_STARTUP_DELAY = 100;

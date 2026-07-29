@@ -69,7 +69,7 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(2)",
+      "value": "(5)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -541,7 +541,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "60.0"
+        "float": "65.0"
       },
       "description": "Rated DC bus voltage."
     },
