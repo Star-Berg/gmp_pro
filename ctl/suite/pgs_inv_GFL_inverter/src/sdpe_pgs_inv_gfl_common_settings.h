@@ -78,6 +78,23 @@ extern "C"
 
 //=================================================================================================
 /**
+ * @brief BUILD LEVEL 6/7 Common Voltage Control.
+ */
+
+/**
+ * @brief Enable measured DC-bus voltage feedforward before final modulation.
+ *        Options: (0), (1)
+ */
+#define GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD (1)
+
+/**
+ * @brief Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
+ *        Options: (0), (1)
+ */
+#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (1)
+
+//=================================================================================================
+/**
  * @brief Requirement bindings.
  */
 
@@ -287,12 +304,6 @@ extern "C"
 #define GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU (GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU)
 
 /**
- * @brief Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
- *        Set to 0 to keep only positive-sequence voltage/current control in BUILD_LEVEL 6/7.
- */
-#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (1)
-
-/**
  * @brief ADC offset calibrator filter cutoff frequency.
  */
 #define GFL_ADC_CALIBRATOR_FC_HZ (20.0f)
@@ -321,6 +332,21 @@ extern "C"
  * @brief BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
  */
 #define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
+
+/**
+ * @brief Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V (40.0f)
+
+/**
+ * @brief Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN (0.75f)
+
+/**
+ * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.25f)
 
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */

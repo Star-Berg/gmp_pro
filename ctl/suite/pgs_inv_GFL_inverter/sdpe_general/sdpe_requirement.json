@@ -76,6 +76,32 @@
         "(3)"
       ],
       "description": "Capacitor-current source: direct measurement, current difference, or capacitor-voltage derivative."
+    },
+    {
+      "group": "BUILD LEVEL 6/7 Common Voltage Control",
+      "macro": "GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD",
+      "enabled": true,
+      "weak": false,
+      "value": "(1)",
+      "options_preset": "",
+      "options": [
+        "(0)",
+        "(1)"
+      ],
+      "description": "Enable measured DC-bus voltage feedforward before final modulation."
+    },
+    {
+      "group": "BUILD LEVEL 6/7 Common Voltage Control",
+      "macro": "GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL",
+      "enabled": true,
+      "weak": false,
+      "value": "(1)",
+      "options_preset": "",
+      "options": [
+        "(0)",
+        "(1)"
+      ],
+      "description": "Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation."
     }
   ],
   "requirements": [
@@ -548,6 +574,36 @@
         "float": "1000.0"
       },
       "description": "BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp."
+    },
+    {
+      "role": "level67_dcbus_feedforward_min_v",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "40.0"
+      },
+      "description": "Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward."
+    },
+    {
+      "role": "level67_dcbus_feedforward_min_gain",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.75"
+      },
+      "description": "Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain."
+    },
+    {
+      "role": "level67_dcbus_feedforward_max_gain",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.25"
+      },
+      "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain."
     }
   ],
   "requirement_groups": [
@@ -597,7 +653,10 @@
         "level6_neg_current_limit",
         "level6_neg_voltage_kp",
         "level6_neg_voltage_ki",
-        "level6_neg_voltage_limit"
+        "level6_neg_voltage_limit",
+        "level67_dcbus_feedforward_min_v",
+        "level67_dcbus_feedforward_min_gain",
+        "level67_dcbus_feedforward_max_gain"
       ]
     },
     {

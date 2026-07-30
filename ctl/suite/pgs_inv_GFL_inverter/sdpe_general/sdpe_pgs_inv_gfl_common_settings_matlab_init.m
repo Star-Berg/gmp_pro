@@ -39,6 +39,15 @@ USE_DEBUG_DISCRETE_PID = true;
 % Options: (1), (2), (3)
 GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
 
+%% BUILD LEVEL 6/7 Common Voltage Control
+% Enable measured DC-bus voltage feedforward before final modulation.
+% Options: (0), (1)
+GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD = 1;
+
+% Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
+% Options: (0), (1)
+GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL = 1;
+
 %% Requirement bindings
 % Nominal grid phase-voltage magnitude in controller per unit.
 GFL_GRID_VOLTAGE_PU = 0.33;
@@ -180,6 +189,15 @@ GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ = 2000.0;
 
 % BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
 GFL_LEVEL67_SOFT_START_TIME_MS = 1000.0;
+
+% Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward.
+GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V = 40.0;
+
+% Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain.
+GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN = 0.75;
+
+% Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain.
+GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN = 1.25;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)
