@@ -624,6 +624,16 @@
         "float": "0.1"
       },
       "description": "First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain."
+    },
+    {
+      "role": "level67_dcbus_feedforward_slew_step",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_SLEW_STEP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.00002"
+      },
+      "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain change per control cycle."
     }
   ],
   "requirement_groups": [

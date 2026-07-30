@@ -358,6 +358,11 @@ extern "C"
  */
 #define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.1f)
 
+/**
+ * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain change per control cycle.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_SLEW_STEP (0.00002f)
+
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */
 #if defined ENBALE_GMP_DL_PIL_SIM && !defined ENABLE_GMP_DL_PIL_SIM
