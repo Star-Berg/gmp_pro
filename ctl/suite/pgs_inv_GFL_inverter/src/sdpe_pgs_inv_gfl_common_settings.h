@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-30"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-31"
 
 //=================================================================================================
 /**
@@ -284,11 +284,6 @@ extern "C"
 #define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.05f)
 
 /**
- * @brief First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.01f)
-
-/**
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
  */
 #define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.70710678f)
@@ -357,6 +352,11 @@ extern "C"
  * @brief BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward.
  */
 #define GFL_LEVEL67_DCBUS_FILTER_FC_HZ (300.0f)
+
+/**
+ * @brief First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.1f)
 
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */

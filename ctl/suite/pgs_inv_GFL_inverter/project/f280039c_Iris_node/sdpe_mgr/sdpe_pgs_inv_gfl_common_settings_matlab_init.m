@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-30';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-31';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -151,17 +151,14 @@ GFL_LEVEL6_NEG_VOLTAGE_KI = 25.132741;
 % BUILD_LEVEL 6 negative voltage-loop current-reference limit in per unit.
 GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU = 0.2;
 
-% BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward.
-GFL_LEVEL67_DCBUS_FILTER_FC_HZ = 300.0;
-
 % Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward.
 GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V = 40.0;
 
 % Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain.
-GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN = 0.75;
+GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN = 0.95;
 
 % Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain.
-GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN = 1.25;
+GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN = 1.05;
 
 % BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
 GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.70710678;
@@ -201,6 +198,12 @@ GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ = 2000.0;
 
 % BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
 GFL_LEVEL67_SOFT_START_TIME_MS = 1000.0;
+
+% BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward.
+GFL_LEVEL67_DCBUS_FILTER_FC_HZ = 300.0;
+
+% First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
+GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA = 0.02;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

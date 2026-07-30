@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-30"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-31"
 
 //=================================================================================================
 /**
@@ -269,11 +269,6 @@ extern "C"
 #define GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU (0.2f)
 
 /**
- * @brief BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward.
- */
-#define GFL_LEVEL67_DCBUS_FILTER_FC_HZ (300.0f)
-
-/**
  * @brief Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward.
  */
 #define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V (40.0f)
@@ -287,11 +282,6 @@ extern "C"
  * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain.
  */
 #define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.05f)
-
-/**
- * @brief First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.01f)
 
 /**
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
@@ -357,6 +347,16 @@ extern "C"
  * @brief BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
  */
 #define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward.
+ */
+#define GFL_LEVEL67_DCBUS_FILTER_FC_HZ (300.0f)
+
+/**
+ * @brief First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.02f)
 
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */

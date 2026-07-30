@@ -5,7 +5,7 @@
   "description": "Validated IRIS platform timing, sensing and resource bindings for the common GFL controller.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-30",
+  "updated_at": "2026-07-31",
   "output_header": "sdpe_pgs_inv_gfl_iris_settings.h",
   "hardware": [
     {
@@ -924,7 +924,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.02738589"
+        "float": "0.02705"
       },
       "description": "DC-link voltage sensing gain."
     },
