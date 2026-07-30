@@ -66,6 +66,7 @@ volatile uint16_t ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0
 volatile uint16_t ctl_output_frequency_request_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
 volatile uint16_t ctl_dc_bus_voltage_setting_v = GFL_UI_DCBUS_LOW_V;
 volatile uint16_t ctl_dc_bus_voltage_request_v = GFL_UI_DCBUS_LOW_V;
+volatile ctrl_gt ctl_dc_bus_feedforward_gain = float2ctrl(1.0f);
 
 //=================================================================================================
 // CTL initialize routine
@@ -81,6 +82,7 @@ void ctl_init()
     ctl_output_frequency_request_hz = ctl_output_frequency_hz;
     ctl_dc_bus_voltage_setting_v = GFL_UI_DCBUS_LOW_V;
     ctl_dc_bus_voltage_request_v = ctl_dc_bus_voltage_setting_v;
+    ctl_dc_bus_feedforward_gain = float2ctrl(1.0f);
 
     //
     // GFL inverter init objects

@@ -5,6 +5,7 @@
 
 // user main header
 #include "user_main.h"
+#include "ctl_main.h"
 
 #include <core/dev/mem_presp.h>
 #include <core/dev/pil_core.h>
@@ -50,6 +51,7 @@ const gmp_param_item_t dict_m1[] = {
     {(void*)&ctl_dc_bus_voltage_request_v, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {&inv_ctrl.filter_udc.out, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ui_dc_bus_voltage, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+    {(void*)&ctl_dc_bus_feedforward_gain, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ui_last_key, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {(void*)&ui_fault_code, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {(void*)&ui_keypad_ec, GMP_PARAM_TYPE_I16, GMP_PARAM_PERM_RO},

@@ -211,8 +211,8 @@ GMP_STATIC_INLINE void ctl_step_level7_voltage(gfl_level67_voltage_ctrl_t* ctrl,
     ctl_step_level67_voltage_pi(ctrl);
 }
 
-GMP_STATIC_INLINE void ctl_step_level7_positive_current(gfl_inv_ctrl_t* gfl, const ctl_vector2_t* idq_feedback,
-                                                        const ctl_vector2_t* vdq_feedforward)
+GMP_STATIC_INLINE void ctl_step_level67_positive_current(gfl_inv_ctrl_t* gfl, const ctl_vector2_t* idq_feedback,
+                                                         const ctl_vector2_t* vdq_feedforward)
 {
     ctl_pid_t* pid_d = &gfl->pid_idq[phase_d];
     ctl_pid_t* pid_q = &gfl->pid_idq[phase_q];
