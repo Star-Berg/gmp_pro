@@ -27,13 +27,47 @@ extern "C"
 // Input Callback
 GMP_STATIC_INLINE void ctl_input_callback(void)
 {
+    static fast_gt vac_lpf_initialized = 0;
+    static ctrl_gt vac_lpf = 0.0f;
+    static fast_gt iac_lpf_initialized = 0;
+    static ctrl_gt iac_lpf_1 = 0.0f;
+    static ctrl_gt iac_lpf_2 = 0.0f;
+
     // Fetch raw ADC data from hardware registers and process through the ADC channels
     // Note: Ensure the INV_VGRID_RESULT_BASE, INV_IAC_RESULT_BASE, etc.,
     // are correctly mapped to your hardware macros in xplt.peripheral.h
 
     ctl_step_adc_channel(&adc_v_grid, ADC_readResult(INV_VAC_RESULT_BASE, INV_VAC));
+    // AC 电压采样一阶低通：轻微抑制 Vac ADC 抖动，避免 PLL 频率估计被采样噪声扰动。
+    // alpha=0.20，比二阶低通相位滞后小；若频率仍有尖峰，可再小幅降到 0.10~0.15。
+    if (!vac_lpf_initialized)
+    {
+        vac_lpf = adc_v_grid.control_port.value;
+        vac_lpf_initialized = 1;
+    }
+    else
+    {
+        vac_lpf += ctl_mul(0.20f, adc_v_grid.control_port.value - vac_lpf);
+        adc_v_grid.control_port.value = vac_lpf;
+    }
     ctl_step_adc_channel(&adc_i_ac, ADC_readResult(INV_IAC_RESULT_BASE, INV_IAC));
+    // AC 电流采样二阶低通：两个一阶 IIR 串联，抑制开关噪声直接进入电流环。
+    // alpha=0.30 在 20 kHz 采样下单级约 1.1 kHz 截止；串联后滚降更快，先用于实物调试观察。
+    if (!iac_lpf_initialized)
+    {
+        iac_lpf_1 = adc_i_ac.control_port.value;
+        iac_lpf_2 = adc_i_ac.control_port.value;
+        iac_lpf_initialized = 1;
+    }
+    else
+    {
+        iac_lpf_1 += ctl_mul(0.30f, adc_i_ac.control_port.value - iac_lpf_1);
+        iac_lpf_2 += ctl_mul(0.30f, iac_lpf_1 - iac_lpf_2);
+        adc_i_ac.control_port.value = iac_lpf_2;
+    }
     ctl_step_adc_channel(&adc_v_bus, ADC_readResult(INV_VBUS_RESULT_BASE, INV_VBUS));
+    ctl_step_adc_channel(&adc_i_buck, ADC_readResult(BUCK_IL_RESULT_BASE, BUCK_IL));
+    ctl_step_adc_channel(&adc_v_buck_out, ADC_readResult(BUCK_VOUT_RESULT_BASE, BUCK_VOUT));
 }
 
 // Output Callback
@@ -42,6 +76,7 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     // Write ePWM peripheral CMP for H-Bridge (Phase L and Phase N)
     EPWM_setCounterCompareValue(PHASE_L_BASE, EPWM_COUNTER_COMPARE_A, ctl_get_single_phase_modulation_L_phase(&hpwm));
     EPWM_setCounterCompareValue(PHASE_N_BASE, EPWM_COUNTER_COMPARE_A, ctl_get_single_phase_modulation_N_phase(&hpwm));
+    EPWM_setCounterCompareValue(BUCK_PWM_BASE, EPWM_COUNTER_COMPARE_A, buck_ctrl.pwm_cmp);
 
     // DAC Monitor Port (Offset by 2048 for bipolar signals on a 12-bit DAC)
 #if BUILD_LEVEL == 1
@@ -59,16 +94,25 @@ GMP_STATIC_INLINE void ctl_fast_enable_output(void)
 {
     DINT;
 
-    // Reset histories first and preload a zero differential-voltage command.
-    clear_all_controllers();
+    // Reset run-control histories first and preload a zero differential-voltage command.
+    // Keep PLL/PQ states: BUILD_LEVEL 3~5 already require PLL lock before entering
+    // Operation Enabled, and clearing PLL here can inject a phase/frequency transient.
+    clear_run_controllers_for_pwm_enable();
     EPWM_setCounterCompareValue(PHASE_L_BASE, EPWM_COUNTER_COMPARE_A,
                                 ctl_get_single_phase_modulation_L_phase(&hpwm));
     EPWM_setCounterCompareValue(PHASE_N_BASE, EPWM_COUNTER_COMPARE_A,
                                 ctl_get_single_phase_modulation_N_phase(&hpwm));
+    EPWM_setCounterCompareValue(BUCK_PWM_BASE, EPWM_COUNTER_COMPARE_A, buck_ctrl.pwm_cmp);
 
-    // Clear any Trip Zone (TZ) flag for Phase L and Phase N
+    // Clear any Trip Zone (TZ) flag for the active power stages.
     EPWM_clearTripZoneFlag(PHASE_L_BASE, EPWM_TZ_FORCE_EVENT_OST);
     EPWM_clearTripZoneFlag(PHASE_N_BASE, EPWM_TZ_FORCE_EVENT_OST);
+#if BUILD_LEVEL >= 6
+    EPWM_clearTripZoneFlag(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
+#else
+    // Buck/Boost is intentionally disabled in BUILD_LEVEL 1~5.
+    EPWM_forceTripZoneEvent(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
+#endif
 
     // Hardware PWM gate driver enable
     GPIO_WritePin(PWM_ENABLE_PORT, 1);
@@ -85,6 +129,7 @@ GMP_STATIC_INLINE void ctl_fast_disable_output(void)
     // Force Trip Zone (TZ) event to hardware-block PWM outputs immediately
     EPWM_forceTripZoneEvent(PHASE_L_BASE, EPWM_TZ_FORCE_EVENT_OST);
     EPWM_forceTripZoneEvent(PHASE_N_BASE, EPWM_TZ_FORCE_EVENT_OST);
+    EPWM_forceTripZoneEvent(BUCK_PWM_BASE, EPWM_TZ_FORCE_EVENT_OST);
 
     // Hardware PWM gate driver disable
     GPIO_WritePin(PWM_ENABLE_PORT, 0);

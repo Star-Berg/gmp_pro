@@ -57,4 +57,5 @@
 #define gmp_pc_simulink_tx_buffer_t dp_sil_tx_buf_t
 
 // Invoke the generated platform settings directly; ctrl_settings.h is retired.
-#include <sdpe_pgs_sinv_rc_simulate_settings.h>
+// Use the project-local generated header to avoid the historical src/ copy with the same include guard.
+#include "../sdpe_mgr/sdpe_pgs_sinv_rc_simulate_settings.h"

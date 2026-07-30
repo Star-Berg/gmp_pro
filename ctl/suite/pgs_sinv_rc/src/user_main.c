@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include <core/dev/mem_presp.h>
+#include <core/dev/display/ht16k33.h>
 #include <core/dev/pil_core.h>
 #include <core/dev/tunable.h>
 
@@ -128,6 +129,81 @@ gmp_scheduler_t sched;
 
 // GPIO
 gpio_halt user_led;
+extern iic_halt iic_bus;
+ht16k33_dev_t ht16k33;
+static fast_gt g_rectifier_keyboard_ready = 0;
+static fast_gt g_rectifier_vbus_profile = SINV_KEYBOARD_DEFAULT_VBUS_PROFILE;
+static fast_gt g_rectifier_run_requested = 0;
+
+#define SINV_7SEG_F       (0x71U)
+#define SINV_7SEG_E       (0x79U)
+#define SINV_7SEG_LOWER_D (0x5EU)
+#define SINV_7SEG_LOWER_O (0x5CU)
+#define SINV_7SEG_LOWER_N (0x54U)
+#define SINV_7SEG_LOWER_R (0x50U)
+#define SINV_7SEG_LOWER_Y (0x6EU)
+#define SINV_7SEG_BLANK   (0x00U)
+
+static const data_gt g_rectifier_digit_segments[10] = {
+    0x3FU, 0x06U, 0x5BU, 0x4FU, 0x66U, 0x6DU, 0x7DU, 0x07U, 0x7FU, 0x6FU,
+};
+
+static ec_gt rectifier_display_update(ht16k33_dev_t* dev)
+{
+    data_gt content[8];
+    float vbus_ref_v = ctrl2float(g_vbus_ref_user) * CTRL_VOLTAGE_BASE;
+    uint16_t vbus_ref_rounded;
+    uint16_t i;
+
+    if (vbus_ref_v < 0.0f)
+        vbus_ref_v = 0.0f;
+    else if (vbus_ref_v > 9999.0f)
+        vbus_ref_v = 9999.0f;
+    vbus_ref_rounded = (uint16_t)(vbus_ref_v + 0.5f);
+
+    if (cia402_sm.current_state == CIA402_SM_FAULT)
+    {
+        content[0] = SINV_7SEG_E;
+        content[1] = SINV_7SEG_LOWER_R;
+        content[2] = SINV_7SEG_LOWER_R;
+    }
+    else if (cia402_sm.state_word.bits.operation_enabled)
+    {
+        content[0] = SINV_7SEG_LOWER_O;
+        content[1] = SINV_7SEG_LOWER_N;
+        content[2] = SINV_7SEG_BLANK;
+    }
+    else if (g_rectifier_run_requested)
+    {
+        content[0] = SINV_7SEG_LOWER_R;
+        content[1] = SINV_7SEG_LOWER_D;
+        content[2] = SINV_7SEG_LOWER_Y;
+    }
+    else
+    {
+        content[0] = SINV_7SEG_LOWER_O;
+        content[1] = SINV_7SEG_F;
+        content[2] = SINV_7SEG_F;
+    }
+
+    content[3] = SINV_7SEG_BLANK;
+    content[4] = g_rectifier_digit_segments[(vbus_ref_rounded / 1000U) % 10U];
+    content[5] = g_rectifier_digit_segments[(vbus_ref_rounded / 100U) % 10U];
+    content[6] = g_rectifier_digit_segments[(vbus_ref_rounded / 10U) % 10U];
+    content[7] = g_rectifier_digit_segments[vbus_ref_rounded % 10U];
+
+    for (i = 0U; i < 8U; ++i)
+    {
+        uint16_t ram_index = i * 2U;
+        if (dev->display_ram[ram_index] != content[i])
+        {
+            dev->display_ram[ram_index] = content[i];
+            dev->is_dirty = 1;
+        }
+    }
+
+    return ht16k33_update_display(dev);
+}
 
 gmp_task_status_t tsk_blink(gmp_task_t* tsk)
 {
@@ -160,6 +236,85 @@ gmp_task_status_t tsk_monitor(gmp_task_t* tsk)
     return GMP_TASK_DONE;
 }
 
+static void rectifier_keyboard_apply_vbus_profile(fast_gt profile)
+{
+    if (profile == 0)
+    {
+        g_vbus_ref_user = float2ctrl(SINV_KEYBOARD_VBUS_REF_0_V / CTRL_VOLTAGE_BASE);
+    }
+    else
+    {
+        g_vbus_ref_user = float2ctrl(SINV_KEYBOARD_VBUS_REF_1_V / CTRL_VOLTAGE_BASE);
+    }
+}
+
+gmp_task_status_t tsk_rectifier_keyboard(gmp_task_t* tsk)
+{
+    ht16k33_dev_t* dev = (ht16k33_dev_t*)tsk->user_data;
+    fast_gt key_id = 0;
+    static fast_gt lock_action = 0;
+    static uint32_t release_ms = 0U;
+
+    if (!g_rectifier_keyboard_ready)
+        return GMP_TASK_DONE;
+
+    if (rectifier_display_update(dev) != GMP_EC_OK)
+    {
+        tsk->is_enabled = 0;
+        g_rectifier_keyboard_ready = 0;
+        return GMP_TASK_DONE;
+    }
+
+    ec_gt ret = ht16k33_read_keys(dev, &key_id);
+    if (ret != GMP_EC_OK)
+    {
+        tsk->is_enabled = 0;
+        g_rectifier_keyboard_ready = 0;
+        return GMP_TASK_DONE;
+    }
+
+    if (key_id == 0)
+    {
+        if (release_ms < SINV_KEYBOARD_RELEASE_TIMEOUT_MS)
+            release_ms += SINV_KEYBOARD_SCAN_PERIOD_MS;
+        if (release_ms >= SINV_KEYBOARD_RELEASE_TIMEOUT_MS)
+            lock_action = 0;
+        return GMP_TASK_DONE;
+    }
+
+    release_ms = 0U;
+    if (lock_action)
+        return GMP_TASK_DONE;
+    lock_action = 1;
+
+    if (key_id == SINV_KEYBOARD_SW1_KEY_ID)
+    {
+        if (cia402_sm.current_state != CIA402_SM_FAULT)
+        {
+            g_rectifier_run_requested ^= 1U;
+            if (g_rectifier_run_requested)
+                cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
+            else
+                cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
+        }
+    }
+    else if (key_id == SINV_KEYBOARD_SW2_KEY_ID)
+    {
+        g_rectifier_vbus_profile ^= 1U;
+        rectifier_keyboard_apply_vbus_profile(g_rectifier_vbus_profile);
+    }
+    else if (key_id == SINV_KEYBOARD_SW3_KEY_ID)
+    {
+        g_rectifier_run_requested = 0;
+        if (cia402_sm.current_state == CIA402_SM_FAULT)
+            cia402_send_cmd(&cia402_sm, CIA402_CMD_FAULT_RESET);
+        else
+            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
+    }
+
+    return GMP_TASK_DONE;
+}
+
 // External declaration for slow protection task defined in ctl_main.c
 extern gmp_task_status_t tsk_protect(gmp_task_t* tsk);
 gmp_task_status_t tsk_startup(gmp_task_t* tsk);
@@ -174,6 +329,7 @@ gmp_task_t tasks[] = {
     {"dl_online", tsk_dl_debug_device, 2, 0, 1, NULL},
     {"monitor_data", tsk_monitor, 5, 0, 1, NULL},  // 5ms -> 200Hz refresh rate
     {"slow_protect", tsk_protect, 1, 0, 1, NULL}, // 1ms matches protection-node debounce tuning
+    {"rectifier_key", tsk_rectifier_keyboard, SINV_KEYBOARD_SCAN_PERIOD_MS, 20, 0, (void*)&ht16k33},
     {"startup", tsk_startup, 500, 0, 1, NULL},
 };
 
@@ -212,6 +368,18 @@ gmp_task_status_t tsk_startup(gmp_task_t* tsk)
     GMP_UNUSED_VAR(tsk);
 
     // Add necessary init code here.
+#if SINV_KEYBOARD_CONTROL_ENABLE
+    ht16k33_init_t ht16k33_init_struct = {.brightness = 15, .blink_rate = 0, .int_enable = 0, .int_act_high = 0};
+    if (ht16k33_init(&ht16k33, iic_bus, HT16K33_DEFAULT_DEV_ADDR, &ht16k33_init_struct) == GMP_EC_OK)
+    {
+        rectifier_keyboard_apply_vbus_profile(g_rectifier_vbus_profile);
+        if (rectifier_display_update(&ht16k33) == GMP_EC_OK)
+        {
+            g_rectifier_keyboard_ready = 1;
+            sched.task_list[4]->is_enabled = 1;
+        }
+    }
+#endif
 
     // startup process is complete, close this task
     tsk->is_enabled = 0;
