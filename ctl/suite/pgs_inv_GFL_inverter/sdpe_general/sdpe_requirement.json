@@ -95,7 +95,7 @@
       "macro": "GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL",
       "enabled": true,
       "weak": false,
-      "value": "(1)",
+      "value": "(0)",
       "options_preset": "",
       "options": [
         "(0)",
@@ -446,6 +446,36 @@
       "description": "BUILD_LEVEL 6 negative voltage-loop current-reference limit in per unit."
     },
     {
+      "role": "level67_dcbus_feedforward_min_v",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "40.0"
+      },
+      "description": "Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward."
+    },
+    {
+      "role": "level67_dcbus_feedforward_min_gain",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.75"
+      },
+      "description": "Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain."
+    },
+    {
+      "role": "level67_dcbus_feedforward_max_gain",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1.25"
+      },
+      "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain."
+    },
+    {
       "role": "level7_ddsrf_filter_fc",
       "macro": "GFL_LEVEL7_DDSRF_FILTER_FC_HZ",
       "enabled": true,
@@ -576,34 +606,14 @@
       "description": "BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp."
     },
     {
-      "role": "level67_dcbus_feedforward_min_v",
-      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V",
+      "role": "level67_dcbus_filter_fc",
+      "macro": "GFL_LEVEL67_DCBUS_FILTER_FC_HZ",
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "40.0"
+        "float": "300.0"
       },
-      "description": "Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward."
-    },
-    {
-      "role": "level67_dcbus_feedforward_min_gain",
-      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.75"
-      },
-      "description": "Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain."
-    },
-    {
-      "role": "level67_dcbus_feedforward_max_gain",
-      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "1.25"
-      },
-      "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain."
+      "description": "BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward."
     }
   ],
   "requirement_groups": [
@@ -695,6 +705,12 @@
       "name": "Ungrouped",
       "requirements": [
         "level67_soft_start_time_ms"
+      ]
+    },
+    {
+      "name": "Ungrouped",
+      "requirements": [
+        "level67_dcbus_filter_fc"
       ]
     }
   ]

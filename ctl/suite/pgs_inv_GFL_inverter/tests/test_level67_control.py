@@ -201,6 +201,23 @@ class Level67ControlTests(unittest.TestCase):
         main_source = CTL_MAIN_C.read_text(encoding="utf-8")
         self.assertIn("GFL_LEVEL67_SOFT_START_TIME_MS", main_source)
 
+    def test_dc_bus_filter_is_configurable_and_shared_by_display_and_feedforward(self):
+        import json
+
+        requirement = json.loads(COMMON_REQUIREMENT.read_text(encoding="utf-8"))
+        parameters = {item["macro"]: item for item in requirement["requirements"]}
+        self.assertEqual(parameters["GFL_LEVEL67_DCBUS_FILTER_FC_HZ"]["binding"]["float"], "300.0")
+
+        main_source = CTL_MAIN_C.read_text(encoding="utf-8")
+        self.assertIn(
+            "ctl_init_filter_iir1_lpf(&inv_ctrl.filter_udc, CONTROLLER_FREQUENCY,",
+            main_source,
+        )
+        self.assertIn("GFL_LEVEL67_DCBUS_FILTER_FC_HZ", main_source)
+
+        main_header = CTL_MAIN_H.read_text(encoding="utf-8")
+        self.assertIn("ctrl_gt dc_bus_safe = inv_ctrl.filter_udc.out;", main_header)
+
     def test_level67_code_is_conditionally_isolated(self):
         header = CTL_MAIN_H.read_text(encoding="utf-8")
         source = CTL_MAIN_C.read_text(encoding="utf-8")

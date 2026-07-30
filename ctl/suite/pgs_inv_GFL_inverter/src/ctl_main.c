@@ -105,6 +105,14 @@ void ctl_init()
 #endif
     ctl_init_gfl_inv(&inv_ctrl, &gfl_init);
 
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    // Use a dedicated, lower-bandwidth DC-bus filter for both the OLED
+    // measurement and feedforward. This rejects PWM/ADC noise without
+    // slowing the phase-voltage and phase-current feedback channels.
+    ctl_init_filter_iir1_lpf(&inv_ctrl.filter_udc, CONTROLLER_FREQUENCY,
+                             GFL_LEVEL67_DCBUS_FILTER_FC_HZ);
+#endif
+
     ctl_auto_tuning_neg_inv(&gfl_neg_init, &gfl_init);
 
 #if BUILD_LEVEL == 6

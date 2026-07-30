@@ -91,7 +91,7 @@ extern "C"
  * @brief Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
  *        Options: (0), (1)
  */
-#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (1)
+#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (0)
 
 //=================================================================================================
 /**
@@ -269,6 +269,21 @@ extern "C"
 #define GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU (0.2f)
 
 /**
+ * @brief Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V (40.0f)
+
+/**
+ * @brief Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN (0.75f)
+
+/**
+ * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.25f)
+
+/**
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
  */
 #define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.70710678f)
@@ -334,19 +349,9 @@ extern "C"
 #define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
 
 /**
- * @brief Minimum valid measured DC-bus voltage used by BUILD_LEVEL 6/7 feedforward.
+ * @brief BUILD_LEVEL 6/7 measured DC-bus low-pass filter cutoff frequency in hertz; shared by OLED display and DC-bus feedforward.
  */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V (40.0f)
-
-/**
- * @brief Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN (0.75f)
-
-/**
- * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.25f)
+#define GFL_LEVEL67_DCBUS_FILTER_FC_HZ (300.0f)
 
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */
