@@ -12,7 +12,7 @@ PGS_INV_GFL_SIM_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_SIM_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-22';
+PGS_INV_GFL_SIM_SDPE_PROJECT_UPDATED_AT = '2026-07-28';
 
 %% Hardware macros
 INN100E0016A_ID = 'inn100e0016a';
@@ -328,9 +328,9 @@ HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A = TLE4971A025_SENSITIVITY_MV_
 HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V = TLE4971A025_BIAS_V;
 
 %% Commissioning
-% Incremental control level; level 5 enables the cascaded P/Q power loop.
-% Options: (1), (2), (3), (4), (5)
-BUILD_LEVEL = 1;
+% Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation.
+% Options: (1), (2), (3), (4), (5), (6), (7)
+BUILD_LEVEL = 2;
 
 %% Sampling
 % Number of directly sampled phase currents.
@@ -355,7 +355,7 @@ CTRL_PWM_DEADBAND_CMP = 50;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % DC-bus voltage base.
-CTRL_DCBUS_VOLTAGE = 80.0;
+CTRL_DCBUS_VOLTAGE = 60.0;
 
 % SVPWM phase-voltage base.
 CTRL_VOLTAGE_BASE = CTRL_DCBUS_VOLTAGE / 1.73205081;

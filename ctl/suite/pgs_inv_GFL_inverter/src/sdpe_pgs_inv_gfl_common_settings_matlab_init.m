@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-22';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-29';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -65,10 +65,10 @@ GFL_PQ_REACTIVE_KI = 0.001;
 GFL_PQ_CURRENT_LIMIT_PU = 1.0;
 
 % BUILD_LEVEL 1 d-axis open-loop voltage command.
-GFL_OPEN_LOOP_VD_PU = 0.6124;
+GFL_OPEN_LOOP_VD_PU = 0.3;
 
 % BUILD_LEVEL 1 q-axis open-loop voltage command.
-GFL_OPEN_LOOP_VQ_PU = 0.0;
+GFL_OPEN_LOOP_VQ_PU = 0.3;
 
 % PLL lock-error threshold in controller per unit.
 CTRL_SPLL_EPSILON = float2ctrl(0.005);
@@ -80,10 +80,10 @@ GFL_ACTIVE_POWER_REF_PU = 0.1;
 GFL_REACTIVE_POWER_REF_PU = 0.0;
 
 % BUILD_LEVEL 2 d-axis current command.
-GFL_CURRENT_LEVEL2_ID_PU = 0.1;
+GFL_CURRENT_LEVEL2_ID_PU = 0.2;
 
 % BUILD_LEVEL 2 q-axis current command.
-GFL_CURRENT_LEVEL2_IQ_PU = 0.1;
+GFL_CURRENT_LEVEL2_IQ_PU = 0.2;
 
 % BUILD_LEVEL 3 grid-connected d-axis current command.
 GFL_CURRENT_LEVEL3_ID_PU = 0.1;
@@ -97,6 +97,72 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 % BUILD_LEVEL 4 q-axis current command.
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
+% BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
+GFL_LEVEL6_VD_REF_PU = 0.696228;
+
+% BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
+GFL_LEVEL6_VQ_REF_PU = 0.0;
+
+% BUILD_LEVEL 6/7 d-axis voltage-loop proportional gain.
+GFL_LEVEL6_VOLTAGE_D_KP = 0.03;
+
+% BUILD_LEVEL 6/7 d-axis series-PI integral frequency in radians per second.
+GFL_LEVEL6_VOLTAGE_D_KI = 25.132741;
+
+% BUILD_LEVEL 6/7 q-axis voltage-loop proportional gain.
+GFL_LEVEL6_VOLTAGE_Q_KP = 0.03;
+
+% BUILD_LEVEL 6/7 q-axis series-PI integral frequency in radians per second.
+GFL_LEVEL6_VOLTAGE_Q_KI = 25.132741;
+
+% BUILD_LEVEL 6/7 circular positive d/q current-reference limit in per unit.
+GFL_LEVEL6_CURRENT_LIMIT_PU = 0.35;
+
+% BUILD_LEVEL 6 positive voltage-feedback 2-omega notch quality factor.
+GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q = 5.0;
+
+% BUILD_LEVEL 6 negative-sequence 2-omega notch quality factor.
+GFL_LEVEL6_NEG_NOTCH_Q = 5.0;
+
+% BUILD_LEVEL 6 negative-sequence current-loop proportional gain.
+GFL_LEVEL6_NEG_CURRENT_KP = 0.2040;
+
+% BUILD_LEVEL 6 negative-sequence current-loop series-PI integral frequency in radians per second.
+GFL_LEVEL6_NEG_CURRENT_KI = 62.831853;
+
+% BUILD_LEVEL 6 negative current-loop voltage-output limit in per unit.
+GFL_LEVEL6_NEG_CURRENT_LIMIT_PU = 0.3;
+
+% BUILD_LEVEL 6 negative-sequence voltage-loop proportional gain.
+GFL_LEVEL6_NEG_VOLTAGE_KP = 0.03;
+
+% BUILD_LEVEL 6 negative-sequence voltage-loop series-PI integral frequency in radians per second.
+GFL_LEVEL6_NEG_VOLTAGE_KI = 25.132741;
+
+% BUILD_LEVEL 6 negative voltage-loop current-reference limit in per unit.
+GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU = 0.2;
+
+% BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
+GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.70710678;
+
+% BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
+GFL_LEVEL7_NEG_CURRENT_KP = GFL_LEVEL6_NEG_CURRENT_KP;
+
+% BUILD_LEVEL 7 negative current-loop Ki; defaults to the Level 6 value.
+GFL_LEVEL7_NEG_CURRENT_KI = GFL_LEVEL6_NEG_CURRENT_KI;
+
+% BUILD_LEVEL 7 negative current-loop output limit; defaults to Level 6.
+GFL_LEVEL7_NEG_CURRENT_LIMIT_PU = GFL_LEVEL6_NEG_CURRENT_LIMIT_PU;
+
+% BUILD_LEVEL 7 negative voltage-loop Kp; defaults to the Level 6 value.
+GFL_LEVEL7_NEG_VOLTAGE_KP = GFL_LEVEL6_NEG_VOLTAGE_KP;
+
+% BUILD_LEVEL 7 negative voltage-loop Ki; defaults to the Level 6 value.
+GFL_LEVEL7_NEG_VOLTAGE_KI = GFL_LEVEL6_NEG_VOLTAGE_KI;
+
+% BUILD_LEVEL 7 negative voltage-loop output limit; defaults to Level 6.
+GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU = GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU;
+
 % ADC offset calibrator filter cutoff frequency.
 GFL_ADC_CALIBRATOR_FC_HZ = 20.0;
 
@@ -107,7 +173,10 @@ GFL_ADC_CALIBRATOR_Q = 0.707;
 GFL_CIA402_OPERATION_ENABLE_DELAY_MS = 100;
 
 % Nominal grid frequency in hertz.
-GFL_GRID_FREQUENCY_HZ = 50.0;
+GFL_GRID_FREQUENCY_HZ = 60.0;
+
+% BUILD_LEVEL 2 phase-current ADC low-pass cutoff frequency in hertz.
+GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ = 2000.0;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)
