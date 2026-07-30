@@ -111,10 +111,17 @@ GMP_STATIC_INLINE ctrl_gt ctl_calc_dc_bus_feedforward_gain(void)
 GMP_STATIC_INLINE void ctl_apply_dc_bus_feedforward_to_modulator(void)
 {
     ctrl_gt target_gain = ctl_calc_dc_bus_feedforward_gain();
-
-    ctl_dc_bus_feedforward_gain +=
+    ctrl_gt gain_delta =
         ctl_mul(float2ctrl(GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA),
                 target_gain - ctl_dc_bus_feedforward_gain);
+    ctrl_gt gain_slew_step = float2ctrl(GFL_LEVEL67_DCBUS_FEEDFORWARD_SLEW_STEP);
+
+    if (gain_delta > gain_slew_step)
+        gain_delta = gain_slew_step;
+    else if (gain_delta < -gain_slew_step)
+        gain_delta = -gain_slew_step;
+
+    ctl_dc_bus_feedforward_gain += gain_delta;
 
     spwm.vab0_out.dat[phase_A] = ctl_mul(spwm.vab0_out.dat[phase_A], ctl_dc_bus_feedforward_gain);
     spwm.vab0_out.dat[phase_B] = ctl_mul(spwm.vab0_out.dat[phase_B], ctl_dc_bus_feedforward_gain);

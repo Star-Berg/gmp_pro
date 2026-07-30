@@ -284,6 +284,19 @@ extern "C"
 #define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.05f)
 
 /**
+<<<<<<< Updated upstream
+=======
+ * @brief First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.01f)
+
+/**
+ * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain change per control cycle.
+ */
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_SLEW_STEP (0.00002f)
+
+/**
+>>>>>>> Stashed changes
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
  */
 #define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.70710678f)
