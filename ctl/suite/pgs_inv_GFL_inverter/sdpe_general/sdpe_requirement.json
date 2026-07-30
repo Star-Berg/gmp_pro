@@ -461,7 +461,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.75"
+        "float": "0.95"
       },
       "description": "Minimum BUILD_LEVEL 6/7 DC-bus feedforward gain."
     },
@@ -471,9 +471,19 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.25"
+        "float": "1.05"
       },
       "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain."
+    },
+    {
+      "role": "level67_dcbus_feedforward_lpf_alpha",
+      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.01"
+      },
+      "description": "First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain."
     },
     {
       "role": "level7_ddsrf_filter_fc",
