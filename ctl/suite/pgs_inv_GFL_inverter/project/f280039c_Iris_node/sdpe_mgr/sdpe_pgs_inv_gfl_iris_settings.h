@@ -19,7 +19,40 @@ extern "C"
 // User project prefix code
 #include <sdpe_pgs_inv_gfl_common_settings.h>
 
-/* Fixed IRIS status resources. PWM, gate-driver and ADC bindings are configurable below. */
+/* Existing IRIS SysConfig resource names assigned to GFL application roles. */
+#define PHASE_U_BASE IRIS_EPWM1_BASE
+#define PHASE_V_BASE IRIS_EPWM2_BASE
+#define PHASE_W_BASE IRIS_EPWM3_BASE
+#define PWM_ENABLE_PORT IRIS_GPIO1
+#define PWM_RESET_PORT IRIS_GPIO3
+#define INV_UA_RESULT_BASE ADC_CH1_RESULT_BASE
+#define INV_UA ADC_CH1
+#define INV_UB_RESULT_BASE ADC_CH2_RESULT_BASE
+#define INV_UB ADC_CH2
+#define INV_UC_RESULT_BASE ADC_CH3_RESULT_BASE
+#define INV_UC ADC_CH3
+#define INV_IA_RESULT_BASE ADC_CH4_RESULT_BASE
+#define INV_IA ADC_CH4
+#define INV_IB_RESULT_BASE ADC_CH5_RESULT_BASE
+#define INV_IB ADC_CH5
+#define INV_IC_RESULT_BASE ADC_CH6_RESULT_BASE
+#define INV_IC ADC_CH6
+#define INV_UU_RESULT_BASE ADC_CH9_RESULT_BASE
+#define INV_UU ADC_CH9
+#define INV_UV_RESULT_BASE ADC_CH10_RESULT_BASE
+#define INV_UV ADC_CH10
+#define INV_UW_RESULT_BASE ADC_CH11_RESULT_BASE
+#define INV_UW ADC_CH11
+#define INV_IU_RESULT_BASE ADC_CH4_RESULT_BASE
+#define INV_IU ADC_CH4
+#define INV_IV_RESULT_BASE ADC_CH5_RESULT_BASE
+#define INV_IV ADC_CH5
+#define INV_IW_RESULT_BASE ADC_CH6_RESULT_BASE
+#define INV_IW ADC_CH6
+#define INV_VBUS_RESULT_BASE ADC_CH7_RESULT_BASE
+#define INV_VBUS ADC_CH7
+#define INV_IBUS_RESULT_BASE ADC_CH8_RESULT_BASE
+#define INV_IBUS ADC_CH8
 #define SYSTEM_LED IRIS_LED1
 #define CONTROLLER_LED IRIS_LED2
 
@@ -31,7 +64,7 @@ extern "C"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_ID "pgs_inv_gfl_f280039c_iris_node"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-30"
+#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-15"
 
 //=================================================================================================
 /**
@@ -49,50 +82,10 @@ extern "C"
  */
 
 /**
- * @brief Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation.
- *        Options: (1), (2), (3), (4), (5), (6), (7)
+ * @brief Incremental control level; level 5 enables the cascaded P/Q power loop.
+ *        Options: (1), (2), (3), (4), (5)
  */
-#define BUILD_LEVEL (7)
-
-//=================================================================================================
-/**
- * @brief PWM Channel Mapping.
- */
-
-/**
- * @brief PWM base for inverter phase U.
- *        Options: IRIS_EPWM1_BASE, IRIS_EPWM2_BASE, IRIS_EPWM3_BASE, IRIS_EPWM4_BASE, IRIS_EPWM5_BASE, IRIS_EPWM6_BASE
- */
-#define PHASE_U_BASE IRIS_EPWM1_BASE
-
-/**
- * @brief PWM base for inverter phase V.
- *        Options: IRIS_EPWM1_BASE, IRIS_EPWM2_BASE, IRIS_EPWM3_BASE, IRIS_EPWM4_BASE, IRIS_EPWM5_BASE, IRIS_EPWM6_BASE
- */
-#define PHASE_V_BASE IRIS_EPWM2_BASE
-
-/**
- * @brief PWM base for inverter phase W.
- *        Options: IRIS_EPWM1_BASE, IRIS_EPWM2_BASE, IRIS_EPWM3_BASE, IRIS_EPWM4_BASE, IRIS_EPWM5_BASE, IRIS_EPWM6_BASE
- */
-#define PHASE_W_BASE IRIS_EPWM3_BASE
-
-//=================================================================================================
-/**
- * @brief Gate Driver GPIO.
- */
-
-/**
- * @brief Gate-driver enable GPIO.
- *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
- */
-#define PWM_ENABLE_PORT IRIS_GPIO5
-
-/**
- * @brief Gate-driver reset GPIO.
- *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
- */
-#define PWM_RESET_PORT IRIS_GPIO3
+#define BUILD_LEVEL (3)
 
 //=================================================================================================
 /**
@@ -113,201 +106,13 @@ extern "C"
 
 //=================================================================================================
 /**
- * @brief Grid Voltage ADC Mapping.
- */
-
-/**
- * @brief Grid phase-A voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_UA_RESULT_BASE ADC_CH1_RESULT_BASE
-
-/**
- * @brief Grid phase-A voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_UA ADC_CH1
-
-/**
- * @brief Grid phase-B voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_UB_RESULT_BASE ADC_CH2_RESULT_BASE
-
-/**
- * @brief Grid phase-B voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_UB ADC_CH2
-
-/**
- * @brief Grid phase-C voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_UC_RESULT_BASE ADC_CH3_RESULT_BASE
-
-/**
- * @brief Grid phase-C voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_UC ADC_CH3
-
-//=================================================================================================
-/**
- * @brief Grid Current ADC Mapping.
- */
-
-/**
- * @brief Grid phase-A current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IA_RESULT_BASE ADC_CH4_RESULT_BASE
-
-/**
- * @brief Grid phase-A current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IA ADC_CH4
-
-/**
- * @brief Grid phase-B current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IB_RESULT_BASE ADC_CH5_RESULT_BASE
-
-/**
- * @brief Grid phase-B current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IB ADC_CH5
-
-/**
- * @brief Grid phase-C current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IC_RESULT_BASE ADC_CH6_RESULT_BASE
-
-/**
- * @brief Grid phase-C current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IC ADC_CH6
-
-//=================================================================================================
-/**
- * @brief Inverter Voltage ADC Mapping.
- */
-
-/**
- * @brief Inverter phase-U voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_UU_RESULT_BASE ADC_CH9_RESULT_BASE
-
-/**
- * @brief Inverter phase-U voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_UU ADC_CH9
-
-/**
- * @brief Inverter phase-V voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_UV_RESULT_BASE ADC_CH10_RESULT_BASE
-
-/**
- * @brief Inverter phase-V voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_UV ADC_CH10
-
-/**
- * @brief Inverter phase-W voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_UW_RESULT_BASE ADC_CH11_RESULT_BASE
-
-/**
- * @brief Inverter phase-W voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_UW ADC_CH11
-
-//=================================================================================================
-/**
- * @brief Inverter Current ADC Mapping.
- */
-
-/**
- * @brief Inverter phase-U current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IU_RESULT_BASE ADC_CH4_RESULT_BASE
-
-/**
- * @brief Inverter phase-U current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IU ADC_CH4
-
-/**
- * @brief Inverter phase-V current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IV_RESULT_BASE ADC_CH5_RESULT_BASE
-
-/**
- * @brief Inverter phase-V current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IV ADC_CH5
-
-/**
- * @brief Inverter phase-W current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IW_RESULT_BASE ADC_CH6_RESULT_BASE
-
-/**
- * @brief Inverter phase-W current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IW ADC_CH6
-
-//=================================================================================================
-/**
- * @brief DC Bus ADC Mapping.
- */
-
-/**
- * @brief DC bus voltage ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_VBUS_RESULT_BASE ADC_CH7_RESULT_BASE
-
-/**
- * @brief DC bus voltage ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_VBUS ADC_CH7
-
-/**
- * @brief DC bus current ADC result register base.
- *        Options: ADC_CH1_RESULT_BASE, ADC_CH2_RESULT_BASE, ADC_CH3_RESULT_BASE, ADC_CH4_RESULT_BASE, ADC_CH5_RESULT_BASE, ADC_CH6_RESULT_BASE, ADC_CH7_RESULT_BASE, ADC_CH8_RESULT_BASE, ADC_CH9_RESULT_BASE, ADC_CH10_RESULT_BASE, ADC_CH11_RESULT_BASE, ADC_CH12_RESULT_BASE
- */
-#define INV_IBUS_RESULT_BASE ADC_CH8_RESULT_BASE
-
-/**
- * @brief DC bus current ADC channel.
- *        Options: ADC_CH1, ADC_CH2, ADC_CH3, ADC_CH4, ADC_CH5, ADC_CH6, ADC_CH7, ADC_CH8, ADC_CH9, ADC_CH10, ADC_CH11, ADC_CH12
- */
-#define INV_IBUS ADC_CH8
-
-//=================================================================================================
-/**
  * @brief Requirement bindings.
  */
+
+/**
+ * @brief Startup delay in milliseconds.
+ */
+#define CTRL_STARTUP_DELAY (100)
 
 /**
  * @brief Current-loop and PWM update frequency in hertz.
@@ -342,7 +147,7 @@ extern "C"
 /**
  * @brief DC-bus per-unit voltage base.
  */
-#define CTRL_DCBUS_VOLTAGE (65.0f)
+#define CTRL_DCBUS_VOLTAGE (80.0f)
 
 /**
  * @brief SVPWM phase-voltage base.
@@ -365,44 +170,34 @@ extern "C"
 #define GFL_GRID_FILTER_CAPACITANCE_F (HARMONIA_3PH_LC_FILTER_CAPACITANCE_F)
 
 /**
- * @brief DC-link voltage sensing gain.
+ * @brief Grid-current sensitivity in volts per ampere.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
+#define CTRL_GRID_CURRENT_SENSITIVITY (HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)
 
 /**
- * @brief DC-link voltage sensing bias.
+ * @brief Grid-current zero bias.
  */
-#define CTRL_DC_VOLTAGE_BIAS (0.0f)
+#define CTRL_GRID_CURRENT_BIAS (HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)
 
 /**
- * @brief LC-board phase-A (U) voltage sensitivity in volts per volt.
+ * @brief Grid-voltage sensing gain.
  */
-#define CTRL_GRID_VOLTAGE_A_SENSITIVITY (0.0133760665f)
+#define CTRL_GRID_VOLTAGE_SENSITIVITY (HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN)
 
 /**
- * @brief LC-board phase-A (U) voltage-sensor bias in volts.
+ * @brief Grid-voltage sensing bias.
  */
-#define CTRL_GRID_VOLTAGE_A_BIAS (1.6608797884f)
+#define CTRL_GRID_VOLTAGE_BIAS (HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V)
 
 /**
- * @brief LC-board phase-B (V) voltage sensitivity in volts per volt.
+ * @brief Validated Helios phase-current sensitivity in volts per ampere.
  */
-#define CTRL_GRID_VOLTAGE_B_SENSITIVITY (0.0134189286f)
+#define CTRL_INVERTER_CURRENT_SENSITIVITY (0.05f)
 
 /**
- * @brief LC-board phase-B (V) voltage-sensor bias in volts.
+ * @brief Helios phase-current zero bias.
  */
-#define CTRL_GRID_VOLTAGE_B_BIAS (1.6542464286f)
-
-/**
- * @brief LC-board phase-C (W) voltage sensitivity in volts per volt.
- */
-#define CTRL_GRID_VOLTAGE_C_SENSITIVITY (0.0134290098f)
-
-/**
- * @brief LC-board phase-C (W) voltage-sensor bias in volts.
- */
-#define CTRL_GRID_VOLTAGE_C_BIAS (1.6549623557f)
+#define CTRL_INVERTER_CURRENT_BIAS (1.65f)
 
 /**
  * @brief Helios phase-voltage sensing gain.
@@ -417,7 +212,7 @@ extern "C"
 /**
  * @brief DC-link current sensitivity in volts per ampere.
  */
-#define CTRL_DC_CURRENT_SENSITIVITY (0.15f)
+#define CTRL_DC_CURRENT_SENSITIVITY (0.02475f)
 
 /**
  * @brief DC-link current zero bias.
@@ -425,53 +220,18 @@ extern "C"
 #define CTRL_DC_CURRENT_BIAS (1.65f)
 
 /**
- * @brief LC-board phase-A (U) current sensitivity in volts per ampere.
+ * @brief DC-link voltage sensing gain.
  */
-#define CTRL_GRID_CURRENT_A_SENSITIVITY (0.1503832007f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
 
 /**
- * @brief LC-board phase-A (U) current-sensor zero bias in volts.
+ * @brief DC-link voltage sensing bias.
  */
-#define CTRL_GRID_CURRENT_A_BIAS (1.6531446197f)
-
-/**
- * @brief LC-board phase-B (V) current sensitivity in volts per ampere.
- */
-#define CTRL_GRID_CURRENT_B_SENSITIVITY (0.1501000000f)
-
-/**
- * @brief LC-board phase-B (V) current-sensor zero bias in volts.
- */
-#define CTRL_GRID_CURRENT_B_BIAS (1.6534500000f)
-
-/**
- * @brief LC-board phase-C (W) current sensitivity in volts per ampere.
- */
-#define CTRL_GRID_CURRENT_C_SENSITIVITY (0.1503476190f)
-
-/**
- * @brief LC-board phase-C (W) current-sensor zero bias in volts.
- */
-#define CTRL_GRID_CURRENT_C_BIAS (1.6539083333f)
-
-/**
- * @brief Validated Helios phase-current sensitivity in volts per ampere.
- */
-#define CTRL_INVERTER_CURRENT_SENSITIVITY (0.05f)
-
-/**
- * @brief Helios phase-current zero bias.
- */
-#define CTRL_INVERTER_CURRENT_BIAS (1.65f)
-
-/**
- * @brief Startup delay in milliseconds.
- */
-#define CTRL_STARTUP_DELAY (100)
+#define CTRL_DC_VOLTAGE_BIAS (0.0f)
 
 // User project tail code
-#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)
-#error BUILD_LEVEL_must_be_between_1_and_7
+#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)
+#error BUILD_LEVEL_must_be_between_1_and_5
 #endif
 
 #ifdef __cplusplus
