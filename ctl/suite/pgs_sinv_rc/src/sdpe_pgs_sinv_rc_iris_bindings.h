@@ -29,7 +29,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-29"
+#define SDPE_PROJECT_UPDATED_AT "2026-07-30"
 
 //=================================================================================================
 /**
@@ -108,12 +108,12 @@ extern "C"
 /**
  * @brief HT16K33 key ID used by SW1. SW1 toggles CiA402 enable/disable.
  */
-#define SINV_KEYBOARD_SW1_KEY_ID (8U)
+#define SINV_KEYBOARD_SW1_KEY_ID (16U)
 
 /**
  * @brief HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile.
  */
-#define SINV_KEYBOARD_SW2_KEY_ID (9U)
+#define SINV_KEYBOARD_SW2_KEY_ID (3U)
 
 /**
  * @brief HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.

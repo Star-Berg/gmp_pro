@@ -64,6 +64,8 @@ uint32_t pq_loop_tick = 0;
 volatile fast_gt ctl_user_run_request = 0;
 volatile uint16_t ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
 volatile uint16_t ctl_output_frequency_request_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
+volatile uint16_t ctl_dc_bus_voltage_setting_v = GFL_UI_DCBUS_LOW_V;
+volatile uint16_t ctl_dc_bus_voltage_request_v = GFL_UI_DCBUS_LOW_V;
 
 //=================================================================================================
 // CTL initialize routine
@@ -77,6 +79,8 @@ void ctl_init()
     ctl_user_run_request = 0;
     ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
     ctl_output_frequency_request_hz = ctl_output_frequency_hz;
+    ctl_dc_bus_voltage_setting_v = GFL_UI_DCBUS_LOW_V;
+    ctl_dc_bus_voltage_request_v = ctl_dc_bus_voltage_setting_v;
 
     //
     // GFL inverter init objects
@@ -128,7 +132,12 @@ void ctl_init()
                              GFL_LEVEL6_VOLTAGE_Q_KP, GFL_LEVEL6_VOLTAGE_Q_KI,
                              GFL_LEVEL6_CURRENT_LIMIT_PU, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q,
                              GFL_LEVEL7_DDSRF_FILTER_FC_HZ, GFL_LEVEL67_SOFT_START_TIME_MS);
-    voltage_ctrl.vdq_set.dat[phase_d] = float2ctrl(GFL_LEVEL6_VD_REF_PU);
+    // CTRL_DCBUS_VOLTAGE remains the fixed ADC/per-unit base. The selected
+    // operating-bus voltage derates the physical AC-voltage target without
+    // changing sensor calibration at run time.
+    voltage_ctrl.vdq_set.dat[phase_d] =
+        float2ctrl(GFL_LEVEL6_VD_REF_PU *
+                   (parameter_gt)ctl_dc_bus_voltage_setting_v / (parameter_gt)CTRL_DCBUS_VOLTAGE);
     voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
 #endif
 
@@ -330,9 +339,46 @@ void ctl_apply_output_frequency_request(void)
     ctl_output_frequency_hz = frequency_hz;
 }
 
+void ctl_request_dc_bus_voltage_v(uint16_t dc_bus_voltage_v)
+{
+    if ((dc_bus_voltage_v != GFL_UI_DCBUS_LOW_V) &&
+        (dc_bus_voltage_v != GFL_UI_DCBUS_HIGH_V))
+        return;
+
+    ctl_dc_bus_voltage_request_v = dc_bus_voltage_v;
+
+    // Applying a new voltage target while PWM is active would create an
+    // immediate reference step. Stop first and require a deliberate restart.
+    if (ctl_user_run_request || inv_ctrl.flag_enable_system)
+        ctl_set_run_request(0);
+}
+
+void ctl_apply_dc_bus_voltage_request(void)
+{
+    uint16_t dc_bus_voltage_v = ctl_dc_bus_voltage_request_v;
+
+    if ((dc_bus_voltage_v == ctl_dc_bus_voltage_setting_v) ||
+        ((dc_bus_voltage_v != GFL_UI_DCBUS_LOW_V) &&
+         (dc_bus_voltage_v != GFL_UI_DCBUS_HIGH_V)))
+        return;
+
+    if (inv_ctrl.flag_enable_system)
+        return;
+
+    ctl_dc_bus_voltage_setting_v = dc_bus_voltage_v;
+
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    voltage_ctrl.vdq_set.dat[phase_d] =
+        float2ctrl(GFL_LEVEL6_VD_REF_PU *
+                   (parameter_gt)dc_bus_voltage_v / (parameter_gt)CTRL_DCBUS_VOLTAGE);
+    voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
+#endif
+}
+
 void ctl_mainloop(void)
 {
     ctl_apply_output_frequency_request();
+    ctl_apply_dc_bus_voltage_request();
     cia402_dispatch(&cia402_sm);
 
     // A controller/state-machine fault must also clear the operator's switch

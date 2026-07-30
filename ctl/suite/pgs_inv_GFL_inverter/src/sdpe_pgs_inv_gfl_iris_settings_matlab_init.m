@@ -534,7 +534,7 @@ DSP_C2000_DSP_TIME_DIV = CTRL_SYS_FREQUENCY / 1000 / CTRL_PWM_CMP_MAX / 2;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % DC-bus per-unit voltage base.
-CTRL_DCBUS_VOLTAGE = 65.0;
+CTRL_DCBUS_VOLTAGE = 60.0;
 
 % SVPWM phase-voltage base.
 CTRL_VOLTAGE_BASE = CTRL_DCBUS_VOLTAGE / 1.73205081;
@@ -610,6 +610,24 @@ CTRL_INVERTER_CURRENT_BIAS = 1.65;
 
 % Startup delay in milliseconds.
 CTRL_STARTUP_DELAY = 100;
+
+% HT16K33 key ID used to toggle the inverter output request.
+GFL_UI_KEY_SWITCH_ID = 16;
+
+% HT16K33 key ID used to toggle the output frequency between 30 Hz and 60 Hz.
+GFL_UI_KEY_FREQUENCY_ID = 3;
+
+% HT16K33 key ID used to stop the inverter and reset a latched fault.
+GFL_UI_KEY_FAULT_RESET_ID = 21;
+
+% HT16K33 key ID used to toggle the nominal DC-bus operating voltage.
+GFL_UI_KEY_DCBUS_ID = 22;
+
+% Low nominal DC-bus operating voltage selected by the local panel.
+GFL_UI_DCBUS_LOW_V = 50;
+
+% High nominal DC-bus operating voltage selected by the local panel.
+GFL_UI_DCBUS_HIGH_V = 60;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

@@ -26,11 +26,6 @@ extern cia402_sm_t cia402_sm;
 extern iic_halt iic_bus;
 extern ht16k33_dev_t ui_keypad;
 
-// HT16K33 key IDs on the Iris extension board. All other keys are ignored.
-#define GFL_UI_KEY_SWITCH_ID      (20)
-#define GFL_UI_KEY_FREQUENCY_ID   (3)
-#define GFL_UI_KEY_FAULT_RESET_ID (21)
-
 // HT16K33 repeats a held key after 120 ms. Treat each supported key press as
 // one event and re-arm only after the key has been released.
 #define GFL_UI_KEY_RELEASE_TIMEOUT_MS (200U)

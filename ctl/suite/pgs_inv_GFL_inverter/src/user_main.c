@@ -46,6 +46,8 @@ const gmp_param_item_t dict_m1[] = {
     {(void*)&ctl_user_run_request, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RW},
     {(void*)&ctl_output_frequency_hz, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {(void*)&ctl_output_frequency_request_hz, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
+    {(void*)&ctl_dc_bus_voltage_setting_v, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
+    {(void*)&ctl_dc_bus_voltage_request_v, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {&inv_ctrl.filter_udc.out, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ui_dc_bus_voltage, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ui_last_key, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
@@ -313,9 +315,9 @@ gmp_task_status_t tsk_keyboard(gmp_task_t* tsk)
         return GMP_TASK_DONE;
     }
 
-    // Only the three operator keys shown on the panel are active.
+    // Only the four configured operator keys are active.
     if ((key_id != GFL_UI_KEY_SWITCH_ID) && (key_id != GFL_UI_KEY_FREQUENCY_ID) &&
-        (key_id != GFL_UI_KEY_FAULT_RESET_ID))
+        (key_id != GFL_UI_KEY_FAULT_RESET_ID) && (key_id != GFL_UI_KEY_DCBUS_ID))
         return GMP_TASK_DONE;
 
     ui_last_key = (uint16_t)key_id;
@@ -342,6 +344,16 @@ gmp_task_status_t tsk_keyboard(gmp_task_t* tsk)
         ctl_set_run_request(0);
         cia402_fault_reset(&cia402_sm);
         break;
+
+    case GFL_UI_KEY_DCBUS_ID:
+    {
+        uint16_t target_dc_bus_voltage_v =
+            (ctl_dc_bus_voltage_setting_v == GFL_UI_DCBUS_LOW_V)
+                ? GFL_UI_DCBUS_HIGH_V
+                : GFL_UI_DCBUS_LOW_V;
+        ctl_request_dc_bus_voltage_v(target_dc_bus_voltage_v);
+        break;
+    }
 
     default:
         break;
@@ -382,9 +394,8 @@ gmp_task_status_t tsk_oled(gmp_task_t* tsk)
         sprintf(text, "OUTPUT:%s", ctl_user_run_request ? "ON" : "OFF");
         ui_oled_write_line(4, text);
 
-        // Clear the fourth line left by older firmware. The requested panel
-        // intentionally shows only frequency, DC bus voltage and output state.
-        ui_oled_write_line(6, "");
+        sprintf(text, "BUS SET:%2u V", (unsigned int)ctl_dc_bus_voltage_setting_v);
+        ui_oled_write_line(6, text);
 
         if ((ui_keypad_ec == GMP_EC_OK) &&
             (ui_7segment_frequency_hz != ctl_output_frequency_hz))

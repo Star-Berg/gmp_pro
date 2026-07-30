@@ -71,14 +71,18 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern volatile fast_gt index_adc_calibrator;
 extern uint32_t pq_loop_tick;
 
-// Local keyboard operator request and selected off-grid output frequency.
+// Local keyboard operator request and selected off-grid operating profile.
 extern volatile fast_gt ctl_user_run_request;
 extern volatile uint16_t ctl_output_frequency_hz;
 extern volatile uint16_t ctl_output_frequency_request_hz;
+extern volatile uint16_t ctl_dc_bus_voltage_setting_v;
+extern volatile uint16_t ctl_dc_bus_voltage_request_v;
 
 void ctl_set_run_request(fast_gt enable);
 void ctl_request_output_frequency_hz(uint16_t frequency_hz);
 void ctl_apply_output_frequency_request(void);
+void ctl_request_dc_bus_voltage_v(uint16_t dc_bus_voltage_v);
+void ctl_apply_dc_bus_voltage_request(void);
 
 // User commands
 

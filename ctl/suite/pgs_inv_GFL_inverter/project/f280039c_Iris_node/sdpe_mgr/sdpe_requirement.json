@@ -874,7 +874,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "65.0"
+        "float": "60.0"
       },
       "description": "DC-bus per-unit voltage base."
     },
@@ -1127,6 +1127,66 @@
         "number": "100"
       },
       "description": "Startup delay in milliseconds."
+    },
+    {
+      "role": "ui_key_switch_id",
+      "macro": "GFL_UI_KEY_SWITCH_ID",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "16"
+      },
+      "description": "HT16K33 key ID used to toggle the inverter output request."
+    },
+    {
+      "role": "ui_key_frequency_id",
+      "macro": "GFL_UI_KEY_FREQUENCY_ID",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "3"
+      },
+      "description": "HT16K33 key ID used to toggle the output frequency between 30 Hz and 60 Hz."
+    },
+    {
+      "role": "ui_key_fault_reset_id",
+      "macro": "GFL_UI_KEY_FAULT_RESET_ID",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "21"
+      },
+      "description": "HT16K33 key ID used to stop the inverter and reset a latched fault."
+    },
+    {
+      "role": "ui_key_dc_bus_id",
+      "macro": "GFL_UI_KEY_DCBUS_ID",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "22"
+      },
+      "description": "HT16K33 key ID used to toggle the nominal DC-bus operating voltage."
+    },
+    {
+      "role": "ui_dc_bus_low_voltage",
+      "macro": "GFL_UI_DCBUS_LOW_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "50"
+      },
+      "description": "Low nominal DC-bus operating voltage selected by the local panel."
+    },
+    {
+      "role": "ui_dc_bus_high_voltage",
+      "macro": "GFL_UI_DCBUS_HIGH_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "60"
+      },
+      "description": "High nominal DC-bus operating voltage selected by the local panel."
     }
   ],
   "requirement_groups": [
@@ -1210,6 +1270,17 @@
       "name": "Runtime Parameters",
       "requirements": [
         "startup_delay"
+      ]
+    },
+    {
+      "name": "Operator Panel Parameters",
+      "requirements": [
+        "ui_key_switch_id",
+        "ui_key_frequency_id",
+        "ui_key_fault_reset_id",
+        "ui_key_dc_bus_id",
+        "ui_dc_bus_low_voltage",
+        "ui_dc_bus_high_voltage"
       ]
     }
   ]

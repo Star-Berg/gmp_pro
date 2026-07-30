@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-29"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-30"
 
 //=================================================================================================
 /**
@@ -179,7 +179,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
  */
-#define GFL_LEVEL6_VD_REF_PU (0.696228f)
+#define GFL_LEVEL6_VD_REF_PU (0.754247f)
 
 /**
  * @brief BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
@@ -257,11 +257,6 @@ extern "C"
 #define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.70710678f)
 
 /**
- * @brief BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
- */
-#define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
-
-/**
  * @brief BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
  */
 #define GFL_LEVEL7_NEG_CURRENT_KP (GFL_LEVEL6_NEG_CURRENT_KP)
@@ -315,6 +310,11 @@ extern "C"
  * @brief BUILD_LEVEL 2 phase-current ADC low-pass cutoff frequency in hertz.
  */
 #define GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ (2000.0f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
+ */
+#define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
 
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */

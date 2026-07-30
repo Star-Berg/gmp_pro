@@ -13,7 +13,7 @@ SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 SDPE_PROJECT_VERSION = '0.2.0';
 
-SDPE_PROJECT_UPDATED_AT = '2026-07-29';
+SDPE_PROJECT_UPDATED_AT = '2026-07-30';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -377,10 +377,10 @@ BUILD_LEVEL = 5;
 SINV_KEYBOARD_CONTROL_ENABLE = 1;
 
 % HT16K33 key ID used by SW1. SW1 toggles CiA402 enable/disable.
-SINV_KEYBOARD_SW1_KEY_ID = 8;
+SINV_KEYBOARD_SW1_KEY_ID = 16;
 
 % HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile.
-SINV_KEYBOARD_SW2_KEY_ID = 9;
+SINV_KEYBOARD_SW2_KEY_ID = 3;
 
 % HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.
 SINV_KEYBOARD_SW3_KEY_ID = 1;

@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-29';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-30';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -98,7 +98,7 @@ GFL_CURRENT_LEVEL4_ID_PU = 0.6;
 GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
 % BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
-GFL_LEVEL6_VD_REF_PU = 0.696228;
+GFL_LEVEL6_VD_REF_PU = 0.754247;
 
 % BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
 GFL_LEVEL6_VQ_REF_PU = 0.0;
@@ -145,9 +145,6 @@ GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU = 0.2;
 % BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
 GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.70710678;
 
-% BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
-GFL_LEVEL67_SOFT_START_TIME_MS = 1000.0;
-
 % BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
 GFL_LEVEL7_NEG_CURRENT_KP = GFL_LEVEL6_NEG_CURRENT_KP;
 
@@ -180,6 +177,9 @@ GFL_GRID_FREQUENCY_HZ = 60.0;
 
 % BUILD_LEVEL 2 phase-current ADC low-pass cutoff frequency in hertz.
 GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ = 2000.0;
+
+% BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp.
+GFL_LEVEL67_SOFT_START_TIME_MS = 1000.0;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

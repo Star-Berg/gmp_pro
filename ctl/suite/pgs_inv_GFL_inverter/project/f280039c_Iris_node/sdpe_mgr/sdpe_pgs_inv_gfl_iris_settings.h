@@ -342,7 +342,7 @@ extern "C"
 /**
  * @brief DC-bus per-unit voltage base.
  */
-#define CTRL_DCBUS_VOLTAGE (65.0f)
+#define CTRL_DCBUS_VOLTAGE (60.0f)
 
 /**
  * @brief SVPWM phase-voltage base.
@@ -468,6 +468,36 @@ extern "C"
  * @brief Startup delay in milliseconds.
  */
 #define CTRL_STARTUP_DELAY (100)
+
+/**
+ * @brief HT16K33 key ID used to toggle the inverter output request.
+ */
+#define GFL_UI_KEY_SWITCH_ID (16)
+
+/**
+ * @brief HT16K33 key ID used to toggle the output frequency between 30 Hz and 60 Hz.
+ */
+#define GFL_UI_KEY_FREQUENCY_ID (3)
+
+/**
+ * @brief HT16K33 key ID used to stop the inverter and reset a latched fault.
+ */
+#define GFL_UI_KEY_FAULT_RESET_ID (21)
+
+/**
+ * @brief HT16K33 key ID used to toggle the nominal DC-bus operating voltage.
+ */
+#define GFL_UI_KEY_DCBUS_ID (22)
+
+/**
+ * @brief Low nominal DC-bus operating voltage selected by the local panel.
+ */
+#define GFL_UI_DCBUS_LOW_V (50)
+
+/**
+ * @brief High nominal DC-bus operating voltage selected by the local panel.
+ */
+#define GFL_UI_DCBUS_HIGH_V (60)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)

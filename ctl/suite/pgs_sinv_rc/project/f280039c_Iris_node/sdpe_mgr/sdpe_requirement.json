@@ -4,7 +4,7 @@
   "description": "Single-phase inverter project requirement prepared from xplt/ctrl_settings.h.\nThis requirement introduces the GMP LVFB 150V 2-phase inverter board as the switching stage and the GMP Harmonia 3-phase LC filter as the grid filter. IRIS F280039C is included as the peripheral option provider.",
   "suite": "pgs_sinv_rc",
   "version": "0.2.0",
-  "updated_at": "2026-07-29",
+  "updated_at": "2026-07-30",
   "output_header": "sdpe_pgs_sinv_rc_iris_bindings.h",
   "hardware": [
     {
@@ -100,7 +100,7 @@
       "macro": "SINV_KEYBOARD_SW1_KEY_ID",
       "enabled": true,
       "weak": false,
-      "value": "(8U)",
+      "value": "(16U)",
       "options_preset": "",
       "options": [],
       "description": "HT16K33 key ID used by SW1. SW1 toggles CiA402 enable/disable."
@@ -110,7 +110,7 @@
       "macro": "SINV_KEYBOARD_SW2_KEY_ID",
       "enabled": true,
       "weak": false,
-      "value": "(9U)",
+      "value": "(3U)",
       "options_preset": "",
       "options": [],
       "description": "HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile."
