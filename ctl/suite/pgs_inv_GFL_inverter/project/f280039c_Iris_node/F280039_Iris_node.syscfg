@@ -39,7 +39,6 @@ const gpio           = scripting.addModule("/driverlib/gpio.js", {}, false);
 const gpio1          = gpio.addInstance();
 const gpio2          = gpio.addInstance();
 const gpio3          = gpio.addInstance();
-const gpio4          = gpio.addInstance();
 const gpio5          = gpio.addInstance();
 const gpio6          = gpio.addInstance();
 const gpio7          = gpio.addInstance();
@@ -519,10 +518,6 @@ gpio3.$name           = "IRIS_GPIO3";
 gpio3.direction       = "GPIO_DIR_MODE_OUT";
 gpio3.gpioPin.$assign = "GPIO40";
 
-gpio4.$name           = "IRIS_GPIO4";
-gpio4.direction       = "GPIO_DIR_MODE_IN";
-gpio4.gpioPin.$assign = "GPIO44";
-
 gpio5.$name           = "IRIS_GPIO5";
 gpio5.gpioPin.$assign = "GPIO34";
 
@@ -542,6 +537,8 @@ gpio9.direction       = "GPIO_DIR_MODE_OUT";
 gpio9.gpioPin.$assign = "GPIO55";
 
 i2c1.$name                  = "IRIS_IIC";
+i2c1.bitCount               = "I2C_BITCOUNT_8";
+i2c1.emulationMode          = "I2C_EMULATION_FREE_RUN";
 i2c1.i2c.$assign            = "I2CA";
 i2c1.i2c.i2c_sdaPin.$assign = "GPIO56";
 i2c1.i2c.i2c_sclPin.$assign = "GPIO57";

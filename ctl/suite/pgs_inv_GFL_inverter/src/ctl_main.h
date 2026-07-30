@@ -71,7 +71,14 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern volatile fast_gt index_adc_calibrator;
 extern uint32_t pq_loop_tick;
 
-void ctl_update_rectifier_ready_command(void);
+// Local keyboard operator request and selected off-grid output frequency.
+extern volatile fast_gt ctl_user_run_request;
+extern volatile uint16_t ctl_output_frequency_hz;
+extern volatile uint16_t ctl_output_frequency_request_hz;
+
+void ctl_set_run_request(fast_gt enable);
+void ctl_request_output_frequency_hz(uint16_t frequency_hz);
+void ctl_apply_output_frequency_request(void);
 
 // User commands
 

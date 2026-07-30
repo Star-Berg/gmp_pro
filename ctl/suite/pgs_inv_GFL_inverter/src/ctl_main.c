@@ -61,6 +61,9 @@ volatile fast_gt index_adc_calibrator = 0;
 uint32_t pq_loop_tick = 0;
 
 // User commands
+volatile fast_gt ctl_user_run_request = 0;
+volatile uint16_t ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
+volatile uint16_t ctl_output_frequency_request_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
 
 //=================================================================================================
 // CTL initialize routine
@@ -71,6 +74,9 @@ void ctl_init()
     // stop here and wait for user start the motor controller
     //
     ctl_fast_disable_output();
+    ctl_user_run_request = 0;
+    ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
+    ctl_output_frequency_request_hz = ctl_output_frequency_hz;
 
     //
     // GFL inverter init objects
@@ -215,10 +221,9 @@ void ctl_init()
     //
     init_cia402_state_machine(&cia402_sm);
     cia402_sm.minimum_transit_delay[3] = GFL_CIA402_OPERATION_ENABLE_DELAY_MS;
-
-#if GFL_RECTIFIER_READY_INPUT_ENABLE
+    // The local expansion-board keyboard is the command source. Do not let an
+    // unused fieldbus control word override RUN/STOP key commands.
     cia402_sm.flag_enable_control_word = 0;
-#endif
 
 #if defined SPECIFY_PC_ENVIRONMENT
     cia402_sm.flag_enable_control_word = 0;
@@ -249,39 +254,95 @@ void ctl_init()
 //=================================================================================================
 // CTL endless loop routine
 
-void ctl_update_rectifier_ready_command(void)
+void ctl_set_run_request(fast_gt enable)
 {
-#if GFL_RECTIFIER_READY_INPUT_ENABLE
-    static time_gt last_tick = (time_gt)-1;
-    static uint32_t ready_ms = 0U;
-    time_gt current_tick = gmp_base_get_ctrl_tick();
+    ctl_user_run_request = enable ? 1 : 0;
 
-    if (current_tick == last_tick)
-        return;
-    last_tick = current_tick;
-
-    if (xplt_get_rectifier_ready_input() == GFL_RECTIFIER_READY_ACTIVE_LEVEL)
-    {
-        if (ready_ms < GFL_RECTIFIER_READY_DEBOUNCE_MS)
-            ++ready_ms;
-
-        if (ready_ms >= GFL_RECTIFIER_READY_DEBOUNCE_MS)
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
-        else
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
-    }
+    if (ctl_user_run_request)
+        cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
     else
-    {
-        ready_ms = 0U;
         cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
+}
+
+void ctl_request_output_frequency_hz(uint16_t frequency_hz)
+{
+    if ((frequency_hz != 30U) && (frequency_hz != 60U))
+        return;
+
+    ctl_output_frequency_request_hz = frequency_hz;
+
+    // Frequency-dependent filters are reconfigured only after PWM has
+    // stopped. The operator must press RUN again after changing frequency.
+    if (inv_ctrl.flag_enable_system)
+        ctl_set_run_request(0);
+}
+
+void ctl_apply_output_frequency_request(void)
+{
+    uint16_t frequency_hz = ctl_output_frequency_request_hz;
+    ctrl_gt preserved_angle;
+    int i;
+
+    if ((frequency_hz == ctl_output_frequency_hz) ||
+        ((frequency_hz != 30U) && (frequency_hz != 60U)))
+        return;
+
+    // Do not change frequency-dependent controller coefficients while the
+    // PWM/control ISR is active.
+    if (inv_ctrl.flag_enable_system)
+        return;
+
+    preserved_angle = inv_ctrl.rg.current;
+    ctl_set_ramp_generator_slope(
+        &inv_ctrl.rg, float2ctrl((parameter_gt)frequency_hz / (parameter_gt)CONTROLLER_FREQUENCY));
+    inv_ctrl.rg.current = preserved_angle;
+
+    gfl_init.freq_base = (parameter_gt)frequency_hz;
+    inv_ctrl.coef_ff_decouple =
+        float2ctrl(CTL_PARAM_CONST_2PI * gfl_init.grid_filter_L * (parameter_gt)frequency_hz *
+                   gfl_init.i_base / gfl_init.v_base);
+
+    // Level 6 uses these 2-omega notches directly. Level 7 bypasses them, but
+    // keeping the coefficients synchronized makes later build-level changes
+    // and CCS inspection unambiguous.
+    gfl_neg_init.freq_base = (parameter_gt)frequency_hz;
+    for (i = 0; i < 2; ++i)
+    {
+        ctl_init_biquad_notch(&neg_current_ctrl.filter_idqn[i], gfl_neg_init.fs,
+                              2.0f * (parameter_gt)frequency_hz, gfl_neg_init.seq_filter_q);
+        ctl_init_biquad_notch(&neg_current_ctrl.filter_vdqn[i], gfl_neg_init.fs,
+                              2.0f * (parameter_gt)frequency_hz, gfl_neg_init.seq_filter_q);
     }
+
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    ctl_init_biquad_notch(&voltage_ctrl.notch_vdq[phase_d], CONTROLLER_FREQUENCY,
+                          2.0f * (parameter_gt)frequency_hz, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q);
+    ctl_init_biquad_notch(&voltage_ctrl.notch_vdq[phase_q], CONTROLLER_FREQUENCY,
+                          2.0f * (parameter_gt)frequency_hz, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q);
+
+    // Keep the DDSRF cutoff proportional to the selected fundamental.
+    ctl_init_ddsrf_channel(&voltage_ctrl.voltage_seq, CONTROLLER_FREQUENCY,
+                           (parameter_gt)frequency_hz * 0.70710678f);
+    ctl_init_ddsrf_channel(&voltage_ctrl.current_seq, CONTROLLER_FREQUENCY,
+                           (parameter_gt)frequency_hz * 0.70710678f);
 #endif
+
+    ctl_output_frequency_hz = frequency_hz;
 }
 
 void ctl_mainloop(void)
 {
-    ctl_update_rectifier_ready_command();
+    ctl_apply_output_frequency_request();
     cia402_dispatch(&cia402_sm);
+
+    // A controller/state-machine fault must also clear the operator's switch
+    // request. This keeps the OLED state truthful and prevents an automatic
+    // restart after the fault is reset.
+    if (ctl_user_run_request &&
+        ((cia402_sm.current_state == CIA402_SM_FAULT_REACTION) ||
+         (cia402_sm.current_state == CIA402_SM_FAULT) ||
+         (cia402_sm.last_cb_result <= CIA402_EC_ERROR)))
+        ctl_set_run_request(0);
 
     return;
 }

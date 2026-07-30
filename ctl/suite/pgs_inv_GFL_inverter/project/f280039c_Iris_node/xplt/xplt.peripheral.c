@@ -141,11 +141,6 @@ void setup_peripheral(void)
         &iabc.control_port, &vabc.control_port);
 
     user_led = SYSTEM_LED;
-
-#if GFL_RECTIFIER_READY_INPUT_ENABLE
-    GPIO_setPadConfig(GFL_RECTIFIER_READY_GPIO, GPIO_PIN_TYPE_STD);
-    GPIO_setDirectionMode(GFL_RECTIFIER_READY_GPIO, GPIO_DIR_MODE_IN);
-#endif
 }
 
 //=================================================================================================
@@ -204,15 +199,6 @@ void reset_controller(void)
 
 }
 
-fast_gt xplt_get_rectifier_ready_input(void)
-{
-#if GFL_RECTIFIER_READY_INPUT_ENABLE
-    return (fast_gt)GPIO_readPin(GFL_RECTIFIER_READY_GPIO);
-#else
-    return 0;
-#endif
-}
-
 //=================================================================================================
 // communication functions and interrupt functions here
 
@@ -237,16 +223,8 @@ interrupt void INT_IRIS_CAN_0_ISR(void)
     {
         CAN_readMessage(IRIS_CAN_BASE, 1, rx_data);
         CAN_clearInterruptStatus(CANA_BASE, 1);
-
-        // Control Flag, Enable System
-        if (rx_data[0] == 1)
-        {
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
-        }
-        if (rx_data[0] == 0)
-        {
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
-        }
+        // RUN/STOP is intentionally ignored here. The expansion-board
+        // keyboard is the only operator command source.
     }
     else if (status == 2)
     {
@@ -290,7 +268,6 @@ interrupt void INT_IRIS_CAN_1_ISR(void)
 
 void send_monitor_data(void)
 {
-    uint16_t rx_raw[4];
     can_data_t tran_content[2];
 
     // 0x201: Monitor Grid Voltage
