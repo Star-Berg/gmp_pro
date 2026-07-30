@@ -213,6 +213,7 @@ gmp_task_status_t tsk_rectifier_keyboard(gmp_task_t* tsk)
     {
         if (cia402_sm.current_state == CIA402_SM_FAULT)
             cia402_send_cmd(&cia402_sm, CIA402_CMD_FAULT_RESET);
+
         else if (cia402_sm.state_word.bits.operation_enabled)
             cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
         else

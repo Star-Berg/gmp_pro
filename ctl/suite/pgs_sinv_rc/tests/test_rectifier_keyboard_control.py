@@ -41,7 +41,7 @@ class RectifierKeyboardControlTests(unittest.TestCase):
         self.assertIn("ht16k33_read_keys", source)
         self.assertIn("SINV_KEYBOARD_SW1_KEY_ID", source)
         self.assertIn("cia402_sm.current_state == CIA402_SM_FAULT", source)
-        self.assertIn("CIA402_CMD_FAULT_RESET", source)
+        self.assertIn("cia402_fault_reset(&cia402_sm)", source)
         self.assertIn("CIA402_CMD_ENABLE_OPERATION", source)
         self.assertIn("CIA402_CMD_DISABLE_VOLTAGE", source)
         self.assertIn("SINV_KEYBOARD_SW2_KEY_ID", source)
