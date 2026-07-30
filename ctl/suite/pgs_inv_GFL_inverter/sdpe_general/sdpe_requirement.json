@@ -476,29 +476,6 @@
       "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain."
     },
     {
-<<<<<<< Updated upstream
-=======
-      "role": "level67_dcbus_feedforward_lpf_alpha",
-      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.01"
-      },
-      "description": "First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain."
-    },
-    {
-      "role": "level67_dcbus_feedforward_slew_step",
-      "macro": "GFL_LEVEL67_DCBUS_FEEDFORWARD_SLEW_STEP",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.00002"
-      },
-      "description": "Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain change per control cycle."
-    },
-    {
->>>>>>> Stashed changes
       "role": "level7_ddsrf_filter_fc",
       "macro": "GFL_LEVEL7_DDSRF_FILTER_FC_HZ",
       "enabled": true,
