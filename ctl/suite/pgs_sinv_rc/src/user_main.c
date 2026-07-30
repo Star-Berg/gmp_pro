@@ -133,6 +133,77 @@ extern iic_halt iic_bus;
 ht16k33_dev_t ht16k33;
 static fast_gt g_rectifier_keyboard_ready = 0;
 static fast_gt g_rectifier_vbus_profile = SINV_KEYBOARD_DEFAULT_VBUS_PROFILE;
+static fast_gt g_rectifier_run_requested = 0;
+
+#define SINV_7SEG_F       (0x71U)
+#define SINV_7SEG_E       (0x79U)
+#define SINV_7SEG_LOWER_D (0x5EU)
+#define SINV_7SEG_LOWER_O (0x5CU)
+#define SINV_7SEG_LOWER_N (0x54U)
+#define SINV_7SEG_LOWER_R (0x50U)
+#define SINV_7SEG_LOWER_Y (0x6EU)
+#define SINV_7SEG_BLANK   (0x00U)
+
+static const data_gt g_rectifier_digit_segments[10] = {
+    0x3FU, 0x06U, 0x5BU, 0x4FU, 0x66U, 0x6DU, 0x7DU, 0x07U, 0x7FU, 0x6FU,
+};
+
+static ec_gt rectifier_display_update(ht16k33_dev_t* dev)
+{
+    data_gt content[8];
+    float vbus_ref_v = ctrl2float(g_vbus_ref_user) * CTRL_VOLTAGE_BASE;
+    uint16_t vbus_ref_rounded;
+    uint16_t i;
+
+    if (vbus_ref_v < 0.0f)
+        vbus_ref_v = 0.0f;
+    else if (vbus_ref_v > 9999.0f)
+        vbus_ref_v = 9999.0f;
+    vbus_ref_rounded = (uint16_t)(vbus_ref_v + 0.5f);
+
+    if (cia402_sm.current_state == CIA402_SM_FAULT)
+    {
+        content[0] = SINV_7SEG_E;
+        content[1] = SINV_7SEG_LOWER_R;
+        content[2] = SINV_7SEG_LOWER_R;
+    }
+    else if (cia402_sm.state_word.bits.operation_enabled)
+    {
+        content[0] = SINV_7SEG_LOWER_O;
+        content[1] = SINV_7SEG_LOWER_N;
+        content[2] = SINV_7SEG_BLANK;
+    }
+    else if (g_rectifier_run_requested)
+    {
+        content[0] = SINV_7SEG_LOWER_R;
+        content[1] = SINV_7SEG_LOWER_D;
+        content[2] = SINV_7SEG_LOWER_Y;
+    }
+    else
+    {
+        content[0] = SINV_7SEG_LOWER_O;
+        content[1] = SINV_7SEG_F;
+        content[2] = SINV_7SEG_F;
+    }
+
+    content[3] = SINV_7SEG_BLANK;
+    content[4] = g_rectifier_digit_segments[(vbus_ref_rounded / 1000U) % 10U];
+    content[5] = g_rectifier_digit_segments[(vbus_ref_rounded / 100U) % 10U];
+    content[6] = g_rectifier_digit_segments[(vbus_ref_rounded / 10U) % 10U];
+    content[7] = g_rectifier_digit_segments[vbus_ref_rounded % 10U];
+
+    for (i = 0U; i < 8U; ++i)
+    {
+        uint16_t ram_index = i * 2U;
+        if (dev->display_ram[ram_index] != content[i])
+        {
+            dev->display_ram[ram_index] = content[i];
+            dev->is_dirty = 1;
+        }
+    }
+
+    return ht16k33_update_display(dev);
+}
 
 gmp_task_status_t tsk_blink(gmp_task_t* tsk)
 {
@@ -187,6 +258,13 @@ gmp_task_status_t tsk_rectifier_keyboard(gmp_task_t* tsk)
     if (!g_rectifier_keyboard_ready)
         return GMP_TASK_DONE;
 
+    if (rectifier_display_update(dev) != GMP_EC_OK)
+    {
+        tsk->is_enabled = 0;
+        g_rectifier_keyboard_ready = 0;
+        return GMP_TASK_DONE;
+    }
+
     ec_gt ret = ht16k33_read_keys(dev, &key_id);
     if (ret != GMP_EC_OK)
     {
@@ -211,17 +289,27 @@ gmp_task_status_t tsk_rectifier_keyboard(gmp_task_t* tsk)
 
     if (key_id == SINV_KEYBOARD_SW1_KEY_ID)
     {
-        if (cia402_sm.current_state == CIA402_SM_FAULT)
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_FAULT_RESET);
-        else if (cia402_sm.state_word.bits.operation_enabled)
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
-        else
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
+        if (cia402_sm.current_state != CIA402_SM_FAULT)
+        {
+            g_rectifier_run_requested ^= 1U;
+            if (g_rectifier_run_requested)
+                cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
+            else
+                cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
+        }
     }
     else if (key_id == SINV_KEYBOARD_SW2_KEY_ID)
     {
         g_rectifier_vbus_profile ^= 1U;
         rectifier_keyboard_apply_vbus_profile(g_rectifier_vbus_profile);
+    }
+    else if (key_id == SINV_KEYBOARD_SW3_KEY_ID)
+    {
+        g_rectifier_run_requested = 0;
+        if (cia402_sm.current_state == CIA402_SM_FAULT)
+            cia402_send_cmd(&cia402_sm, CIA402_CMD_FAULT_RESET);
+        else
+            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
     }
 
     return GMP_TASK_DONE;
@@ -285,8 +373,11 @@ gmp_task_status_t tsk_startup(gmp_task_t* tsk)
     if (ht16k33_init(&ht16k33, iic_bus, HT16K33_DEFAULT_DEV_ADDR, &ht16k33_init_struct) == GMP_EC_OK)
     {
         rectifier_keyboard_apply_vbus_profile(g_rectifier_vbus_profile);
-        g_rectifier_keyboard_ready = 1;
-        sched.task_list[4]->is_enabled = 1;
+        if (rectifier_display_update(&ht16k33) == GMP_EC_OK)
+        {
+            g_rectifier_keyboard_ready = 1;
+            sched.task_list[4]->is_enabled = 1;
+        }
     }
 #endif
 
