@@ -170,6 +170,9 @@ SINV_BUCK_DUTY_FF_GAIN = 0.15;
 % Nominal grid frequency in Hz.
 CTRL_GRID_FREQUENCY = 50.0;
 
+% BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters.
+SINV_DC_BUS_REF_V = 40.0;
+
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)
 if condition

@@ -515,6 +515,16 @@
         "float": "50.0"
       },
       "description": "Nominal grid frequency in Hz."
+    },
+    {
+      "role": "bus_ref",
+      "macro": "SINV_DC_BUS_REF_V",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "40.0"
+      },
+      "description": "BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters."
     }
   ],
   "requirement_groups": [
@@ -589,6 +599,12 @@
       "name": "Default Parameters",
       "requirements": [
         "grid_frequency"
+      ]
+    },
+    {
+      "name": "Ungrouped",
+      "requirements": [
+        "bus_ref"
       ]
     }
   ]

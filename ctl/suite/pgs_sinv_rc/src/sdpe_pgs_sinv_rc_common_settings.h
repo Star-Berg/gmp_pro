@@ -295,6 +295,11 @@ extern "C"
  */
 #define CTRL_GRID_FREQUENCY (50.0f)
 
+/**
+ * @brief BUILD_LEVEL 5 physical DC bus voltage target. This is the rectifier DC-bus voltage-loop reference; tune it here instead of reusing platform rated-voltage/protection parameters.
+ */
+#define SINV_DC_BUS_REF_V (40.0f)
+
 // User project tail code
 // SDPE extension point: add before_footer code in the Project Requirement Code page if needed.
 

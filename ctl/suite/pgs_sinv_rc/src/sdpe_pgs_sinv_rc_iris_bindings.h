@@ -509,11 +509,6 @@ extern "C"
  */
 #define SINV_BUCK_OUTPUT_REF_V (48.0f)
 
-/**
- * @brief BUILD_LEVEL 5 physical DC bus voltage target. This aliases CTRL_DCBUS_VOLTAGE so the DC-bus target follows the platform DC-bus voltage setting.
- */
-#define SINV_DC_BUS_REF_V CTRL_DCBUS_VOLTAGE
-
 // User project tail code
 /* Compatibility with framework revisions that use the historical misspelling. */
 #if defined(ENABLE_GMP_DL_PIL_SIM) && !defined(ENBALE_GMP_DL_PIL_SIM)
