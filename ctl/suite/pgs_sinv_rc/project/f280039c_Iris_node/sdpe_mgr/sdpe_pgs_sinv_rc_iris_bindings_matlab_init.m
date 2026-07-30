@@ -371,18 +371,34 @@ CIA402_CONFIG_ENABLE_SEQUENCE_SWITCH = true;
 % Options: (1), (2), (3), (4), (5), (6), (7)
 BUILD_LEVEL = 5;
 
-%% Inverter Ready Interlock
-% Enable the active-high rectifier READY interlock output.
+%% Rectifier Keyboard Control
+% Enable HT16K33 keyboard control on the rectifier DSP.
 % Options: (0), (1)
-SINV_INVERTER_READY_OUTPUT_ENABLE = 1;
+SINV_KEYBOARD_CONTROL_ENABLE = 1;
 
-% GPIO used to signal that the rectifier DC bus is ready.
-% Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
-SINV_INVERTER_READY_GPIO = 'IRIS_GPIO4';
+% HT16K33 key ID used by SW1. SW1 toggles CiA402 enable/disable.
+SINV_KEYBOARD_SW1_KEY_ID = 8;
 
-% Active logic level of the inverter READY output.
+% HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile.
+SINV_KEYBOARD_SW2_KEY_ID = 9;
+
+% SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
+SINV_KEYBOARD_VBUS_REF_0_V = 50.0;
+
+% SW2.1 DC-bus reference in V. This is the higher-bus profile for high input voltage tests.
+SINV_KEYBOARD_VBUS_REF_1_V = 60.0;
+
+% Default SW2 profile after power-up. 0 selects SINV_KEYBOARD_VBUS_REF_0_V.
 % Options: (0U), (1U)
-SINV_INVERTER_READY_ACTIVE_LEVEL = 1;
+SINV_KEYBOARD_DEFAULT_VBUS_PROFILE = 0;
+
+% Keyboard scan period in ms.
+SINV_KEYBOARD_SCAN_PERIOD_MS = 50;
+
+% Required time without repeated key messages before another key action is accepted.
+SINV_KEYBOARD_RELEASE_TIMEOUT_MS = 200;
+
+SINV_KEYBOARD_DEFAULT_VBUS_REF_V = sdpe_select(SINV_KEYBOARD_DEFAULT_VBUS_PROFILE == 0, SINV_KEYBOARD_VBUS_REF_0_V, SINV_KEYBOARD_VBUS_REF_1_V);
 
 %% PWM Modulator
 % Use negative PWM modulator logic.
@@ -582,12 +598,6 @@ SINV_LEVEL7_BOOST_VBUS_SLEW_V_S = 120.0;
 
 % BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
 SINV_LEVEL7_BOOST_START_DELAY_MS = 100;
-
-% Time that all inverter READY conditions must remain valid.
-SINV_INVERTER_READY_STABLE_MS = 100;
-
-% Allowed physical DC-bus voltage error before asserting inverter READY.
-SINV_INVERTER_READY_VBUS_TOLERANCE_V = 3.0;
 
 % Startup delay in ms.
 CTRL_STARTUP_DELAY = 100;

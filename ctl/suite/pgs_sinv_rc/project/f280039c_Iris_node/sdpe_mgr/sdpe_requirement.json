@@ -83,8 +83,8 @@
       "description": "Single-phase converter commissioning build level, aligned with the simulation controller branches.\nBUILD_LEVEL 1: open-loop H-bridge modulation for resistive-load validation.\nBUILD_LEVEL 2: sinusoidal current command for resistive-load current-loop validation.\nBUILD_LEVEL 3: grid current loop with signed P/Q command.\nBUILD_LEVEL 4: measured active-power outer loop feeding the grid current loop.\nBUILD_LEVEL 5: original rectifier DC-bus voltage loop with Q_ref = 0 and no Buck/Boost PWM.\nBUILD_LEVEL 6: rectifier DC-bus voltage loop with PF-derived Q command and downstream Buck control.\nBUILD_LEVEL 7: boost-fed grid mode; the DCDC stage regulates DC bus from the low-voltage side, while the grid side uses direct signed P/Q."
     },
     {
-      "group": "Inverter Ready Interlock",
-      "macro": "SINV_INVERTER_READY_OUTPUT_ENABLE",
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_CONTROL_ENABLE",
       "enabled": true,
       "weak": false,
       "value": "(1)",
@@ -93,37 +93,80 @@
         "(0)",
         "(1)"
       ],
-      "description": "Enable the active-high rectifier READY interlock output."
+      "description": "Enable HT16K33 keyboard control on the rectifier DSP."
     },
     {
-      "group": "Inverter Ready Interlock",
-      "macro": "SINV_INVERTER_READY_GPIO",
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_SW1_KEY_ID",
       "enabled": true,
       "weak": false,
-      "value": "IRIS_GPIO4",
-      "options_preset": "iris_f280039c_node.IRIS_GPIO",
-      "options": [
-        "IRIS_GPIO1",
-        "IRIS_GPIO2",
-        "IRIS_GPIO3",
-        "IRIS_GPIO4",
-        "IRIS_GPIO5",
-        "IRIS_GPIO6"
-      ],
-      "description": "GPIO used to signal that the rectifier DC bus is ready."
+      "value": "(8U)",
+      "options_preset": "",
+      "options": [],
+      "description": "HT16K33 key ID used by SW1. SW1 toggles CiA402 enable/disable."
     },
     {
-      "group": "Inverter Ready Interlock",
-      "macro": "SINV_INVERTER_READY_ACTIVE_LEVEL",
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_SW2_KEY_ID",
       "enabled": true,
       "weak": false,
-      "value": "(1U)",
+      "value": "(9U)",
+      "options_preset": "",
+      "options": [],
+      "description": "HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile."
+    },
+    {
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_VBUS_REF_0_V",
+      "enabled": true,
+      "weak": false,
+      "value": "(50.0f)",
+      "options_preset": "",
+      "options": [],
+      "description": "SW2.0 DC-bus reference in V. This is the default efficiency-test profile."
+    },
+    {
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_VBUS_REF_1_V",
+      "enabled": true,
+      "weak": false,
+      "value": "(60.0f)",
+      "options_preset": "",
+      "options": [],
+      "description": "SW2.1 DC-bus reference in V. This is the higher-bus profile for high input voltage tests."
+    },
+    {
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_DEFAULT_VBUS_PROFILE",
+      "enabled": true,
+      "weak": false,
+      "value": "(0U)",
       "options_preset": "",
       "options": [
         "(0U)",
         "(1U)"
       ],
-      "description": "Active logic level of the inverter READY output."
+      "description": "Default SW2 profile after power-up. 0 selects SINV_KEYBOARD_VBUS_REF_0_V."
+    },
+    {
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_SCAN_PERIOD_MS",
+      "enabled": true,
+      "weak": false,
+      "value": "(50U)",
+      "options_preset": "",
+      "options": [],
+      "description": "Keyboard scan period in ms."
+    },
+    {
+      "group": "Rectifier Keyboard Control",
+      "macro": "SINV_KEYBOARD_RELEASE_TIMEOUT_MS",
+      "enabled": true,
+      "weak": false,
+      "value": "(200U)",
+      "options_preset": "",
+      "options": [],
+      "description": "Required time without repeated key messages before another key action is accepted."
     },
     {
       "group": "PWM Modulator",
@@ -876,26 +919,6 @@
       "description": "BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts."
     },
     {
-      "role": "inverter_ready_stable_ms",
-      "macro": "SINV_INVERTER_READY_STABLE_MS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "literal": "(100U)"
-      },
-      "description": "Time that all inverter READY conditions must remain valid."
-    },
-    {
-      "role": "inverter_ready_vbus_tolerance",
-      "macro": "SINV_INVERTER_READY_VBUS_TOLERANCE_V",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "literal": "(3.0f)"
-      },
-      "description": "Allowed physical DC-bus voltage error before asserting inverter READY."
-    },
-    {
       "role": "startup_delay",
       "macro": "CTRL_STARTUP_DELAY",
       "enabled": true,
@@ -1019,13 +1042,6 @@
         "level6_boost_input_ref",
         "level6_boost_vbus_slew",
         "level6_boost_start_delay"
-      ]
-    },
-    {
-      "name": "Inverter Ready Interlock",
-      "requirements": [
-        "inverter_ready_stable_ms",
-        "inverter_ready_vbus_tolerance"
       ]
     },
     {

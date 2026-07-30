@@ -190,9 +190,9 @@ void ctl_init(void)
     g_p_ref_user = float2ctrl(SINV_LEVEL4_ACTIVE_POWER_REF_PU);
     g_q_ref_user = float2ctrl(0.0f);
 #elif BUILD_LEVEL == 5
-    g_vbus_ref_user = float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
+    g_vbus_ref_user = float2ctrl(SINV_KEYBOARD_DEFAULT_VBUS_REF_V / CTRL_VOLTAGE_BASE);
 #elif BUILD_LEVEL == 6
-    g_vbus_ref_user = float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
+    g_vbus_ref_user = float2ctrl(SINV_KEYBOARD_DEFAULT_VBUS_REF_V / CTRL_VOLTAGE_BASE);
 #elif BUILD_LEVEL == 7
     g_vbus_ref_user = float2ctrl(SINV_LEVEL7_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
     g_p_ref_user = float2ctrl(SINV_LEVEL7_ACTIVE_POWER_REF_PU);
@@ -209,40 +209,6 @@ void ctl_init(void)
 //=================================================================================================
 // CTL endless loop routine
 
-void ctl_update_inverter_ready_output(void)
-{
-#if SINV_INVERTER_READY_OUTPUT_ENABLE
-    static uint32_t stable_ms = 0U;
-    ctrl_gt vbus_ready_feedback = adc_v_bus.control_port.value;
-    ctrl_gt vbus_error;
-#if BUILD_LEVEL == 5
-    /* Use the same 10 Hz feedback used by the Level 5 DC-bus loop. This
-       evaluates the regulated DC level instead of rejecting READY on every
-       normal 100 Hz single-phase power-ripple peak. Fast raw-sample OVP
-       remains active in the ISR protection path. */
-    vbus_ready_feedback = g_vbus_feedback_filtered;
-#endif
-    vbus_error = ctl_abs(vbus_ready_feedback -
-                         float2ctrl(SINV_DC_BUS_REF_V / CTRL_VOLTAGE_BASE));
-    fast_gt ready_condition = cia402_sm.state_word.bits.operation_enabled &&
-                              (protection.active_errors == 0) &&
-                              (vbus_error <= float2ctrl(SINV_INVERTER_READY_VBUS_TOLERANCE_V /
-                                                       CTRL_VOLTAGE_BASE));
-
-    if (ready_condition)
-    {
-        if (stable_ms < SINV_INVERTER_READY_STABLE_MS)
-            ++stable_ms;
-    }
-    else
-    {
-        stable_ms = 0U;
-    }
-
-    xplt_set_inverter_ready_output(stable_ms >= SINV_INVERTER_READY_STABLE_MS);
-#endif
-}
-
 void ctl_mainloop(void)
 {
     // gmp_base_loop() may spin much faster than 1 kHz. Run state-machine and
@@ -254,7 +220,6 @@ void ctl_mainloop(void)
     last_tick = current_tick;
 
     cia402_dispatch(&cia402_sm);
-    ctl_update_inverter_ready_output();
 
 #if (BUILD_LEVEL >= 2) && defined(SINV_ENABLE_REPETITIVE_CONTROL)
     if (cia402_sm.state_word.bits.operation_enabled &&

@@ -114,7 +114,6 @@ void clear_all_controllers(void);
 void clear_run_controllers_for_pwm_enable(void);
 void ctl_init(void);
 void ctl_mainloop(void);
-void ctl_update_inverter_ready_output(void);
 fast_gt ctl_exec_adc_calibration(void);
 fast_gt ctl_exec_dc_voltage_ready(void);
 fast_gt ctl_check_pll_locked(void);

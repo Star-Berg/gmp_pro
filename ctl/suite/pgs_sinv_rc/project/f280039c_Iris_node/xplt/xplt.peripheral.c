@@ -11,6 +11,7 @@
 
 #include "ctl_main.h" // Includes SINV modules, ADC structures, and ctrl_settings.h
 #include "user_main.h"
+#include <core/dev/display/ht16k33.h>
 #include <ctl/component/dsa/dsa_trigger.h>
 #include <xplt.peripheral.h>
 
@@ -40,6 +41,21 @@ ctrl_gt dlog_mem2[DLOG_MEM_LENGTH];
 
 // GPIO port
 extern gpio_halt user_led;
+iic_halt iic_bus;
+
+static void init_rectifier_i2c(void)
+{
+#if SINV_KEYBOARD_CONTROL_ENABLE
+    I2C_disableModule(IRIS_IIC_BASE);
+    I2C_initController(IRIS_IIC_BASE, DEVICE_SYSCLK_FREQ, 400000, I2C_DUTYCYCLE_33);
+    I2C_setBitCount(IRIS_IIC_BASE, I2C_BITCOUNT_8);
+    I2C_setTargetAddress(IRIS_IIC_BASE, HT16K33_DEFAULT_DEV_ADDR);
+    I2C_setEmulationMode(IRIS_IIC_BASE, I2C_EMULATION_FREE_RUN);
+    I2C_enableFIFO(IRIS_IIC_BASE);
+    I2C_clearInterruptStatus(IRIS_IIC_BASE, I2C_INT_RXFF | I2C_INT_TXFF);
+    I2C_enableModule(IRIS_IIC_BASE);
+#endif
+}
 
 //=================================================================================================
 // Peripheral Setup Function
@@ -55,16 +71,8 @@ void setup_peripheral(void)
     asm(" RPT #255 || NOP");
 
     user_led = SYSTEM_LED;
-
-#if SINV_INVERTER_READY_OUTPUT_ENABLE
-#if SINV_INVERTER_READY_ACTIVE_LEVEL == 0U
-    GPIO_writePin(SINV_INVERTER_READY_GPIO, 1U);
-#else
-    GPIO_writePin(SINV_INVERTER_READY_GPIO, 0U);
-#endif
-    GPIO_setPadConfig(SINV_INVERTER_READY_GPIO, GPIO_PIN_TYPE_STD);
-    GPIO_setDirectionMode(SINV_INVERTER_READY_GPIO, GPIO_DIR_MODE_OUT);
-#endif
+    init_rectifier_i2c();
+    iic_bus = IRIS_IIC_BASE;
 
     // ---------------------------------------------------------
     // 1. Initialize AC Grid Voltage ADC Channel
@@ -168,17 +176,6 @@ void reset_controller(void)
         ;
 
     GPIO_WritePin(PWM_RESET_PORT, 1);
-}
-
-void xplt_set_inverter_ready_output(fast_gt ready)
-{
-#if SINV_INVERTER_READY_OUTPUT_ENABLE
-    uint32_t output_level = ready ? SINV_INVERTER_READY_ACTIVE_LEVEL
-                                  : (SINV_INVERTER_READY_ACTIVE_LEVEL ^ 1U);
-    GPIO_writePin(SINV_INVERTER_READY_GPIO, output_level);
-#else
-    GMP_UNUSED_VAR(ready);
-#endif
 }
 
 //=================================================================================================

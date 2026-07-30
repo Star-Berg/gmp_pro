@@ -96,26 +96,56 @@ extern "C"
 
 //=================================================================================================
 /**
- * @brief Inverter Ready Interlock.
+ * @brief Rectifier Keyboard Control.
  */
 
 /**
- * @brief Enable the active-high rectifier READY interlock output.
+ * @brief Enable HT16K33 keyboard control on the rectifier DSP.
  *        Options: (0), (1)
  */
-#define SINV_INVERTER_READY_OUTPUT_ENABLE (1)
+#define SINV_KEYBOARD_CONTROL_ENABLE (1)
 
 /**
- * @brief GPIO used to signal that the rectifier DC bus is ready.
- *        Options: IRIS_GPIO1, IRIS_GPIO2, IRIS_GPIO3, IRIS_GPIO4, IRIS_GPIO5, IRIS_GPIO6
+ * @brief HT16K33 key ID used by SW1. SW1 toggles CiA402 enable/disable.
  */
-#define SINV_INVERTER_READY_GPIO IRIS_GPIO4
+#define SINV_KEYBOARD_SW1_KEY_ID (8U)
 
 /**
- * @brief Active logic level of the inverter READY output.
+ * @brief HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile.
+ */
+#define SINV_KEYBOARD_SW2_KEY_ID (9U)
+
+/**
+ * @brief SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
+ */
+#define SINV_KEYBOARD_VBUS_REF_0_V (50.0f)
+
+/**
+ * @brief SW2.1 DC-bus reference in V. This is the higher-bus profile for high input voltage tests.
+ */
+#define SINV_KEYBOARD_VBUS_REF_1_V (60.0f)
+
+/**
+ * @brief Default SW2 profile after power-up. 0 selects SINV_KEYBOARD_VBUS_REF_0_V.
  *        Options: (0U), (1U)
  */
-#define SINV_INVERTER_READY_ACTIVE_LEVEL (1U)
+#define SINV_KEYBOARD_DEFAULT_VBUS_PROFILE (0U)
+
+/**
+ * @brief Keyboard scan period in ms.
+ */
+#define SINV_KEYBOARD_SCAN_PERIOD_MS (50U)
+
+/**
+ * @brief Required time without repeated key messages before another key action is accepted.
+ */
+#define SINV_KEYBOARD_RELEASE_TIMEOUT_MS (200U)
+
+#if SINV_KEYBOARD_DEFAULT_VBUS_PROFILE == 0U
+#define SINV_KEYBOARD_DEFAULT_VBUS_REF_V SINV_KEYBOARD_VBUS_REF_0_V
+#else
+#define SINV_KEYBOARD_DEFAULT_VBUS_REF_V SINV_KEYBOARD_VBUS_REF_1_V
+#endif
 
 //=================================================================================================
 /**
@@ -469,16 +499,6 @@ extern "C"
  * @brief BUILD_LEVEL 7 delay after the low-voltage Boost input is present and CiA402 is operation-enabled before Boost PWM starts.
  */
 #define SINV_LEVEL7_BOOST_START_DELAY_MS (100)
-
-/**
- * @brief Time that all inverter READY conditions must remain valid.
- */
-#define SINV_INVERTER_READY_STABLE_MS (100U)
-
-/**
- * @brief Allowed physical DC-bus voltage error before asserting inverter READY.
- */
-#define SINV_INVERTER_READY_VBUS_TOLERANCE_V (3.0f)
 
 /**
  * @brief Startup delay in ms.
