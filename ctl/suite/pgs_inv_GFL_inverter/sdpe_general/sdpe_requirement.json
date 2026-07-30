@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-22",
+  "updated_at": "2026-07-29",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -165,7 +165,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.6124"
+        "float": "0.3"
       },
       "description": "BUILD_LEVEL 1 d-axis open-loop voltage command."
     },
@@ -175,7 +175,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0"
+        "float": "0.3"
       },
       "description": "BUILD_LEVEL 1 q-axis open-loop voltage command."
     },
@@ -215,7 +215,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.1"
+        "float": "0.2"
       },
       "description": "BUILD_LEVEL 2 d-axis current command."
     },
@@ -225,7 +225,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.1"
+        "float": "0.2"
       },
       "description": "BUILD_LEVEL 2 q-axis current command."
     },
@@ -270,6 +270,236 @@
       "description": "BUILD_LEVEL 4 q-axis current command."
     },
     {
+      "role": "level6_vd_ref",
+      "macro": "GFL_LEVEL6_VD_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.696228"
+      },
+      "description": "BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit."
+    },
+    {
+      "role": "level6_vq_ref",
+      "macro": "GFL_LEVEL6_VQ_REF_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.0"
+      },
+      "description": "BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit."
+    },
+    {
+      "role": "level6_voltage_d_kp",
+      "macro": "GFL_LEVEL6_VOLTAGE_D_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.03"
+      },
+      "description": "BUILD_LEVEL 6/7 d-axis voltage-loop proportional gain."
+    },
+    {
+      "role": "level6_voltage_d_ki",
+      "macro": "GFL_LEVEL6_VOLTAGE_D_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "25.132741"
+      },
+      "description": "BUILD_LEVEL 6/7 d-axis series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_voltage_q_kp",
+      "macro": "GFL_LEVEL6_VOLTAGE_Q_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.03"
+      },
+      "description": "BUILD_LEVEL 6/7 q-axis voltage-loop proportional gain."
+    },
+    {
+      "role": "level6_voltage_q_ki",
+      "macro": "GFL_LEVEL6_VOLTAGE_Q_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "25.132741"
+      },
+      "description": "BUILD_LEVEL 6/7 q-axis series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_current_limit",
+      "macro": "GFL_LEVEL6_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.35"
+      },
+      "description": "BUILD_LEVEL 6/7 circular positive d/q current-reference limit in per unit."
+    },
+    {
+      "role": "level6_pos_voltage_notch_q",
+      "macro": "GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "BUILD_LEVEL 6 positive voltage-feedback 2-omega notch quality factor."
+    },
+    {
+      "role": "level6_neg_notch_q",
+      "macro": "GFL_LEVEL6_NEG_NOTCH_Q",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "5.0"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence 2-omega notch quality factor."
+    },
+    {
+      "role": "level6_neg_current_kp",
+      "macro": "GFL_LEVEL6_NEG_CURRENT_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.2040"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence current-loop proportional gain."
+    },
+    {
+      "role": "level6_neg_current_ki",
+      "macro": "GFL_LEVEL6_NEG_CURRENT_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "62.831853"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence current-loop series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_neg_current_limit",
+      "macro": "GFL_LEVEL6_NEG_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.3"
+      },
+      "description": "BUILD_LEVEL 6 negative current-loop voltage-output limit in per unit."
+    },
+    {
+      "role": "level6_neg_voltage_kp",
+      "macro": "GFL_LEVEL6_NEG_VOLTAGE_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.03"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence voltage-loop proportional gain."
+    },
+    {
+      "role": "level6_neg_voltage_ki",
+      "macro": "GFL_LEVEL6_NEG_VOLTAGE_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "25.132741"
+      },
+      "description": "BUILD_LEVEL 6 negative-sequence voltage-loop series-PI integral frequency in radians per second."
+    },
+    {
+      "role": "level6_neg_voltage_limit",
+      "macro": "GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.2"
+      },
+      "description": "BUILD_LEVEL 6 negative voltage-loop current-reference limit in per unit."
+    },
+    {
+      "role": "level7_ddsrf_filter_fc",
+      "macro": "GFL_LEVEL7_DDSRF_FILTER_FC_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_GRID_FREQUENCY_HZ * 0.70710678f)"
+      },
+      "description": "BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz."
+    },
+    {
+      "role": "level67_soft_start_time_ms",
+      "macro": "GFL_LEVEL67_SOFT_START_TIME_MS",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "1000.0"
+      },
+      "description": "BUILD_LEVEL 6/7 voltage-reference soft-start duration in milliseconds; set to zero to disable the ramp."
+    },
+    {
+      "role": "level7_neg_current_kp",
+      "macro": "GFL_LEVEL7_NEG_CURRENT_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_CURRENT_KP)"
+      },
+      "description": "BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_current_ki",
+      "macro": "GFL_LEVEL7_NEG_CURRENT_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_CURRENT_KI)"
+      },
+      "description": "BUILD_LEVEL 7 negative current-loop Ki; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_current_limit",
+      "macro": "GFL_LEVEL7_NEG_CURRENT_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_CURRENT_LIMIT_PU)"
+      },
+      "description": "BUILD_LEVEL 7 negative current-loop output limit; defaults to Level 6."
+    },
+    {
+      "role": "level7_neg_voltage_kp",
+      "macro": "GFL_LEVEL7_NEG_VOLTAGE_KP",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_VOLTAGE_KP)"
+      },
+      "description": "BUILD_LEVEL 7 negative voltage-loop Kp; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_voltage_ki",
+      "macro": "GFL_LEVEL7_NEG_VOLTAGE_KI",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_VOLTAGE_KI)"
+      },
+      "description": "BUILD_LEVEL 7 negative voltage-loop Ki; defaults to the Level 6 value."
+    },
+    {
+      "role": "level7_neg_voltage_limit",
+      "macro": "GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "literal": "(GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU)"
+      },
+      "description": "BUILD_LEVEL 7 negative voltage-loop output limit; defaults to Level 6."
+    },
+    {
       "role": "adc_calibrator_cutoff",
       "macro": "GFL_ADC_CALIBRATOR_FC_HZ",
       "enabled": true,
@@ -305,9 +535,19 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "50.0"
+        "float": "60.0"
       },
       "description": "Nominal grid frequency in hertz."
+    },
+    {
+      "role": "level2_current_adc_filter_cutoff",
+      "macro": "GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "2000.0"
+      },
+      "description": "BUILD_LEVEL 2 phase-current ADC low-pass cutoff frequency in hertz."
     }
   ],
   "requirement_groups": [
@@ -341,6 +581,38 @@
       ]
     },
     {
+      "name": "BUILD LEVEL 6/7 Common Voltage Control",
+      "requirements": [
+        "level6_vd_ref",
+        "level6_vq_ref",
+        "level6_voltage_d_kp",
+        "level6_voltage_d_ki",
+        "level6_voltage_q_kp",
+        "level6_voltage_q_ki",
+        "level6_current_limit",
+        "level6_pos_voltage_notch_q",
+        "level6_neg_notch_q",
+        "level6_neg_current_kp",
+        "level6_neg_current_ki",
+        "level6_neg_current_limit",
+        "level6_neg_voltage_kp",
+        "level6_neg_voltage_ki",
+        "level6_neg_voltage_limit"
+      ]
+    },
+    {
+      "name": "BUILD LEVEL 7 DDSRF Control",
+      "requirements": [
+        "level7_ddsrf_filter_fc",
+        "level7_neg_current_kp",
+        "level7_neg_current_ki",
+        "level7_neg_current_limit",
+        "level7_neg_voltage_kp",
+        "level7_neg_voltage_ki",
+        "level7_neg_voltage_limit"
+      ]
+    },
+    {
       "name": "Runtime Parameters",
       "requirements": [
         "adc_calibrator_cutoff",
@@ -352,6 +624,12 @@
       "name": "Default Parameters",
       "requirements": [
         "grid_frequency"
+      ]
+    },
+    {
+      "name": "Ungrouped",
+      "requirements": [
+        "level2_current_adc_filter_cutoff"
       ]
     }
   ]

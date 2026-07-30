@@ -20,7 +20,7 @@
   ],
   "code_sections": {
     "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>",
-    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)\n#error BUILD_LEVEL_must_be_between_1_and_5\n#endif"
+    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)\n#error BUILD_LEVEL_must_be_between_1_and_7\n#endif"
   },
   "feature_macros": [],
   "option_macros": [
@@ -34,9 +34,11 @@
         "(2)",
         "(3)",
         "(4)",
-        "(5)"
+        "(5)",
+        "(6)",
+        "(7)"
       ],
-      "description": "Incremental control level; level 5 enables the cascaded P/Q power loop."
+      "description": "Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation."
     },
     {
       "group": "Sampling",

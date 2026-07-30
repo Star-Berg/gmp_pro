@@ -80,18 +80,38 @@ void setup_peripheral(void)
     ctl_init_tri_ptr_adc_channel(
         &vabc, vabc_src,
         // ADC gain, ADC bias
-        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_SENSITIVITY, CTRL_VOLTAGE_BASE),
-        ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_BIAS),
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_A_SENSITIVITY, CTRL_VOLTAGE_BASE),
+        ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_A_BIAS),
         // ADC resolution, IQN
         12, 24);
+
+    vabc.gain[phase_A] =
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_A_SENSITIVITY, CTRL_VOLTAGE_BASE);
+    vabc.bias[phase_A] = ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_A_BIAS);
+    vabc.gain[phase_B] =
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_B_SENSITIVITY, CTRL_VOLTAGE_BASE);
+    vabc.bias[phase_B] = ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_B_BIAS);
+    vabc.gain[phase_C] =
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_C_SENSITIVITY, CTRL_VOLTAGE_BASE);
+    vabc.bias[phase_C] = ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_VOLTAGE_C_BIAS);
 
     ctl_init_tri_ptr_adc_channel(
         &iabc, iabc_src,
         // ADC gain, ADC bias
-        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_SENSITIVITY, CTRL_CURRENT_BASE),
-        ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_BIAS),
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_A_SENSITIVITY, CTRL_CURRENT_BASE),
+        ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_A_BIAS),
         // ADC resolution, IQN
         12, 24);
+
+    iabc.gain[phase_A] =
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_A_SENSITIVITY, CTRL_CURRENT_BASE);
+    iabc.bias[phase_A] = ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_A_BIAS);
+    iabc.gain[phase_B] =
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_B_SENSITIVITY, CTRL_CURRENT_BASE);
+    iabc.bias[phase_B] = ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_B_BIAS);
+    iabc.gain[phase_C] =
+        ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_C_SENSITIVITY, CTRL_CURRENT_BASE);
+    iabc.bias[phase_C] = ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_GRID_CURRENT_C_BIAS);
 
     ctl_init_ptr_adc_channel(
         &udc, &udc_src,
@@ -203,16 +223,8 @@ interrupt void INT_IRIS_CAN_0_ISR(void)
     {
         CAN_readMessage(IRIS_CAN_BASE, 1, rx_data);
         CAN_clearInterruptStatus(CANA_BASE, 1);
-
-        // Control Flag, Enable System
-        if (rx_data[0] == 1)
-        {
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
-        }
-        if (rx_data[0] == 0)
-        {
-            cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
-        }
+        // RUN/STOP is intentionally ignored here. The expansion-board
+        // keyboard is the only operator command source.
     }
     else if (status == 2)
     {
@@ -256,7 +268,6 @@ interrupt void INT_IRIS_CAN_1_ISR(void)
 
 void send_monitor_data(void)
 {
-    uint16_t rx_raw[4];
     can_data_t tran_content[2];
 
     // 0x201: Monitor Grid Voltage
