@@ -215,7 +215,9 @@ void ctl_init()
     ctl_set_gfl_inv_current_mode(&inv_ctrl);
     ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
     inv_ctrl.flag_enable_decouple = 1;
+#if GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL != 0
     ctl_enable_neg_voltage_inv(&neg_current_ctrl);
+#endif
 
 #elif BUILD_LEVEL == 7
     // Level 6 voltage control with DDSRF positive/negative sequence separation.
@@ -223,7 +225,9 @@ void ctl_init()
     ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
     inv_ctrl.flag_enable_current_ctrl = 0;
     inv_ctrl.flag_enable_decouple = 1;
+#if GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL != 0
     ctl_enable_neg_voltage_inv(&neg_current_ctrl);
+#endif
 
 #endif // BUILD_LEVEL
 

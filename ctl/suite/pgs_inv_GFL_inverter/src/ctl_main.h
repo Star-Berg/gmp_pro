@@ -154,7 +154,11 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
             ctl_set_gfl_inv_current(&inv_ctrl, voltage_ctrl.idq_ref.dat[phase_d],
                                     voltage_ctrl.idq_ref.dat[phase_q]);
             ctl_step_level67_positive_current(&inv_ctrl, &inv_ctrl.idq, &voltage_ctrl.vdq_feedback);
+#if GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL != 0
             ctl_step_neg_inv_ctrl(&neg_current_ctrl);
+#else
+            ctl_vector2_clear(&neg_current_ctrl.vab_out);
+#endif
         }
         else
         {
@@ -169,8 +173,12 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                                     voltage_ctrl.idq_ref.dat[phase_q]);
             ctl_step_level67_positive_current(&inv_ctrl, &voltage_ctrl.current_seq.pos_decoupled,
                                               &voltage_ctrl.voltage_seq.pos_dc);
+#if GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL != 0
             ctl_step_neg_inv_ctrl_dq(&neg_current_ctrl, &voltage_ctrl.current_seq.neg_decoupled,
                                      &voltage_ctrl.voltage_seq.neg_dc);
+#else
+            ctl_vector2_clear(&neg_current_ctrl.vab_out);
+#endif
         }
         else
         {

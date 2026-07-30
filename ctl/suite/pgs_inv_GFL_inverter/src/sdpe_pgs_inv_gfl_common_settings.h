@@ -287,6 +287,12 @@ extern "C"
 #define GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU (GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU)
 
 /**
+ * @brief Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
+ *        Set to 0 to keep only positive-sequence voltage/current control in BUILD_LEVEL 6/7.
+ */
+#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (1)
+
+/**
  * @brief ADC offset calibrator filter cutoff frequency.
  */
 #define GFL_ADC_CALIBRATOR_FC_HZ (20.0f)
