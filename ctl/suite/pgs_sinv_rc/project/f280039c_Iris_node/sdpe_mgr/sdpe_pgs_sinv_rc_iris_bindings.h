@@ -116,6 +116,11 @@ extern "C"
 #define SINV_KEYBOARD_SW2_KEY_ID (9U)
 
 /**
+ * @brief HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.
+ */
+#define SINV_KEYBOARD_SW3_KEY_ID (1U)
+
+/**
  * @brief SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
  */
 #define SINV_KEYBOARD_VBUS_REF_0_V (50.0f)
@@ -140,12 +145,6 @@ extern "C"
  * @brief Required time without repeated key messages before another key action is accepted.
  */
 #define SINV_KEYBOARD_RELEASE_TIMEOUT_MS (200U)
-
-#if SINV_KEYBOARD_DEFAULT_VBUS_PROFILE == 0U
-#define SINV_KEYBOARD_DEFAULT_VBUS_REF_V SINV_KEYBOARD_VBUS_REF_0_V
-#else
-#define SINV_KEYBOARD_DEFAULT_VBUS_REF_V SINV_KEYBOARD_VBUS_REF_1_V
-#endif
 
 //=================================================================================================
 /**
