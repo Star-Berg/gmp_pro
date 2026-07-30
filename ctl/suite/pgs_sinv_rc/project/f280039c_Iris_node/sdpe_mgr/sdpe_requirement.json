@@ -117,16 +117,6 @@
     },
     {
       "group": "Rectifier Keyboard Control",
-      "macro": "SINV_KEYBOARD_SW3_KEY_ID",
-      "enabled": true,
-      "weak": false,
-      "value": "(10U)",
-      "options_preset": "",
-      "options": [],
-      "description": "HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault."
-    },
-    {
-      "group": "Rectifier Keyboard Control",
       "macro": "SINV_KEYBOARD_VBUS_REF_0_V",
       "enabled": true,
       "weak": false,

@@ -190,15 +190,9 @@ void ctl_init(void)
     g_p_ref_user = float2ctrl(SINV_LEVEL4_ACTIVE_POWER_REF_PU);
     g_q_ref_user = float2ctrl(0.0f);
 #elif BUILD_LEVEL == 5
-    g_vbus_ref_user =
-        float2ctrl(((SINV_KEYBOARD_DEFAULT_VBUS_PROFILE == 0U) ? SINV_KEYBOARD_VBUS_REF_0_V
-                                                              : SINV_KEYBOARD_VBUS_REF_1_V) /
-                   CTRL_VOLTAGE_BASE);
+    g_vbus_ref_user = float2ctrl(SINV_KEYBOARD_DEFAULT_VBUS_REF_V / CTRL_VOLTAGE_BASE);
 #elif BUILD_LEVEL == 6
-    g_vbus_ref_user =
-        float2ctrl(((SINV_KEYBOARD_DEFAULT_VBUS_PROFILE == 0U) ? SINV_KEYBOARD_VBUS_REF_0_V
-                                                              : SINV_KEYBOARD_VBUS_REF_1_V) /
-                   CTRL_VOLTAGE_BASE);
+    g_vbus_ref_user = float2ctrl(SINV_KEYBOARD_DEFAULT_VBUS_REF_V / CTRL_VOLTAGE_BASE);
 #elif BUILD_LEVEL == 7
     g_vbus_ref_user = float2ctrl(SINV_LEVEL7_DC_BUS_REF_V / CTRL_VOLTAGE_BASE);
     g_p_ref_user = float2ctrl(SINV_LEVEL7_ACTIVE_POWER_REF_PU);

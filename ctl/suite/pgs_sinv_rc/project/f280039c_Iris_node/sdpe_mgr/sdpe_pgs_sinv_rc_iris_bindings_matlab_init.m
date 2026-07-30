@@ -382,9 +382,6 @@ SINV_KEYBOARD_SW1_KEY_ID = 8;
 % HT16K33 key ID used by SW2. SW2 toggles the DC-bus reference profile.
 SINV_KEYBOARD_SW2_KEY_ID = 9;
 
-% HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.
-SINV_KEYBOARD_SW3_KEY_ID = 10;
-
 % SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
 SINV_KEYBOARD_VBUS_REF_0_V = 50.0;
 
@@ -400,6 +397,8 @@ SINV_KEYBOARD_SCAN_PERIOD_MS = 50;
 
 % Required time without repeated key messages before another key action is accepted.
 SINV_KEYBOARD_RELEASE_TIMEOUT_MS = 200;
+
+SINV_KEYBOARD_DEFAULT_VBUS_REF_V = sdpe_select(SINV_KEYBOARD_DEFAULT_VBUS_PROFILE == 0, SINV_KEYBOARD_VBUS_REF_0_V, SINV_KEYBOARD_VBUS_REF_1_V);
 
 %% PWM Modulator
 % Use negative PWM modulator logic.
