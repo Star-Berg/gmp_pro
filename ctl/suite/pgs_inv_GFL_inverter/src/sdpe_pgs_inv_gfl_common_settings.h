@@ -316,26 +316,6 @@ extern "C"
  */
 #define GFL_LEVEL67_SOFT_START_TIME_MS (1000.0f)
 
-/**
- * @brief Enable DC-bus feedforward for BUILD_LEVEL 6/7 final modulation.
- */
-#define GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD (1)
-
-/**
- * @brief Minimum valid measured DC-bus voltage for feedforward division.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_V (40.0f)
-
-/**
- * @brief Minimum DC-bus feedforward gain clamp.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN (0.75f)
-
-/**
- * @brief Maximum DC-bus feedforward gain clamp.
- */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN (1.25f)
-
 // User project tail code
 /* Accept the historical PIL spelling while new projects use the canonical switch. */
 #if defined ENBALE_GMP_DL_PIL_SIM && !defined ENABLE_GMP_DL_PIL_SIM

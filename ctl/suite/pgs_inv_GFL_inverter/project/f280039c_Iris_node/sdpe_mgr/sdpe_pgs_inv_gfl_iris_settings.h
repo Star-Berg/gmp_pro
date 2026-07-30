@@ -492,12 +492,12 @@ extern "C"
 /**
  * @brief Low nominal DC-bus operating voltage selected by the local panel.
  */
-#define GFL_UI_DCBUS_LOW_V (50)
+#define GFL_UI_DCBUS_LOW_V (60)
 
 /**
  * @brief High nominal DC-bus operating voltage selected by the local panel.
  */
-#define GFL_UI_DCBUS_HIGH_V (60)
+#define GFL_UI_DCBUS_HIGH_V (65)
 
 // User project tail code
 #if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)

@@ -624,10 +624,10 @@ GFL_UI_KEY_FAULT_RESET_ID = 21;
 GFL_UI_KEY_DCBUS_ID = 22;
 
 % Low nominal DC-bus operating voltage selected by the local panel.
-GFL_UI_DCBUS_LOW_V = 50;
+GFL_UI_DCBUS_LOW_V = 60;
 
 % High nominal DC-bus operating voltage selected by the local panel.
-GFL_UI_DCBUS_HIGH_V = 60;
+GFL_UI_DCBUS_HIGH_V = 65;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

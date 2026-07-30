@@ -1174,7 +1174,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "number": "50"
+        "number": "60"
       },
       "description": "Low nominal DC-bus operating voltage selected by the local panel."
     },
@@ -1184,7 +1184,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "number": "60"
+        "number": "65"
       },
       "description": "High nominal DC-bus operating voltage selected by the local panel."
     }
