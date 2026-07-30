@@ -11,6 +11,7 @@
 
 #include "ctl_main.h" // Includes SINV modules, ADC structures, and ctrl_settings.h
 #include "user_main.h"
+#include <core/dev/display/ht16k33.h>
 #include <ctl/component/dsa/dsa_trigger.h>
 #include <xplt.peripheral.h>
 
@@ -26,6 +27,11 @@ adc_channel_t adc_i_ac;
 // DC Bus Voltage Feedback
 adc_channel_t adc_v_bus;
 
+// Buck-stage feedbacks
+adc_channel_t adc_i_buck;
+adc_channel_t adc_v_buck_in;
+adc_channel_t adc_v_buck_out;
+
 // dlog DSA objects
 //basic_trigger_t trigger;
 
@@ -35,6 +41,21 @@ ctrl_gt dlog_mem2[DLOG_MEM_LENGTH];
 
 // GPIO port
 extern gpio_halt user_led;
+iic_halt iic_bus;
+
+static void init_rectifier_i2c(void)
+{
+#if SINV_KEYBOARD_CONTROL_ENABLE
+    I2C_disableModule(IRIS_IIC_BASE);
+    I2C_initController(IRIS_IIC_BASE, DEVICE_SYSCLK_FREQ, 400000, I2C_DUTYCYCLE_33);
+    I2C_setBitCount(IRIS_IIC_BASE, I2C_BITCOUNT_8);
+    I2C_setTargetAddress(IRIS_IIC_BASE, HT16K33_DEFAULT_DEV_ADDR);
+    I2C_setEmulationMode(IRIS_IIC_BASE, I2C_EMULATION_FREE_RUN);
+    I2C_enableFIFO(IRIS_IIC_BASE);
+    I2C_clearInterruptStatus(IRIS_IIC_BASE, I2C_INT_RXFF | I2C_INT_TXFF);
+    I2C_enableModule(IRIS_IIC_BASE);
+#endif
+}
 
 //=================================================================================================
 // Peripheral Setup Function
@@ -50,6 +71,8 @@ void setup_peripheral(void)
     asm(" RPT #255 || NOP");
 
     user_led = SYSTEM_LED;
+    init_rectifier_i2c();
+    iic_bus = IRIS_IIC_BASE;
 
     // ---------------------------------------------------------
     // 1. Initialize AC Grid Voltage ADC Channel
@@ -82,6 +105,22 @@ void setup_peripheral(void)
                          // ADC bias
                          ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
                          // ADC resolution, IQN
+                         12, 24);
+
+    ctl_init_adc_channel(&adc_i_buck,
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_CURRENT_SENSITIVITY, CTRL_CURRENT_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_CURRENT_BIAS),
+                         12, 24);
+
+    ctl_init_adc_channel(&adc_v_buck_in,
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_SENSITIVITY, CTRL_VOLTAGE_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_DC_VOLTAGE_BIAS),
+                         12, 24);
+
+    ctl_init_adc_channel(&adc_v_buck_out,
+                         ctl_gain_calc_generic(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_OUTPUT_VOLTAGE_SENSITIVITY,
+                                               CTRL_VOLTAGE_BASE),
+                         ctl_bias_calc_via_Vref_Vbias(CTRL_ADC_VOLTAGE_REF, CTRL_BUCK_OUTPUT_VOLTAGE_BIAS),
                          12, 24);
 
     // ---------------------------------------------------------

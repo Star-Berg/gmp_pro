@@ -29,6 +29,7 @@
 #include <ctl/component/digital_power/sinv/sms_pq.h>
 #include <ctl/component/digital_power/sinv/spll_sogi.h>
 #include <ctl/component/interface/hpwm_modulator.h>
+#include <ctl/component/intrinsic/continuous/continuous_pid.h>
 #include <ctl/component/intrinsic/discrete/signal_generator.h>
 
 #ifdef __cplusplus
@@ -54,9 +55,35 @@ extern ctl_ramp_generator_t rg;
 extern adc_channel_t adc_v_grid;
 extern adc_channel_t adc_i_ac;
 extern adc_channel_t adc_v_bus;
+extern adc_channel_t adc_i_buck;
+extern adc_channel_t adc_v_buck_in;
+extern adc_channel_t adc_v_buck_out;
 
 // Output channel
 extern single_phase_H_modulation_t hpwm;
+
+typedef struct _tag_sinv_buck_ctrl
+{
+    ctl_pid_t voltage_pid;
+    ctl_pid_t current_pid;
+    ctrl_gt v_ref;
+    ctrl_gt v_ref_target;
+    ctrl_gt v_ref_step;
+    ctrl_gt v_out_lpf;
+    ctrl_gt i_ref;
+    ctrl_gt v_in_ff;
+    ctrl_gt duty_ff;
+    ctrl_gt duty_trim;
+    ctrl_gt duty_cmd;
+    ctrl_gt duty;
+    uint32_t startup_delay_count;
+    uint32_t startup_counter;
+    uint32_t voltage_loop_counter;
+    pwm_gt pwm_cmp;
+    fast_gt flag_enable;
+} sinv_buck_ctrl_t;
+
+extern sinv_buck_ctrl_t buck_ctrl;
 
 // Protection module
 extern ctl_sinv_protect_t protection;
@@ -69,6 +96,14 @@ extern volatile fast_gt flag_enable_adc_calibrator;
 extern ctrl_gt g_p_ref_user;
 extern ctrl_gt g_q_ref_user;
 extern ctrl_gt g_vbus_ref_user;
+#if BUILD_LEVEL == 5 || BUILD_LEVEL == 6
+extern ctrl_gt g_vbus_ref_ramped;
+extern ctrl_gt g_vbus_ref_step;
+#endif
+#if BUILD_LEVEL == 5
+extern ctrl_gt g_vbus_feedback_filtered;
+extern ctrl_gt g_vbus_feedback_lpf_alpha;
+#endif
 
 extern ctrl_gt openloop_v_ref;
 extern vector2_gt phasor;
@@ -76,6 +111,7 @@ extern vector2_gt phasor;
 //=================================================================================================
 // function prototype
 void clear_all_controllers(void);
+void clear_run_controllers_for_pwm_enable(void);
 void ctl_init(void);
 void ctl_mainloop(void);
 fast_gt ctl_exec_adc_calibration(void);
@@ -83,6 +119,24 @@ fast_gt ctl_exec_dc_voltage_ready(void);
 fast_gt ctl_check_pll_locked(void);
 fast_gt ctl_check_compliance(void);
 fast_gt ctl_fault_recover_routine(void);
+void ctl_init_sinv_buck(sinv_buck_ctrl_t* buck);
+void ctl_clear_sinv_buck(sinv_buck_ctrl_t* buck);
+pwm_gt ctl_step_sinv_buck(sinv_buck_ctrl_t* buck, ctrl_gt v_in, ctrl_gt v_out, ctrl_gt i_l, fast_gt enable);
+
+GMP_STATIC_INLINE ctrl_gt ctl_calc_sinv_q_ref_from_pf(ctrl_gt p_ref)
+{
+    ctrl_gt pf_ref = float2ctrl(SINV_POWER_FACTOR_REF);
+    pf_ref = ctl_sat(pf_ref, float2ctrl(1.0f), float2ctrl(0.1f));
+
+    ctrl_gt sin_phi_sq = float2ctrl(1.0f) - ctl_mul(pf_ref, pf_ref);
+    if (sin_phi_sq < float2ctrl(0.0f))
+        sin_phi_sq = float2ctrl(0.0f);
+
+    ctrl_gt tan_phi = ctl_div(ctl_sqrt(sin_phi_sq), pf_ref);
+    ctrl_gt q_sign = (SINV_POWER_FACTOR_Q_SIGN >= 0.0f) ? float2ctrl(1.0f) : float2ctrl(-1.0f);
+
+    return ctl_mul(ctl_mul(ctl_mul(p_ref, tan_phi), q_sign), float2ctrl(SINV_POWER_FACTOR_Q_GAIN));
+}
 
 //=================================================================================================
 // Background Controller Tasks
@@ -116,6 +170,38 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
         // 2. Real-time PQ Measurement
         ctl_step_sms_pq(&pq_meter, pll.uab.dat[phase_alpha], pll.uab.dat[phase_beta], adc_i_ac.control_port.value);
 
+#if BUILD_LEVEL == 5
+        /* Track the measured precharge voltage while disabled so enabling PWM
+           does not start the 10 Hz filter from zero. */
+        if (cia402_sm.state_word.bits.operation_enabled)
+        {
+            g_vbus_feedback_filtered += ctl_mul(g_vbus_feedback_lpf_alpha,
+                adc_v_bus.control_port.value - g_vbus_feedback_filtered);
+        }
+        else
+        {
+            g_vbus_feedback_filtered = adc_v_bus.control_port.value;
+        }
+#endif
+
+#if BUILD_LEVEL == 5
+        ctrl_gt vbus_loop_feedback = g_vbus_feedback_filtered;
+#elif BUILD_LEVEL == 6
+        ctrl_gt vbus_loop_feedback = adc_v_bus.control_port.value;
+#endif
+
+#if BUILD_LEVEL == 5 || BUILD_LEVEL == 6
+        if (cia402_sm.state_word.bits.operation_enabled)
+        {
+            g_vbus_ref_ramped += ctl_sat(
+                g_vbus_ref_user - g_vbus_ref_ramped, g_vbus_ref_step, -g_vbus_ref_step);
+        }
+        else
+        {
+            g_vbus_ref_ramped = vbus_loop_feedback;
+        }
+#endif
+
         // 3. Command generation for the selected commissioning level.
         if (cia402_sm.state_word.bits.operation_enabled)
         {
@@ -136,9 +222,17 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
                 g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #elif BUILD_LEVEL == 5
             ctl_step_sinv_ref_gen_pq(&ref_gen,
-                ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_user,
-                    adc_v_bus.control_port.value, float2ctrl(-1.0f)),
+                ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_ramped,
+                    vbus_loop_feedback, float2ctrl(+1.0f)),
                 float2ctrl(0.0f), ctl_abs(pll.v_mag), &pll.phasor);
+#elif BUILD_LEVEL == 6
+            ctrl_gt p_ref = ctl_step_sinv_dc_bus_loop(&outer_loop, g_vbus_ref_ramped,
+                vbus_loop_feedback, float2ctrl(-1.0f));
+            ctl_step_sinv_ref_gen_pq(&ref_gen,
+                p_ref, ctl_calc_sinv_q_ref_from_pf(p_ref),
+                ctl_abs(pll.v_mag), &pll.phasor);
+#elif BUILD_LEVEL == 7
+            ctl_step_sinv_ref_gen_pq(&ref_gen, g_p_ref_user, g_q_ref_user, ctl_abs(pll.v_mag), &pll.phasor);
 #endif
         }
         else
@@ -179,13 +273,25 @@ GMP_STATIC_INLINE void ctl_dispatch(void)
 #else
             ctl_step_single_phase_H_modulation(&hpwm, rc_core.v_out_ref, adc_i_ac.control_port.value);
 #endif // BUILD_LEVEL
-
-
         }
         else
         {
             ctl_clear_single_phase_H_modulation(&hpwm);
         }
+
+#if BUILD_LEVEL == 7
+        ctl_step_sinv_buck(&buck_ctrl, adc_v_buck_out.control_port.value,
+                           adc_v_bus.control_port.value, adc_i_buck.control_port.value,
+                           cia402_sm.state_word.bits.operation_enabled &&
+                               (adc_v_buck_out.control_port.value >= float2ctrl(1.0f / CTRL_VOLTAGE_BASE)));
+#elif BUILD_LEVEL == 6
+        ctl_step_sinv_buck(&buck_ctrl, adc_v_bus.control_port.value,
+                           adc_v_buck_out.control_port.value, adc_i_buck.control_port.value,
+                           cia402_sm.state_word.bits.operation_enabled &&
+                               (adc_v_bus.control_port.value >= float2ctrl(SINV_BUCK_START_VBUS_MIN_V / CTRL_VOLTAGE_BASE)));
+#else
+        ctl_clear_sinv_buck(&buck_ctrl);
+#endif
 
     }
 }

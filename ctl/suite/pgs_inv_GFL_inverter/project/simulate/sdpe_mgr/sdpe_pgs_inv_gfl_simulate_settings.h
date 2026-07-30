@@ -37,7 +37,7 @@ extern "C"
  * @brief Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation.
  *        Options: (1), (2), (3), (4), (5), (6), (7)
  */
-#define BUILD_LEVEL (2)
+#define BUILD_LEVEL (1)
 
 //=================================================================================================
 /**

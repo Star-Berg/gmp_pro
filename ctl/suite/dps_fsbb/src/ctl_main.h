@@ -58,6 +58,12 @@ void ctl_mainloop(void);
 void ctl_enable_pwm(void);
 void ctl_disable_pwm(void);
 void clear_all_controllers(void);
+/**
+ * @brief Request a latched-fault reset after all real-time fault conditions clear.
+ * @return 1 when the reset command is accepted; 0 while a fault is still active
+ *         or there is no latched fault to reset.
+ */
+fast_gt ctl_request_fault_reset(void);
 gmp_task_status_t tsk_protect(gmp_task_t* tsk);
 
 /** Execute one control sample after the platform input callback has run. */

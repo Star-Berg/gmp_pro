@@ -13,6 +13,8 @@
     {
       "role": "PWM Depth",
       "macro": "CTRL_PWM_CMP_MAX",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "3000 - 1"
       },
@@ -21,6 +23,8 @@
     {
       "role": "PWM Deadband Width",
       "macro": "CTRL_PWM_DEADBAND_CMP",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "50"
       },
@@ -29,6 +33,8 @@
     {
       "role": "CPU Main Frequency",
       "macro": "CTRL_SYS_FREQUENCY",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "120e6"
       },
@@ -37,6 +43,8 @@
     {
       "role": "System Divition",
       "macro": "DSP_C2000_DSP_TIME_DIV",
+      "enabled": true,
+      "weak": false,
       "binding": {
         "number": "CTRL_SYS_FREQUENCY / 1000 / CTRL_PWM_CMP_MAX / 2"
       },
@@ -48,6 +56,7 @@
       "group": "Controller Settings",
       "macro": "SPECIFY_ENABLE_ADC_CALIBRATE",
       "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Enable ADC calibration before normal control starts."
     },
@@ -55,6 +64,7 @@
       "group": "Controller Settings",
       "macro": "ENABLE_GMP_DL_PIL_SIM",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Enable PIL simulation mode. This mode disables direct controller output for safe communication-based simulation."
     },
@@ -62,6 +72,7 @@
       "group": "Controller Settings",
       "macro": "GMP_CTL_FM_CONFIG_ENABLE_DEBUG_INFO",
       "enabled": false,
+      "weak": false,
       "value": "",
       "description": "Enable GMP framework debug information."
     },
@@ -69,6 +80,7 @@
       "group": "Controller Settings",
       "macro": "PWM_MODULATOR_USING_NEGATIVE_LOGIC",
       "enabled": true,
+      "weak": false,
       "value": "1",
       "description": "Invert duty-to-CMP mapping because the IRIS ePWM action qualifier sets high on up-count CMPA and low on down-count CMPA."
     },
@@ -76,20 +88,23 @@
       "group": "Controller Settings",
       "macro": "DISABLE_FSBB_PROTECTION_FAULT_LOGIC",
       "enabled": true,
+      "weak": false,
       "value": "",
       "description": "This macro will disable the fault request of the controller. That's dangerous."
     },
     {
       "group": "Optional Sampling Channels",
       "macro": "FSBB_ENABLE_IOUT_SAMPLE",
-      "enabled": false,
+      "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Enable output/load current sampling path."
     },
     {
       "group": "Optional Sampling Channels",
       "macro": "FSBB_ENABLE_VIN_SAMPLE",
-      "enabled": false,
+      "enabled": true,
+      "weak": false,
       "value": "",
       "description": "Enable input voltage sampling path."
     }
@@ -99,7 +114,8 @@
       "group": "Controller Options",
       "macro": "BUILD_LEVEL",
       "enabled": true,
-      "value": "(1)",
+      "weak": false,
+      "value": "(3)",
       "options_preset": "",
       "options": [
         "(1)",
@@ -112,7 +128,8 @@
       "group": "Board GPIO",
       "macro": "PWM_ENABLE_PORT",
       "enabled": true,
-      "value": "IRIS_GPIO1",
+      "weak": false,
+      "value": "IRIS_GPIO5",
       "options_preset": "iris_f280039c_node.IRIS_GPIO",
       "options": [
         "IRIS_GPIO1",
@@ -128,6 +145,7 @@
       "group": "Board GPIO",
       "macro": "PWM_RESET_PORT",
       "enabled": true,
+      "weak": false,
       "value": "IRIS_GPIO3",
       "options_preset": "iris_f280039c_node.IRIS_GPIO",
       "options": [
@@ -144,6 +162,7 @@
       "group": "Board GPIO",
       "macro": "SYSTEM_LED",
       "enabled": true,
+      "weak": false,
       "value": "IRIS_LED1",
       "options_preset": "",
       "options": [
@@ -158,6 +177,7 @@
       "group": "PWM Channel",
       "macro": "PHASE_BUCK_BASE",
       "enabled": true,
+      "weak": false,
       "value": "IRIS_EPWM1_BASE",
       "options_preset": "iris_f280039c_node.IRIS_EPWM",
       "options": [
@@ -174,6 +194,7 @@
       "group": "PWM Channel",
       "macro": "PHASE_BOOST_BASE",
       "enabled": true,
+      "weak": false,
       "value": "IRIS_EPWM2_BASE",
       "options_preset": "iris_f280039c_node.IRIS_EPWM",
       "options": [
@@ -190,6 +211,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_VIN_ADC_BASE",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH1_RESULT_BASE",
       "options_preset": "ADC_RESULT_REG",
       "options": [
@@ -212,6 +234,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_VIN",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH1",
       "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
       "options": [
@@ -234,6 +257,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_VOUT_ADC_BASE",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH2_RESULT_BASE",
       "options_preset": "ADC_RESULT_REG",
       "options": [
@@ -256,6 +280,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_VOUT",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH2",
       "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
       "options": [
@@ -278,6 +303,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_IL_ADC_BASE",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH3_RESULT_BASE",
       "options_preset": "ADC_RESULT_REG",
       "options": [
@@ -300,6 +326,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_IL",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH3",
       "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
       "options": [
@@ -322,6 +349,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_IIN_ADC_BASE",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH4_RESULT_BASE",
       "options_preset": "ADC_RESULT_REG",
       "options": [
@@ -344,6 +372,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_IIN",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH4",
       "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
       "options": [
@@ -366,6 +395,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_IOUT_ADC_BASE",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH5_RESULT_BASE",
       "options_preset": "ADC_RESULT_REG",
       "options": [
@@ -388,6 +418,7 @@
       "group": "ADC Channel",
       "macro": "FSBB_IOUT",
       "enabled": true,
+      "weak": false,
       "value": "ADC_CH5",
       "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
       "options": [
@@ -412,7 +443,7 @@
     "before_footer": "/* Backward compatibility for the historical misspelled PIL switch. */\n#if defined ENBALE_GMP_DL_PIL_SIM && !defined ENABLE_GMP_DL_PIL_SIM\n#define ENABLE_GMP_DL_PIL_SIM\n#endif\n\n/* Project-specific compile-time validation. */\n#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 3)\n#error \"BUILD_LEVEL must be 1 (open loop), 2 (current loop), or 3 (voltage/current cascade).\"\n#endif"
   },
   "description": "Four-switch buck-boost converter SDPE project requirement prepared from ctl/suite/dps_fsbb/project/f280039c_Iris_node/xplt/ctrl_settings.h.\nThe requirement introduces the GMP LVFB 150V 2-phase board as the switching stage and sensor source, and IRIS F280039C Node as the peripheral option provider.",
-  "updated_at": "2026-07-16",
+  "updated_at": "2026-07-19",
   "requirement_groups": [
     {
       "name": "Peripheral Parameters",

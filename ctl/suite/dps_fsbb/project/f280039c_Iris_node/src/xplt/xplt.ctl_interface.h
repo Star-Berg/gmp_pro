@@ -42,12 +42,18 @@ GMP_STATIC_INLINE uint16_t ctl_fsbb_active_faults(void)
 
 GMP_STATIC_INLINE void ctl_input_callback(void)
 {
+    uint16_t vout_adc_sample;
+
 #if defined FSBB_ENABLE_VIN_SAMPLE
-    ctl_step_adc_channel(&adc_v_in, ADC_readResult(FSBB_VIN_ADC_BASE, FSBB_VIN));
+    uint16_t vin_adc_sample;
+
+    vin_adc_sample = ADC_readResult(FSBB_VIN_ADC_BASE, FSBB_VIN);
+    ctl_step_adc_channel(&adc_v_in, fsbb_average_vin_adc_sample(vin_adc_sample));
 #else
     adc_v_in.control_port.value = float2ctrl(FSBB_INPUT_VOLTAGE_NOMINAL / CTRL_VOLTAGE_BASE);
 #endif
-    ctl_step_adc_channel(&adc_v_out, ADC_readResult(FSBB_VOUT_ADC_BASE, FSBB_VOUT));
+    vout_adc_sample = ADC_readResult(FSBB_VOUT_ADC_BASE, FSBB_VOUT);
+    ctl_step_adc_channel(&adc_v_out, fsbb_average_vout_adc_sample(vout_adc_sample));
     ctl_step_adc_channel(&adc_i_L, ADC_readResult(FSBB_IL_ADC_BASE, FSBB_IL));
 #if defined FSBB_ENABLE_IOUT_SAMPLE
     ctl_step_adc_channel(&adc_i_load, ADC_readResult(FSBB_IOUT_ADC_BASE, FSBB_IOUT));
