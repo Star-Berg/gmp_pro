@@ -50,21 +50,6 @@
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src/user_main.h</locationURI>
 		</link>
-		<link>
-			<name>user/oled_driver.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/csp/c28x_syscfg/iris_280039c_board/oled_driver/oled_driver.c</locationURI>
-		</link>
-		<link>
-			<name>user/oled_driver.h</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/csp/c28x_syscfg/iris_280039c_board/oled_driver/oled_driver.h</locationURI>
-		</link>
-		<link>
-			<name>user/oledfont.h</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/csp/c28x_syscfg/iris_280039c_board/oled_driver/oledfont.h</locationURI>
-		</link>
 	</linkedResources>
 	<variableList>
 		<variable>

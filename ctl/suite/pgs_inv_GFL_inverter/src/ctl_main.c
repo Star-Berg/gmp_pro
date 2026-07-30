@@ -35,9 +35,6 @@ inv_neg_ctrl_init_t gfl_neg_init;
 inv_neg_ctrl_t neg_current_ctrl;
 gfl_inv_ctrl_init_t gfl_init;
 gfl_inv_ctrl_t inv_ctrl;
-#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
-gfl_level67_voltage_ctrl_t voltage_ctrl;
-#endif
 
 // Input channel
 
@@ -61,9 +58,6 @@ volatile fast_gt index_adc_calibrator = 0;
 uint32_t pq_loop_tick = 0;
 
 // User commands
-volatile fast_gt ctl_user_run_request = 0;
-volatile uint16_t ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
-volatile uint16_t ctl_output_frequency_request_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
 
 //=================================================================================================
 // CTL initialize routine
@@ -74,9 +68,6 @@ void ctl_init()
     // stop here and wait for user start the motor controller
     //
     ctl_fast_disable_output();
-    ctl_user_run_request = 0;
-    ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
-    ctl_output_frequency_request_hz = ctl_output_frequency_hz;
 
     //
     // GFL inverter init objects
@@ -91,46 +82,11 @@ void ctl_init()
     gfl_init.grid_filter_C = GFL_GRID_FILTER_CAPACITANCE_F;
 
     ctl_auto_tuning_gfl_inv(&gfl_init);
-#if BUILD_LEVEL == 2
-    // Level 2 is the first hardware current-loop test. Use a lower input
-    // bandwidth to reject PWM-related ADC noise without materially reducing
-    // phase margin at the auto-tuned current-loop crossover.
-    gfl_init.current_adc_fc = GFL_LEVEL2_CURRENT_ADC_FILTER_FC_HZ;
-#endif
     ctl_init_gfl_inv(&inv_ctrl, &gfl_init);
 
     ctl_auto_tuning_neg_inv(&gfl_neg_init, &gfl_init);
-
-#if BUILD_LEVEL == 6
-    gfl_neg_init.seq_filter_q = GFL_LEVEL6_NEG_NOTCH_Q;
-    gfl_neg_init.kp_current = GFL_LEVEL6_NEG_CURRENT_KP;
-    gfl_neg_init.ki_current = GFL_LEVEL6_NEG_CURRENT_KI;
-    gfl_neg_init.limit_current_out = GFL_LEVEL6_NEG_CURRENT_LIMIT_PU;
-    gfl_neg_init.kp_voltage = GFL_LEVEL6_NEG_VOLTAGE_KP;
-    gfl_neg_init.ki_voltage = GFL_LEVEL6_NEG_VOLTAGE_KI;
-    gfl_neg_init.limit_voltage_out = GFL_LEVEL6_NEG_VOLTAGE_LIMIT_PU;
-#elif BUILD_LEVEL == 7
-    gfl_neg_init.seq_filter_q = GFL_LEVEL6_NEG_NOTCH_Q;
-    gfl_neg_init.kp_current = GFL_LEVEL7_NEG_CURRENT_KP;
-    gfl_neg_init.ki_current = GFL_LEVEL7_NEG_CURRENT_KI;
-    gfl_neg_init.limit_current_out = GFL_LEVEL7_NEG_CURRENT_LIMIT_PU;
-    gfl_neg_init.kp_voltage = GFL_LEVEL7_NEG_VOLTAGE_KP;
-    gfl_neg_init.ki_voltage = GFL_LEVEL7_NEG_VOLTAGE_KI;
-    gfl_neg_init.limit_voltage_out = GFL_LEVEL7_NEG_VOLTAGE_LIMIT_PU;
-#endif
-
     ctl_init_neg_inv(&neg_current_ctrl, &gfl_neg_init);
     ctl_attach_neg_inv_to_gfl(&neg_current_ctrl, &inv_ctrl);
-
-#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
-    ctl_init_level67_voltage(&voltage_ctrl, CONTROLLER_FREQUENCY, GFL_GRID_FREQUENCY_HZ,
-                             GFL_LEVEL6_VOLTAGE_D_KP, GFL_LEVEL6_VOLTAGE_D_KI,
-                             GFL_LEVEL6_VOLTAGE_Q_KP, GFL_LEVEL6_VOLTAGE_Q_KI,
-                             GFL_LEVEL6_CURRENT_LIMIT_PU, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q,
-                             GFL_LEVEL7_DDSRF_FILTER_FC_HZ, GFL_LEVEL67_SOFT_START_TIME_MS);
-    voltage_ctrl.vdq_set.dat[phase_d] = float2ctrl(GFL_LEVEL6_VD_REF_PU);
-    voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
-#endif
 
     //
     // init SPWM modulator
@@ -199,21 +155,6 @@ void ctl_init()
     ctl_enable_gfl_inv_lead_compensator(&inv_ctrl);
     ctl_enable_gfl_pq_ctrl(&pq_ctrl);
 
-#elif BUILD_LEVEL == 6
-    // Cascaded positive voltage/current loops with the existing notch-based negative sequence loops.
-    ctl_set_gfl_inv_current_mode(&inv_ctrl);
-    ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
-    inv_ctrl.flag_enable_decouple = 1;
-    ctl_enable_neg_voltage_inv(&neg_current_ctrl);
-
-#elif BUILD_LEVEL == 7
-    // Level 6 voltage control with DDSRF positive/negative sequence separation.
-    ctl_set_gfl_inv_current_mode(&inv_ctrl);
-    ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
-    inv_ctrl.flag_enable_current_ctrl = 0;
-    inv_ctrl.flag_enable_decouple = 1;
-    ctl_enable_neg_voltage_inv(&neg_current_ctrl);
-
 #endif // BUILD_LEVEL
 
     //
@@ -221,9 +162,6 @@ void ctl_init()
     //
     init_cia402_state_machine(&cia402_sm);
     cia402_sm.minimum_transit_delay[3] = GFL_CIA402_OPERATION_ENABLE_DELAY_MS;
-    // The local expansion-board keyboard is the command source. Do not let an
-    // unused fieldbus control word override RUN/STOP key commands.
-    cia402_sm.flag_enable_control_word = 0;
 
 #if defined SPECIFY_PC_ENVIRONMENT
     cia402_sm.flag_enable_control_word = 0;
@@ -254,95 +192,9 @@ void ctl_init()
 //=================================================================================================
 // CTL endless loop routine
 
-void ctl_set_run_request(fast_gt enable)
-{
-    ctl_user_run_request = enable ? 1 : 0;
-
-    if (ctl_user_run_request)
-        cia402_send_cmd(&cia402_sm, CIA402_CMD_ENABLE_OPERATION);
-    else
-        cia402_send_cmd(&cia402_sm, CIA402_CMD_DISABLE_VOLTAGE);
-}
-
-void ctl_request_output_frequency_hz(uint16_t frequency_hz)
-{
-    if ((frequency_hz != 30U) && (frequency_hz != 60U))
-        return;
-
-    ctl_output_frequency_request_hz = frequency_hz;
-
-    // Frequency-dependent filters are reconfigured only after PWM has
-    // stopped. The operator must press RUN again after changing frequency.
-    if (inv_ctrl.flag_enable_system)
-        ctl_set_run_request(0);
-}
-
-void ctl_apply_output_frequency_request(void)
-{
-    uint16_t frequency_hz = ctl_output_frequency_request_hz;
-    ctrl_gt preserved_angle;
-    int i;
-
-    if ((frequency_hz == ctl_output_frequency_hz) ||
-        ((frequency_hz != 30U) && (frequency_hz != 60U)))
-        return;
-
-    // Do not change frequency-dependent controller coefficients while the
-    // PWM/control ISR is active.
-    if (inv_ctrl.flag_enable_system)
-        return;
-
-    preserved_angle = inv_ctrl.rg.current;
-    ctl_set_ramp_generator_slope(
-        &inv_ctrl.rg, float2ctrl((parameter_gt)frequency_hz / (parameter_gt)CONTROLLER_FREQUENCY));
-    inv_ctrl.rg.current = preserved_angle;
-
-    gfl_init.freq_base = (parameter_gt)frequency_hz;
-    inv_ctrl.coef_ff_decouple =
-        float2ctrl(CTL_PARAM_CONST_2PI * gfl_init.grid_filter_L * (parameter_gt)frequency_hz *
-                   gfl_init.i_base / gfl_init.v_base);
-
-    // Level 6 uses these 2-omega notches directly. Level 7 bypasses them, but
-    // keeping the coefficients synchronized makes later build-level changes
-    // and CCS inspection unambiguous.
-    gfl_neg_init.freq_base = (parameter_gt)frequency_hz;
-    for (i = 0; i < 2; ++i)
-    {
-        ctl_init_biquad_notch(&neg_current_ctrl.filter_idqn[i], gfl_neg_init.fs,
-                              2.0f * (parameter_gt)frequency_hz, gfl_neg_init.seq_filter_q);
-        ctl_init_biquad_notch(&neg_current_ctrl.filter_vdqn[i], gfl_neg_init.fs,
-                              2.0f * (parameter_gt)frequency_hz, gfl_neg_init.seq_filter_q);
-    }
-
-#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
-    ctl_init_biquad_notch(&voltage_ctrl.notch_vdq[phase_d], CONTROLLER_FREQUENCY,
-                          2.0f * (parameter_gt)frequency_hz, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q);
-    ctl_init_biquad_notch(&voltage_ctrl.notch_vdq[phase_q], CONTROLLER_FREQUENCY,
-                          2.0f * (parameter_gt)frequency_hz, GFL_LEVEL6_POS_VOLTAGE_NOTCH_Q);
-
-    // Keep the DDSRF cutoff proportional to the selected fundamental.
-    ctl_init_ddsrf_channel(&voltage_ctrl.voltage_seq, CONTROLLER_FREQUENCY,
-                           (parameter_gt)frequency_hz * 0.70710678f);
-    ctl_init_ddsrf_channel(&voltage_ctrl.current_seq, CONTROLLER_FREQUENCY,
-                           (parameter_gt)frequency_hz * 0.70710678f);
-#endif
-
-    ctl_output_frequency_hz = frequency_hz;
-}
-
 void ctl_mainloop(void)
 {
-    ctl_apply_output_frequency_request();
     cia402_dispatch(&cia402_sm);
-
-    // A controller/state-machine fault must also clear the operator's switch
-    // request. This keeps the OLED state truthful and prevents an automatic
-    // restart after the fault is reset.
-    if (ctl_user_run_request &&
-        ((cia402_sm.current_state == CIA402_SM_FAULT_REACTION) ||
-         (cia402_sm.current_state == CIA402_SM_FAULT) ||
-         (cia402_sm.last_cb_result <= CIA402_EC_ERROR)))
-        ctl_set_run_request(0);
 
     return;
 }
@@ -376,18 +228,11 @@ void ctl_enable_pwm()
 void ctl_disable_pwm()
 {
     ctl_fast_disable_output();
-    ctl_disable_gfl_inv(&inv_ctrl);
-#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
-    ctl_set_gfl_inv_current(&inv_ctrl, 0, 0);
-#endif
 
     // clear controller here
     ctl_clear_gfl_inv(&inv_ctrl);
     ctl_clear_neg_inv(&neg_current_ctrl);
     ctl_clear_gfl_pq(&pq_ctrl);
-#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
-    ctl_clear_level67_voltage(&voltage_ctrl);
-#endif
     pq_loop_tick = 0;
 }
 

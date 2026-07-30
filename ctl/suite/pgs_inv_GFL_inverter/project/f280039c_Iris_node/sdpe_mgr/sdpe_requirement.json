@@ -5,7 +5,7 @@
   "description": "Validated IRIS platform timing, sensing and resource bindings for the common GFL controller.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-30",
+  "updated_at": "2026-07-22",
   "output_header": "sdpe_pgs_inv_gfl_iris_settings.h",
   "hardware": [
     {
@@ -19,8 +19,8 @@
     }
   ],
   "code_sections": {
-    "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>\n\n/* Fixed IRIS status resources. PWM, gate-driver and ADC bindings are configurable below. */\n#define SYSTEM_LED IRIS_LED1\n#define CONTROLLER_LED IRIS_LED2",
-    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 7)\n#error BUILD_LEVEL_must_be_between_1_and_7\n#endif"
+    "after_extern_open": "#include <sdpe_pgs_inv_gfl_common_settings.h>\n\n/* Existing IRIS SysConfig resource names assigned to GFL application roles. */\n#define PHASE_U_BASE IRIS_EPWM1_BASE\n#define PHASE_V_BASE IRIS_EPWM2_BASE\n#define PHASE_W_BASE IRIS_EPWM3_BASE\n#define PWM_ENABLE_PORT IRIS_GPIO1\n#define PWM_RESET_PORT IRIS_GPIO3\n#define INV_UA_RESULT_BASE ADC_CH1_RESULT_BASE\n#define INV_UA ADC_CH1\n#define INV_UB_RESULT_BASE ADC_CH2_RESULT_BASE\n#define INV_UB ADC_CH2\n#define INV_UC_RESULT_BASE ADC_CH3_RESULT_BASE\n#define INV_UC ADC_CH3\n#define INV_IA_RESULT_BASE ADC_CH4_RESULT_BASE\n#define INV_IA ADC_CH4\n#define INV_IB_RESULT_BASE ADC_CH5_RESULT_BASE\n#define INV_IB ADC_CH5\n#define INV_IC_RESULT_BASE ADC_CH6_RESULT_BASE\n#define INV_IC ADC_CH6\n#define INV_UU_RESULT_BASE ADC_CH9_RESULT_BASE\n#define INV_UU ADC_CH9\n#define INV_UV_RESULT_BASE ADC_CH10_RESULT_BASE\n#define INV_UV ADC_CH10\n#define INV_UW_RESULT_BASE ADC_CH11_RESULT_BASE\n#define INV_UW ADC_CH11\n#define INV_IU_RESULT_BASE ADC_CH4_RESULT_BASE\n#define INV_IU ADC_CH4\n#define INV_IV_RESULT_BASE ADC_CH5_RESULT_BASE\n#define INV_IV ADC_CH5\n#define INV_IW_RESULT_BASE ADC_CH6_RESULT_BASE\n#define INV_IW ADC_CH6\n#define INV_VBUS_RESULT_BASE ADC_CH7_RESULT_BASE\n#define INV_VBUS ADC_CH7\n#define INV_IBUS_RESULT_BASE ADC_CH8_RESULT_BASE\n#define INV_IBUS ADC_CH8\n#define SYSTEM_LED IRIS_LED1\n#define CONTROLLER_LED IRIS_LED2",
+    "before_footer": "#if (BUILD_LEVEL < 1) || (BUILD_LEVEL > 5)\n#error BUILD_LEVEL_must_be_between_1_and_5\n#endif"
   },
   "feature_macros": [
     {
@@ -38,103 +38,16 @@
       "macro": "BUILD_LEVEL",
       "enabled": true,
       "weak": false,
-      "value": "(7)",
+      "value": "(3)",
       "options_preset": "",
       "options": [
         "(1)",
         "(2)",
         "(3)",
         "(4)",
-        "(5)",
-        "(6)",
-        "(7)"
+        "(5)"
       ],
-      "description": "Incremental control level; level 6 adds voltage control and level 7 adds DDSRF sequence separation."
-    },
-    {
-      "group": "PWM Channel Mapping",
-      "macro": "PHASE_U_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "IRIS_EPWM1_BASE",
-      "options_preset": "iris_f280039c_node.IRIS_EPWM",
-      "options": [
-        "IRIS_EPWM1_BASE",
-        "IRIS_EPWM2_BASE",
-        "IRIS_EPWM3_BASE",
-        "IRIS_EPWM4_BASE",
-        "IRIS_EPWM5_BASE",
-        "IRIS_EPWM6_BASE"
-      ],
-      "description": "PWM base for inverter phase U."
-    },
-    {
-      "group": "PWM Channel Mapping",
-      "macro": "PHASE_V_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "IRIS_EPWM2_BASE",
-      "options_preset": "iris_f280039c_node.IRIS_EPWM",
-      "options": [
-        "IRIS_EPWM1_BASE",
-        "IRIS_EPWM2_BASE",
-        "IRIS_EPWM3_BASE",
-        "IRIS_EPWM4_BASE",
-        "IRIS_EPWM5_BASE",
-        "IRIS_EPWM6_BASE"
-      ],
-      "description": "PWM base for inverter phase V."
-    },
-    {
-      "group": "PWM Channel Mapping",
-      "macro": "PHASE_W_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "IRIS_EPWM3_BASE",
-      "options_preset": "iris_f280039c_node.IRIS_EPWM",
-      "options": [
-        "IRIS_EPWM1_BASE",
-        "IRIS_EPWM2_BASE",
-        "IRIS_EPWM3_BASE",
-        "IRIS_EPWM4_BASE",
-        "IRIS_EPWM5_BASE",
-        "IRIS_EPWM6_BASE"
-      ],
-      "description": "PWM base for inverter phase W."
-    },
-    {
-      "group": "Gate Driver GPIO",
-      "macro": "PWM_ENABLE_PORT",
-      "enabled": true,
-      "weak": false,
-      "value": "IRIS_GPIO5",
-      "options_preset": "iris_f280039c_node.IRIS_GPIO",
-      "options": [
-        "IRIS_GPIO1",
-        "IRIS_GPIO2",
-        "IRIS_GPIO3",
-        "IRIS_GPIO4",
-        "IRIS_GPIO5",
-        "IRIS_GPIO6"
-      ],
-      "description": "Gate-driver enable GPIO."
-    },
-    {
-      "group": "Gate Driver GPIO",
-      "macro": "PWM_RESET_PORT",
-      "enabled": true,
-      "weak": false,
-      "value": "IRIS_GPIO3",
-      "options_preset": "iris_f280039c_node.IRIS_GPIO",
-      "options": [
-        "IRIS_GPIO1",
-        "IRIS_GPIO2",
-        "IRIS_GPIO3",
-        "IRIS_GPIO4",
-        "IRIS_GPIO5",
-        "IRIS_GPIO6"
-      ],
-      "description": "Gate-driver reset GPIO."
+      "description": "Incremental control level; level 5 enables the cascaded P/Q power loop."
     },
     {
       "group": "Sampling",
@@ -161,650 +74,6 @@
         "(3)"
       ],
       "description": "Number of directly sampled phase voltages."
-    },
-    {
-      "group": "Grid Voltage ADC Mapping",
-      "macro": "INV_UA_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH1_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Grid phase-A voltage ADC result register base."
-    },
-    {
-      "group": "Grid Voltage ADC Mapping",
-      "macro": "INV_UA",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH1",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Grid phase-A voltage ADC channel."
-    },
-    {
-      "group": "Grid Voltage ADC Mapping",
-      "macro": "INV_UB_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH2_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Grid phase-B voltage ADC result register base."
-    },
-    {
-      "group": "Grid Voltage ADC Mapping",
-      "macro": "INV_UB",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH2",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Grid phase-B voltage ADC channel."
-    },
-    {
-      "group": "Grid Voltage ADC Mapping",
-      "macro": "INV_UC_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH3_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Grid phase-C voltage ADC result register base."
-    },
-    {
-      "group": "Grid Voltage ADC Mapping",
-      "macro": "INV_UC",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH3",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Grid phase-C voltage ADC channel."
-    },
-    {
-      "group": "Grid Current ADC Mapping",
-      "macro": "INV_IA_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH4_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Grid phase-A current ADC result register base."
-    },
-    {
-      "group": "Grid Current ADC Mapping",
-      "macro": "INV_IA",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH4",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Grid phase-A current ADC channel."
-    },
-    {
-      "group": "Grid Current ADC Mapping",
-      "macro": "INV_IB_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH5_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Grid phase-B current ADC result register base."
-    },
-    {
-      "group": "Grid Current ADC Mapping",
-      "macro": "INV_IB",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH5",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Grid phase-B current ADC channel."
-    },
-    {
-      "group": "Grid Current ADC Mapping",
-      "macro": "INV_IC_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH6_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Grid phase-C current ADC result register base."
-    },
-    {
-      "group": "Grid Current ADC Mapping",
-      "macro": "INV_IC",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH6",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Grid phase-C current ADC channel."
-    },
-    {
-      "group": "Inverter Voltage ADC Mapping",
-      "macro": "INV_UU_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH9_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Inverter phase-U voltage ADC result register base."
-    },
-    {
-      "group": "Inverter Voltage ADC Mapping",
-      "macro": "INV_UU",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH9",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Inverter phase-U voltage ADC channel."
-    },
-    {
-      "group": "Inverter Voltage ADC Mapping",
-      "macro": "INV_UV_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH10_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Inverter phase-V voltage ADC result register base."
-    },
-    {
-      "group": "Inverter Voltage ADC Mapping",
-      "macro": "INV_UV",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH10",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Inverter phase-V voltage ADC channel."
-    },
-    {
-      "group": "Inverter Voltage ADC Mapping",
-      "macro": "INV_UW_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH11_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Inverter phase-W voltage ADC result register base."
-    },
-    {
-      "group": "Inverter Voltage ADC Mapping",
-      "macro": "INV_UW",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH11",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Inverter phase-W voltage ADC channel."
-    },
-    {
-      "group": "Inverter Current ADC Mapping",
-      "macro": "INV_IU_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH4_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Inverter phase-U current ADC result register base."
-    },
-    {
-      "group": "Inverter Current ADC Mapping",
-      "macro": "INV_IU",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH4",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Inverter phase-U current ADC channel."
-    },
-    {
-      "group": "Inverter Current ADC Mapping",
-      "macro": "INV_IV_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH5_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Inverter phase-V current ADC result register base."
-    },
-    {
-      "group": "Inverter Current ADC Mapping",
-      "macro": "INV_IV",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH5",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Inverter phase-V current ADC channel."
-    },
-    {
-      "group": "Inverter Current ADC Mapping",
-      "macro": "INV_IW_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH6_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "Inverter phase-W current ADC result register base."
-    },
-    {
-      "group": "Inverter Current ADC Mapping",
-      "macro": "INV_IW",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH6",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "Inverter phase-W current ADC channel."
-    },
-    {
-      "group": "DC Bus ADC Mapping",
-      "macro": "INV_VBUS_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH7_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "DC bus voltage ADC result register base."
-    },
-    {
-      "group": "DC Bus ADC Mapping",
-      "macro": "INV_VBUS",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH7",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "DC bus voltage ADC channel."
-    },
-    {
-      "group": "DC Bus ADC Mapping",
-      "macro": "INV_IBUS_RESULT_BASE",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH8_RESULT_BASE",
-      "options_preset": "iris_f280039c_node.ADC_RESULT_REG",
-      "options": [
-        "ADC_CH1_RESULT_BASE",
-        "ADC_CH2_RESULT_BASE",
-        "ADC_CH3_RESULT_BASE",
-        "ADC_CH4_RESULT_BASE",
-        "ADC_CH5_RESULT_BASE",
-        "ADC_CH6_RESULT_BASE",
-        "ADC_CH7_RESULT_BASE",
-        "ADC_CH8_RESULT_BASE",
-        "ADC_CH9_RESULT_BASE",
-        "ADC_CH10_RESULT_BASE",
-        "ADC_CH11_RESULT_BASE",
-        "ADC_CH12_RESULT_BASE"
-      ],
-      "description": "DC bus current ADC result register base."
-    },
-    {
-      "group": "DC Bus ADC Mapping",
-      "macro": "INV_IBUS",
-      "enabled": true,
-      "weak": false,
-      "value": "ADC_CH8",
-      "options_preset": "iris_f280039c_node.ADC_CHANNEL_INDEX",
-      "options": [
-        "ADC_CH1",
-        "ADC_CH2",
-        "ADC_CH3",
-        "ADC_CH4",
-        "ADC_CH5",
-        "ADC_CH6",
-        "ADC_CH7",
-        "ADC_CH8",
-        "ADC_CH9",
-        "ADC_CH10",
-        "ADC_CH11",
-        "ADC_CH12"
-      ],
-      "description": "DC bus current ADC channel."
     }
   ],
   "requirements": [
@@ -874,7 +143,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "65.0"
+        "float": "80.0"
       },
       "description": "DC-bus per-unit voltage base."
     },
@@ -939,64 +208,24 @@
       "description": "DC-link voltage sensing bias."
     },
     {
-      "role": "grid_voltage_a_sensitivity",
-      "macro": "CTRL_GRID_VOLTAGE_A_SENSITIVITY",
+      "role": "grid_voltage_sensitivity",
+      "macro": "CTRL_GRID_VOLTAGE_SENSITIVITY",
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0133760665"
+        "literal": "(HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_GAIN)"
       },
-      "description": "LC-board phase-A (U) voltage sensitivity in volts per volt."
+      "description": "Grid-voltage sensing gain."
     },
     {
-      "role": "grid_voltage_a_bias",
-      "macro": "CTRL_GRID_VOLTAGE_A_BIAS",
+      "role": "grid_voltage_bias",
+      "macro": "CTRL_GRID_VOLTAGE_BIAS",
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.6608797884"
+        "literal": "(HARMONIA_3PH_LC_FILTER_PH_VOLTAGE_SENSE_BIAS_V)"
       },
-      "description": "LC-board phase-A (U) voltage-sensor bias in volts."
-    },
-    {
-      "role": "grid_voltage_b_sensitivity",
-      "macro": "CTRL_GRID_VOLTAGE_B_SENSITIVITY",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.0134189286"
-      },
-      "description": "LC-board phase-B (V) voltage sensitivity in volts per volt."
-    },
-    {
-      "role": "grid_voltage_b_bias",
-      "macro": "CTRL_GRID_VOLTAGE_B_BIAS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "1.6542464286"
-      },
-      "description": "LC-board phase-B (V) voltage-sensor bias in volts."
-    },
-    {
-      "role": "grid_voltage_c_sensitivity",
-      "macro": "CTRL_GRID_VOLTAGE_C_SENSITIVITY",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.0134290098"
-      },
-      "description": "LC-board phase-C (W) voltage sensitivity in volts per volt."
-    },
-    {
-      "role": "grid_voltage_c_bias",
-      "macro": "CTRL_GRID_VOLTAGE_C_BIAS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "1.6549623557"
-      },
-      "description": "LC-board phase-C (W) voltage-sensor bias in volts."
+      "description": "Grid-voltage sensing bias."
     },
     {
       "role": "inverter_voltage_sensitivity",
@@ -1024,7 +253,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.15"
+        "float": "0.02475"
       },
       "description": "DC-link current sensitivity in volts per ampere."
     },
@@ -1039,64 +268,24 @@
       "description": "DC-link current zero bias."
     },
     {
-      "role": "grid_current_a_sensitivity",
-      "macro": "CTRL_GRID_CURRENT_A_SENSITIVITY",
+      "role": "grid_current_sensitivity",
+      "macro": "CTRL_GRID_CURRENT_SENSITIVITY",
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.1503832007"
+        "literal": "(HARMONIA_3PH_LC_FILTER_PH_CURRENT_SENSITIVITY_MV_A * 0.001f)"
       },
-      "description": "LC-board phase-A (U) current sensitivity in volts per ampere."
+      "description": "Grid-current sensitivity in volts per ampere."
     },
     {
-      "role": "grid_current_a_bias",
-      "macro": "CTRL_GRID_CURRENT_A_BIAS",
+      "role": "grid_current_bias",
+      "macro": "CTRL_GRID_CURRENT_BIAS",
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "1.6531446197"
+        "literal": "(HARMONIA_3PH_LC_FILTER_PH_CURRENT_ZERO_BIAS_V)"
       },
-      "description": "LC-board phase-A (U) current-sensor zero bias in volts."
-    },
-    {
-      "role": "grid_current_b_sensitivity",
-      "macro": "CTRL_GRID_CURRENT_B_SENSITIVITY",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.1501000000"
-      },
-      "description": "LC-board phase-B (V) current sensitivity in volts per ampere."
-    },
-    {
-      "role": "grid_current_b_bias",
-      "macro": "CTRL_GRID_CURRENT_B_BIAS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "1.6534500000"
-      },
-      "description": "LC-board phase-B (V) current-sensor zero bias in volts."
-    },
-    {
-      "role": "grid_current_c_sensitivity",
-      "macro": "CTRL_GRID_CURRENT_C_SENSITIVITY",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "0.1503476190"
-      },
-      "description": "LC-board phase-C (W) current sensitivity in volts per ampere."
-    },
-    {
-      "role": "grid_current_c_bias",
-      "macro": "CTRL_GRID_CURRENT_C_BIAS",
-      "enabled": true,
-      "weak": false,
-      "binding": {
-        "float": "1.6539083333"
-      },
-      "description": "LC-board phase-C (W) current-sensor zero bias in volts."
+      "description": "Grid-current zero bias."
     },
     {
       "role": "inverter_current_sensitivity",
@@ -1164,14 +353,10 @@
       ]
     },
     {
-      "name": "ABC-side Voltage Sensors",
+      "name": "Grid Voltage Sensor",
       "requirements": [
-        "grid_voltage_a_sensitivity",
-        "grid_voltage_a_bias",
-        "grid_voltage_b_sensitivity",
-        "grid_voltage_b_bias",
-        "grid_voltage_c_sensitivity",
-        "grid_voltage_c_bias"
+        "grid_voltage_sensitivity",
+        "grid_voltage_bias"
       ]
     },
     {
@@ -1189,14 +374,10 @@
       ]
     },
     {
-      "name": "ABC-side Current Sensors",
+      "name": "Grid Current Sensor",
       "requirements": [
-        "grid_current_a_sensitivity",
-        "grid_current_a_bias",
-        "grid_current_b_sensitivity",
-        "grid_current_b_bias",
-        "grid_current_c_sensitivity",
-        "grid_current_c_bias"
+        "grid_current_sensitivity",
+        "grid_current_bias"
       ]
     },
     {

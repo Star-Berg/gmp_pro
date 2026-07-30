@@ -1,8 +1,8 @@
 /**
  * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
  * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
- * @cliArgs --device "F28003x" --part "F28003x_100PZ" --package "100PZ" --context "system" --product "gmp_pro@1.00.00.05" --product "C2000WARE@5.04.00.00"
- * @v2CliArgs --device "TMS320F280039C" --package "100PZ" --context "system" --product "gmp_pro@1.00.00.05" --product "C2000WARE@5.04.00.00"
+ * @cliArgs --device "F28003x" --part "F28003x_100PZ" --package "100PZ" --context "system" --product "C2000WARE@5.03.00.00" --product "gmp_pro@1.00.00.05"
+ * @v2CliArgs --device "TMS320F280039C" --package "100PZ" --context "system" --product "C2000WARE@5.03.00.00" --product "gmp_pro@1.00.00.05"
  * @versions {"tool":"1.21.0+3721"}
  */
 
@@ -39,6 +39,7 @@ const gpio           = scripting.addModule("/driverlib/gpio.js", {}, false);
 const gpio1          = gpio.addInstance();
 const gpio2          = gpio.addInstance();
 const gpio3          = gpio.addInstance();
+const gpio4          = gpio.addInstance();
 const gpio5          = gpio.addInstance();
 const gpio6          = gpio.addInstance();
 const gpio7          = gpio.addInstance();
@@ -518,6 +519,9 @@ gpio3.$name           = "IRIS_GPIO3";
 gpio3.direction       = "GPIO_DIR_MODE_OUT";
 gpio3.gpioPin.$assign = "GPIO40";
 
+gpio4.$name           = "IRIS_GPIO4";
+gpio4.gpioPin.$assign = "GPIO44";
+
 gpio5.$name           = "IRIS_GPIO5";
 gpio5.gpioPin.$assign = "GPIO34";
 
@@ -537,8 +541,6 @@ gpio9.direction       = "GPIO_DIR_MODE_OUT";
 gpio9.gpioPin.$assign = "GPIO55";
 
 i2c1.$name                  = "IRIS_IIC";
-i2c1.bitCount               = "I2C_BITCOUNT_8";
-i2c1.emulationMode          = "I2C_EMULATION_FREE_RUN";
 i2c1.i2c.$assign            = "I2CA";
 i2c1.i2c.i2c_sdaPin.$assign = "GPIO56";
 i2c1.i2c.i2c_sclPin.$assign = "GPIO57";
