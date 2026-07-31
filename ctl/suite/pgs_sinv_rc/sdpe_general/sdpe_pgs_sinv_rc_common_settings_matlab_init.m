@@ -90,7 +90,7 @@ SINV_LEVEL5_VBUS_FEEDBACK_LPF_HZ = 10.0;
 SINV_VBUS_REF_SLEW_V_S = 20.0;
 
 % Symmetric outer-loop active-power command limit.
-SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.20;
+SINV_OUTER_LOOP_POWER_LIMIT_PU = 0.25;
 
 % Power and DC-bus outer-loop execution frequency.
 SINV_OUTER_LOOP_FREQUENCY_HZ = 1000.0;

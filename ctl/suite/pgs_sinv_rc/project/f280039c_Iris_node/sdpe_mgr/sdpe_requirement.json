@@ -120,7 +120,7 @@
       "macro": "SINV_KEYBOARD_SW3_KEY_ID",
       "enabled": true,
       "weak": false,
-      "value": "(1U)",
+      "value": "(21U)",
       "options_preset": "",
       "options": [],
       "description": "HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault."

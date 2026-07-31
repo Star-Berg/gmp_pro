@@ -163,7 +163,7 @@ extern "C"
 /**
  * @brief Symmetric outer-loop active-power command limit.
  */
-#define SINV_OUTER_LOOP_POWER_LIMIT_PU (0.20f)
+#define SINV_OUTER_LOOP_POWER_LIMIT_PU (0.25f)
 
 /**
  * @brief Power and DC-bus outer-loop execution frequency.

@@ -13,7 +13,7 @@ SDPE_PROJECT_SUITE = 'pgs_sinv_rc';
 
 SDPE_PROJECT_VERSION = '0.2.0';
 
-SDPE_PROJECT_UPDATED_AT = '2026-07-30';
+SDPE_PROJECT_UPDATED_AT = '2026-07-31';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -383,13 +383,13 @@ SINV_KEYBOARD_SW1_KEY_ID = 16;
 SINV_KEYBOARD_SW2_KEY_ID = 3;
 
 % HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.
-SINV_KEYBOARD_SW3_KEY_ID = 1;
+SINV_KEYBOARD_SW3_KEY_ID = 21;
 
 % SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
-SINV_KEYBOARD_VBUS_REF_0_V = 50.0;
+SINV_KEYBOARD_VBUS_REF_0_V = 60.0;
 
 % SW2.1 DC-bus reference in V. This is the higher-bus profile for high input voltage tests.
-SINV_KEYBOARD_VBUS_REF_1_V = 60.0;
+SINV_KEYBOARD_VBUS_REF_1_V = 65.0;
 
 % Default SW2 profile after power-up. 0 selects SINV_KEYBOARD_VBUS_REF_0_V.
 % Options: (0U), (1U)
@@ -499,7 +499,7 @@ DSP_C2000_DSP_TIME_DIV = 120000 / CTRL_PWM_CMP_MAX / 2;
 CTRL_ADC_VOLTAGE_REF = 3.3;
 
 % Rated DC bus voltage.
-CTRL_DCBUS_VOLTAGE = 65.0;
+CTRL_DCBUS_VOLTAGE = 60.0;
 
 % Rated AC grid/load RMS voltage.
 CTRL_GRID_VOLTAGE_RMS = 36.0;

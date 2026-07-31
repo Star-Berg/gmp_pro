@@ -383,7 +383,7 @@ SINV_KEYBOARD_SW1_KEY_ID = 16;
 SINV_KEYBOARD_SW2_KEY_ID = 3;
 
 % HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.
-SINV_KEYBOARD_SW3_KEY_ID = 1;
+SINV_KEYBOARD_SW3_KEY_ID = 21;
 
 % SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
 SINV_KEYBOARD_VBUS_REF_0_V = 60.0;

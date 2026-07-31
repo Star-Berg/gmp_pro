@@ -252,7 +252,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.20"
+        "float": "0.25"
       },
       "description": "Symmetric outer-loop active-power command limit."
     },

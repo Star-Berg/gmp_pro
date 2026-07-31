@@ -118,7 +118,7 @@ extern "C"
 /**
  * @brief HT16K33 key ID used by SW3. SW3 cancels startup or resets a CiA402 fault.
  */
-#define SINV_KEYBOARD_SW3_KEY_ID (1U)
+#define SINV_KEYBOARD_SW3_KEY_ID (21U)
 
 /**
  * @brief SW2.0 DC-bus reference in V. This is the default efficiency-test profile.

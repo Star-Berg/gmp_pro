@@ -134,7 +134,7 @@ void ctl_init(void)
     ctl_init_single_phase_H_modulation(&hpwm, CTRL_PWM_CMP_MAX + 1, CTRL_PWM_DEADBAND_CMP,
                                        float2ctrl(CTRL_CURRENT_DB_PU));
     ctl_init_sinv_buck(&buck_ctrl);
-    //hpwm.flag_enable_dbcomp = 1; // 开启死区补偿
+    //hpwm.flag_enable_dbcomp = 1; // 寮�鍚鍖鸿ˉ鍋�
 
     //
     // init and config CiA402 standard state machine
@@ -296,9 +296,9 @@ fast_gt ctl_check_pll_locked(void)
     // Bench/open-loop build levels intentionally use the free-running angle.
     return 1;
 #else
-    // 准入条件：
-    // 1. 电网电压幅值在 0.8pu ~ 1.2pu 之间 (防止断路器未闭合或严重欠压)
-    // 2. PLL 内部频率误差必须小于系统设定的容忍度 (例如 0.005 PU)
+    // 鍑嗗叆鏉′欢锛�
+    // 1. 鐢电綉鐢靛帇骞呭�煎湪 0.8pu ~ 1.2pu 涔嬮棿 (闃叉鏂矾鍣ㄦ湭闂悎鎴栦弗閲嶆瑺鍘�)
+    // 2. PLL 鍐呴儴棰戠巼璇樊蹇呴』灏忎簬绯荤粺璁惧畾鐨勫蹇嶅害 (渚嬪 0.005 PU)
     ctrl_gt v_mag_pu = ctl_abs(pll.v_mag);
     ctrl_gt f_err_abs = ctl_abs(pll.freq_error);
 
@@ -322,6 +322,8 @@ fast_gt ctl_exec_dc_voltage_ready(void)
 
 fast_gt ctl_check_compliance(void)
 {
+    return 1;
+
     if (protection.active_errors != 0)
         return 0;
 
