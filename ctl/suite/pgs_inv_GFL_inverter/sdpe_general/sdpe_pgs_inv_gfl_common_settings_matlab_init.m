@@ -42,7 +42,7 @@ GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
 %% BUILD LEVEL 6/7 Common Voltage Control
 % Enable measured DC-bus voltage feedforward before final modulation.
 % Options: (0), (1)
-GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD = 1;
+GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD = 0;
 
 % Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
 % Options: (0), (1)
@@ -161,7 +161,7 @@ GFL_LEVEL67_DCBUS_FEEDFORWARD_MIN_GAIN = 0.95;
 GFL_LEVEL67_DCBUS_FEEDFORWARD_MAX_GAIN = 1.05;
 
 % BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
-GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.70710678;
+GFL_LEVEL7_DDSRF_FILTER_FC_HZ = GFL_GRID_FREQUENCY_HZ * 0.35355339;
 
 % BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
 GFL_LEVEL7_NEG_CURRENT_KP = GFL_LEVEL6_NEG_CURRENT_KP;
@@ -203,7 +203,10 @@ GFL_LEVEL67_SOFT_START_TIME_MS = 1000.0;
 GFL_LEVEL67_DCBUS_FILTER_FC_HZ = 300.0;
 
 % First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
-GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA = 0.1;
+GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA = 0.2;
+
+% Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain change per control cycle.
+GFL_LEVEL67_DCBUS_FEEDFORWARD_SLEW_STEP = 0.00002;
 
 %% Local helpers
 function value = sdpe_select(condition, true_value, false_value)

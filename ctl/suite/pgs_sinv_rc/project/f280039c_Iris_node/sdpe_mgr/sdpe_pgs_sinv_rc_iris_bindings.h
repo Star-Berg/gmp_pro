@@ -29,7 +29,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-30"
+#define SDPE_PROJECT_UPDATED_AT "2026-07-31"
 
 //=================================================================================================
 /**
@@ -123,12 +123,12 @@ extern "C"
 /**
  * @brief SW2.0 DC-bus reference in V. This is the default efficiency-test profile.
  */
-#define SINV_KEYBOARD_VBUS_REF_0_V (50.0f)
+#define SINV_KEYBOARD_VBUS_REF_0_V (60.0f)
 
 /**
  * @brief SW2.1 DC-bus reference in V. This is the higher-bus profile for high input voltage tests.
  */
-#define SINV_KEYBOARD_VBUS_REF_1_V (60.0f)
+#define SINV_KEYBOARD_VBUS_REF_1_V (65.0f)
 
 /**
  * @brief Default SW2 profile after power-up. 0 selects SINV_KEYBOARD_VBUS_REF_0_V.
@@ -332,7 +332,7 @@ extern "C"
 /**
  * @brief Rated DC bus voltage.
  */
-#define CTRL_DCBUS_VOLTAGE (65.0f)
+#define CTRL_DCBUS_VOLTAGE (60.0f)
 
 /**
  * @brief Rated AC grid/load RMS voltage.

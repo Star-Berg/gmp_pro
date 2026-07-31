@@ -131,6 +131,24 @@ GMP_STATIC_INLINE void ctl_output_callback(void)
     //    DAC_setShadowValue(IRIS_DACB_BASE, inv_ctrl.pll.v_pos_seq.dat[0] * 2048 + 2048);
     //    DAC_setShadowValue(IRIS_DACB_BASE, inv_ctrl.pll.srf_pll.theta * 2048 + 2048);
 
+#elif (BUILD_LEVEL == 6) || (BUILD_LEVEL == 7)
+
+    // Voltage-loop diagnostic outputs:
+    // DACA = applied d-axis voltage reference, DACB = d-axis voltage feedback.
+    // Clamp both signals to the DAC's +/-1.0 pu observable range so that a
+    // transient outside the nominal range cannot wrap the unsigned DAC code.
+    ctrl_gt vd_ref_d = ctl_sat(voltage_ctrl.vdq_set_applied.dat[phase_d],
+                               float2ctrl(1.0f), float2ctrl(-1.0f));
+    ctrl_gt vd_feedback_d = ctl_sat(voltage_ctrl.vdq_feedback.dat[phase_d],
+                                    float2ctrl(1.0f), float2ctrl(-1.0f));
+
+    DAC_setShadowValue(
+        IRIS_DACA_BASE,
+        (uint16_t)(2048.0f + 2047.0f * ctrl2float(vd_ref_d)));
+    DAC_setShadowValue(
+        IRIS_DACB_BASE,
+        (uint16_t)(2048.0f + 2047.0f * ctrl2float(vd_feedback_d)));
+
 #endif // BUILD_LEVEL
 }
 

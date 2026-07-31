@@ -924,7 +924,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.02705"
+        "float": "0.02701586"
       },
       "description": "DC-link voltage sensing gain."
     },
@@ -934,7 +934,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.0"
+        "float": "0.00348571"
       },
       "description": "DC-link voltage sensing bias."
     },

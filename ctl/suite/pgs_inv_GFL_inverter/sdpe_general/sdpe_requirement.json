@@ -82,7 +82,7 @@
       "macro": "GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD",
       "enabled": true,
       "weak": false,
-      "value": "(1)",
+      "value": "(0)",
       "options_preset": "",
       "options": [
         "(0)",
@@ -481,7 +481,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "literal": "(GFL_GRID_FREQUENCY_HZ * 0.70710678f)"
+        "literal": "(GFL_GRID_FREQUENCY_HZ * 0.35355339f)"
       },
       "description": "BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz."
     },
@@ -621,7 +621,7 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "float": "0.1"
+        "float": "0.2"
       },
       "description": "First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain."
     },
@@ -737,6 +737,12 @@
       "name": "Ungrouped",
       "requirements": [
         "level67_dcbus_feedforward_lpf_alpha"
+      ]
+    },
+    {
+      "name": "Ungrouped",
+      "requirements": [
+        "level67_dcbus_feedforward_slew_step"
       ]
     }
   ]

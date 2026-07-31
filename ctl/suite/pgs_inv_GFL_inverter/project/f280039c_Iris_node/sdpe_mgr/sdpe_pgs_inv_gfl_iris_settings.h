@@ -31,7 +31,7 @@ extern "C"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_ID "pgs_inv_gfl_f280039c_iris_node"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-30"
+#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-31"
 
 //=================================================================================================
 /**
@@ -367,12 +367,12 @@ extern "C"
 /**
  * @brief DC-link voltage sensing gain.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02738589f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02701586f)
 
 /**
  * @brief DC-link voltage sensing bias.
  */
-#define CTRL_DC_VOLTAGE_BIAS (0.0f)
+#define CTRL_DC_VOLTAGE_BIAS (0.00348571f)
 
 /**
  * @brief LC-board phase-A (U) voltage sensitivity in volts per volt.

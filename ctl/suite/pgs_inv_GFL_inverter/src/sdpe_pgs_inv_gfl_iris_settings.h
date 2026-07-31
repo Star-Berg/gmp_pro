@@ -367,12 +367,12 @@ extern "C"
 /**
  * @brief DC-link voltage sensing gain.
  */
-#define CTRL_DC_VOLTAGE_SENSITIVITY (0.02705f)
+#define CTRL_DC_VOLTAGE_SENSITIVITY (0.03675809f)
 
 /**
  * @brief DC-link voltage sensing bias.
  */
-#define CTRL_DC_VOLTAGE_BIAS (0.0f)
+#define CTRL_DC_VOLTAGE_BIAS (0.03123957f)
 
 /**
  * @brief LC-board phase-A (U) voltage sensitivity in volts per volt.

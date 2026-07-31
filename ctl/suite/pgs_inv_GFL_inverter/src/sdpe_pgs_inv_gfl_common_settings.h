@@ -85,7 +85,7 @@ extern "C"
  * @brief Enable measured DC-bus voltage feedforward before final modulation.
  *        Options: (0), (1)
  */
-#define GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD (1)
+#define GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD (0)
 
 /**
  * @brief Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
@@ -286,7 +286,7 @@ extern "C"
 /**
  * @brief BUILD_LEVEL 7 DDSRF decoupling low-pass cutoff frequency in hertz.
  */
-#define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.70710678f)
+#define GFL_LEVEL7_DDSRF_FILTER_FC_HZ (GFL_GRID_FREQUENCY_HZ * 0.35355339f)
 
 /**
  * @brief BUILD_LEVEL 7 negative current-loop Kp; defaults to the Level 6 value.
@@ -356,7 +356,7 @@ extern "C"
 /**
  * @brief First-order low-pass coefficient for BUILD_LEVEL 6/7 DC-bus feedforward gain.
  */
-#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.1f)
+#define GFL_LEVEL67_DCBUS_FEEDFORWARD_LPF_ALPHA (0.2f)
 
 /**
  * @brief Maximum BUILD_LEVEL 6/7 DC-bus feedforward gain change per control cycle.
