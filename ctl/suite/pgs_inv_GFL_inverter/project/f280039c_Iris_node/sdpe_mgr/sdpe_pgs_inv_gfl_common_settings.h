@@ -23,7 +23,7 @@ extern "C"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_ID "pgs_inv_gfl_common"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-07-31"
+#define PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT "2026-08-01"
 
 //=================================================================================================
 /**
@@ -91,7 +91,7 @@ extern "C"
  * @brief Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
  *        Options: (0), (1)
  */
-#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (0)
+#define GFL_LEVEL67_ENABLE_NEG_SEQ_CTRL (1)
 
 //=================================================================================================
 /**
@@ -197,6 +197,26 @@ extern "C"
  * @brief BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
  */
 #define GFL_LEVEL6_VD_REF_PU (0.754247f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 profile 2 d-axis output-voltage reference selected by the local panel.
+ */
+#define GFL_LEVEL6_VD_REF_LOW_MID_PU (0.755131f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 profile 3 d-axis output-voltage reference selected by the local panel.
+ */
+#define GFL_LEVEL6_VD_REF_MID_PU (0.756015f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 profile 4 d-axis output-voltage reference selected by the local panel.
+ */
+#define GFL_LEVEL6_VD_REF_HIGH_PU (0.756899f)
+
+/**
+ * @brief BUILD_LEVEL 6/7 profile 5 d-axis output-voltage reference selected by the local panel.
+ */
+#define GFL_LEVEL6_VD_REF_MAX_PU (0.757783f)
 
 /**
  * @brief BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.

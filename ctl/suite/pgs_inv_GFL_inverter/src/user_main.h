@@ -34,6 +34,7 @@ extern volatile uint16_t ui_last_key;
 extern volatile uint16_t ui_fault_code;
 extern volatile int16_t ui_keypad_ec;
 extern volatile float ui_dc_bus_voltage;
+extern volatile float ui_line_voltage_setpoint_v;
 extern volatile uint16_t ui_initialized;
 
 #ifndef SPECIFY_PC_TEST_ENV

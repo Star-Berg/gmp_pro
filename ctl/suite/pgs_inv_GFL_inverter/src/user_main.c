@@ -36,6 +36,7 @@ volatile uint16_t ui_last_key = 0;
 volatile uint16_t ui_fault_code = 0;
 volatile int16_t ui_keypad_ec = GMP_EC_OK;
 volatile float ui_dc_bus_voltage = 0.0f;
+volatile float ui_line_voltage_setpoint_v = 0.0f;
 volatile uint16_t ui_initialized = 0;
 
 //
@@ -49,8 +50,12 @@ const gmp_param_item_t dict_m1[] = {
     {(void*)&ctl_output_frequency_request_hz, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {(void*)&ctl_dc_bus_voltage_setting_v, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {(void*)&ctl_dc_bus_voltage_request_v, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
+    {(void*)&ctl_voltage_ref_profile, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
+    {(void*)&ctl_voltage_ref_profile_request, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
+    {(void*)&ctl_voltage_ref_pu, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {&inv_ctrl.filter_udc.out, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ui_dc_bus_voltage, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
+    {(void*)&ui_line_voltage_setpoint_v, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ctl_dc_bus_feedforward_gain, GMP_PARAM_TYPE_F32, GMP_PARAM_PERM_RO},
     {(void*)&ui_last_key, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
     {(void*)&ui_fault_code, GMP_PARAM_TYPE_U16, GMP_PARAM_PERM_RO},
@@ -224,22 +229,54 @@ static const data_gt ui_7segment_digit_lut[10] = {
 
 static uint16_t ui_7segment_frequency_hz = 0U;
 
+static data_gt ui_rotate_7segment_180(data_gt segments)
+{
+    data_gt rotated = segments & ((data_gt)0x80); // Decimal point is unused; preserve it.
+
+    if (segments & ((data_gt)0x01)) // a -> d
+        rotated |= (data_gt)0x08;
+    if (segments & ((data_gt)0x02)) // b -> e
+        rotated |= (data_gt)0x10;
+    if (segments & ((data_gt)0x04)) // c -> f
+        rotated |= (data_gt)0x20;
+    if (segments & ((data_gt)0x08)) // d -> a
+        rotated |= (data_gt)0x01;
+    if (segments & ((data_gt)0x10)) // e -> b
+        rotated |= (data_gt)0x02;
+    if (segments & ((data_gt)0x20)) // f -> c
+        rotated |= (data_gt)0x04;
+    if (segments & ((data_gt)0x40)) // g -> g
+        rotated |= (data_gt)0x40;
+
+    return rotated;
+}
+
 static void ui_set_7segment_frequency(uint16_t frequency_hz)
 {
     uint16_t i;
+    data_gt logical_digits[8];
 
     for (i = 0U; i < HT16K33_CFG_DISP_RAM_SIZE; ++i)
         ui_keypad.display_ram[i] = UI_7SEG_BLANK;
 
-    // Eight digits: L<level>-F-<frequency>, for example L7-F-60.
-    ui_keypad.display_ram[0] = UI_7SEG_L;
-    ui_keypad.display_ram[2] = ui_7segment_digit_lut[BUILD_LEVEL % 10U];
-    ui_keypad.display_ram[4] = UI_7SEG_DASH;
-    ui_keypad.display_ram[6] = UI_7SEG_F;
-    ui_keypad.display_ram[8] = UI_7SEG_DASH;
-    ui_keypad.display_ram[10] = ui_7segment_digit_lut[(frequency_hz / 10U) % 10U];
-    ui_keypad.display_ram[12] = ui_7segment_digit_lut[frequency_hz % 10U];
-    ui_keypad.display_ram[14] = UI_7SEG_BLANK;
+    // Eight logical digits: L<level>-F-<frequency>, for example L7-F-60.
+    logical_digits[0] = UI_7SEG_L;
+    logical_digits[1] = ui_7segment_digit_lut[BUILD_LEVEL % 10U];
+    logical_digits[2] = UI_7SEG_DASH;
+    logical_digits[3] = UI_7SEG_F;
+    logical_digits[4] = UI_7SEG_DASH;
+    logical_digits[5] = ui_7segment_digit_lut[(frequency_hz / 10U) % 10U];
+    logical_digits[6] = ui_7segment_digit_lut[frequency_hz % 10U];
+    logical_digits[7] = UI_7SEG_BLANK;
+
+    for (i = 0U; i < 8U; ++i)
+    {
+#if GFL_UI_7SEG_ROTATE_180 != 0
+        ui_keypad.display_ram[2U * (7U - i)] = ui_rotate_7segment_180(logical_digits[i]);
+#else
+        ui_keypad.display_ram[2U * i] = logical_digits[i];
+#endif
+    }
     ui_keypad.is_dirty = 1;
     ui_7segment_frequency_hz = frequency_hz;
 }
@@ -286,6 +323,55 @@ static void ui_oled_write_line(uint8_t page, const char* text)
 
     oled_show_str(0, page, line);
 }
+
+static void ui_oled_write_line_with_profile_dot(uint8_t page, const char* text, fast_gt show_dot)
+{
+    char marked_line[17];
+    uint16_t i = 0U;
+
+    // Reserve the last OLED character cell for the profile marker.
+    while ((i < 15U) && (text[i] != '\0'))
+    {
+        marked_line[i] = text[i];
+        ++i;
+    }
+    while (i < 15U)
+    {
+        marked_line[i] = ' ';
+        ++i;
+    }
+    marked_line[15] = show_dot ? '.' : ' ';
+    marked_line[16] = '\0';
+    ui_oled_write_line(page, marked_line);
+}
+
+static void ui_oled_write_last_line_with_profile_dots(uint8_t page, const char* text,
+                                                       uint16_t profile)
+{
+    char marked_line[17];
+    uint16_t i;
+    uint16_t text_start = (profile >= 3U) ? 2U : 0U;
+
+    for (i = 0U; i < 16U; ++i)
+        marked_line[i] = ' ';
+
+    // Profiles four and five add markers on the last line from left to right.
+    if (profile >= 3U)
+        marked_line[0] = '.';
+    if (profile >= 4U)
+        marked_line[1] = '.';
+
+    i = 0U;
+    while (((text_start + i) < 15U) && (text[i] != '\0'))
+    {
+        marked_line[text_start + i] = text[i];
+        ++i;
+    }
+
+    marked_line[15] = (profile >= 2U) ? '.' : ' ';
+    marked_line[16] = '\0';
+    ui_oled_write_line(page, marked_line);
+}
 #endif
 
 gmp_task_status_t tsk_keyboard(gmp_task_t* tsk)
@@ -317,9 +403,10 @@ gmp_task_status_t tsk_keyboard(gmp_task_t* tsk)
         return GMP_TASK_DONE;
     }
 
-    // Only the four configured operator keys are active.
+    // Only the five configured operator keys are active.
     if ((key_id != GFL_UI_KEY_SWITCH_ID) && (key_id != GFL_UI_KEY_FREQUENCY_ID) &&
-        (key_id != GFL_UI_KEY_FAULT_RESET_ID) && (key_id != GFL_UI_KEY_DCBUS_ID))
+        (key_id != GFL_UI_KEY_FAULT_RESET_ID) && (key_id != GFL_UI_KEY_DCBUS_ID) &&
+        (key_id != GFL_UI_KEY_VOLTAGE_REF_ID))
         return GMP_TASK_DONE;
 
     ui_last_key = (uint16_t)key_id;
@@ -357,6 +444,10 @@ gmp_task_status_t tsk_keyboard(gmp_task_t* tsk)
         break;
     }
 
+    case GFL_UI_KEY_VOLTAGE_REF_ID:
+        ctl_request_voltage_ref_profile((uint16_t)((ctl_voltage_ref_profile + 1U) % 5U));
+        break;
+
     default:
         break;
     }
@@ -371,6 +462,14 @@ gmp_task_status_t tsk_oled(gmp_task_t* tsk)
     GMP_UNUSED_VAR(tsk);
 
     ui_dc_bus_voltage = ctrl2float(inv_ctrl.filter_udc.out) * (float)CTRL_VOLTAGE_BASE;
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    // vdq_set is a phase-voltage peak command. Convert it to the steady-state
+    // line-to-line RMS target shown to the operator: Vll,rms = Vphase,pk*sqrt(3/2).
+    ui_line_voltage_setpoint_v = ctrl2float(voltage_ctrl.vdq_set.dat[phase_d]) *
+                                 (float)CTRL_VOLTAGE_BASE * 1.224744871f;
+#else
+    ui_line_voltage_setpoint_v = 0.0f;
+#endif
     ui_fault_code = ui_get_fault_code();
 
 #if GFL_IRIS_PANEL_ENABLED
@@ -378,6 +477,7 @@ gmp_task_status_t tsk_oled(gmp_task_t* tsk)
     {
         char text[24];
         uint16_t dc_bus_decivolts;
+        uint16_t line_voltage_centivolts;
 
         if (ui_dc_bus_voltage < 0.0f)
             dc_bus_decivolts = 0U;
@@ -386,18 +486,28 @@ gmp_task_status_t tsk_oled(gmp_task_t* tsk)
         else
             dc_bus_decivolts = (uint16_t)(ui_dc_bus_voltage * 10.0f + 0.5f);
 
-        sprintf(text, "FREQ SET:%02u Hz", (unsigned int)ctl_output_frequency_hz);
-        ui_oled_write_line(0, text);
+        // Keep the operator-facing voltage label at the nominal 32 V rating.
+        // The selected compensation profile is indicated only by the dots at
+        // the right edge; ui_line_voltage_setpoint_v retains the true target
+        // for CCS diagnostics.
+        line_voltage_centivolts =
+            (uint16_t)(GFL_LEVEL6_VD_REF_PU * (float)CTRL_VOLTAGE_BASE *
+                       1.224744871f * 100.0f + 0.5f);
 
-        sprintf(text, "DC BUS:%3u.%u V", (unsigned int)(dc_bus_decivolts / 10U),
-                (unsigned int)(dc_bus_decivolts % 10U));
-        ui_oled_write_line(2, text);
+        sprintf(text, "F:%02u V:%2u.%02uV", (unsigned int)ctl_output_frequency_hz,
+                (unsigned int)(line_voltage_centivolts / 100U),
+                (unsigned int)(line_voltage_centivolts % 100U));
+        ui_oled_write_line_with_profile_dot(0, text, 1);
+
+        sprintf(text, "DC:%3u.%u SET:%2u", (unsigned int)(dc_bus_decivolts / 10U),
+                (unsigned int)(dc_bus_decivolts % 10U),
+                (unsigned int)ctl_dc_bus_voltage_setting_v);
+        ui_oled_write_line_with_profile_dot(2, text, ctl_voltage_ref_profile >= 1U);
 
         sprintf(text, "OUTPUT:%s", ctl_user_run_request ? "ON" : "OFF");
-        ui_oled_write_line(4, text);
+        ui_oled_write_last_line_with_profile_dots(4, text, ctl_voltage_ref_profile);
 
-        sprintf(text, "BUS SET:%2u V", (unsigned int)ctl_dc_bus_voltage_setting_v);
-        ui_oled_write_line(6, text);
+        ui_oled_write_line(6, "");
 
         if ((ui_keypad_ec == GMP_EC_OK) &&
             (ui_7segment_frequency_hz != ctl_output_frequency_hz))

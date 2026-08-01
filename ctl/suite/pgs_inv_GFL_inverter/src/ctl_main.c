@@ -66,7 +66,40 @@ volatile uint16_t ctl_output_frequency_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0
 volatile uint16_t ctl_output_frequency_request_hz = (uint16_t)(GFL_GRID_FREQUENCY_HZ + 0.5f);
 volatile uint16_t ctl_dc_bus_voltage_setting_v = GFL_UI_DCBUS_LOW_V;
 volatile uint16_t ctl_dc_bus_voltage_request_v = GFL_UI_DCBUS_LOW_V;
+volatile uint16_t ctl_voltage_ref_profile = 0U;
+volatile uint16_t ctl_voltage_ref_profile_request = 0U;
+volatile float ctl_voltage_ref_pu = GFL_LEVEL6_VD_REF_PU;
 volatile ctrl_gt ctl_dc_bus_feedforward_gain = float2ctrl(1.0f);
+
+static float ctl_get_voltage_ref_pu(uint16_t profile)
+{
+    switch (profile)
+    {
+    case 1U:
+        return GFL_LEVEL6_VD_REF_LOW_MID_PU;
+    case 2U:
+        return GFL_LEVEL6_VD_REF_MID_PU;
+    case 3U:
+        return GFL_LEVEL6_VD_REF_HIGH_PU;
+    case 4U:
+        return GFL_LEVEL6_VD_REF_MAX_PU;
+    default:
+        return GFL_LEVEL6_VD_REF_PU;
+    }
+}
+
+static void ctl_update_level67_voltage_reference(void)
+{
+#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
+    ctl_voltage_ref_pu = ctl_get_voltage_ref_pu(ctl_voltage_ref_profile);
+    voltage_ctrl.vdq_set.dat[phase_d] =
+        float2ctrl((parameter_gt)ctl_voltage_ref_pu *
+                   (parameter_gt)ctl_dc_bus_voltage_setting_v / (parameter_gt)CTRL_DCBUS_VOLTAGE);
+    voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
+#else
+    ctl_voltage_ref_pu = ctl_get_voltage_ref_pu(ctl_voltage_ref_profile);
+#endif
+}
 
 //=================================================================================================
 // CTL initialize routine
@@ -82,6 +115,9 @@ void ctl_init()
     ctl_output_frequency_request_hz = ctl_output_frequency_hz;
     ctl_dc_bus_voltage_setting_v = GFL_UI_DCBUS_LOW_V;
     ctl_dc_bus_voltage_request_v = ctl_dc_bus_voltage_setting_v;
+    ctl_voltage_ref_profile = 0U;
+    ctl_voltage_ref_profile_request = 0U;
+    ctl_voltage_ref_pu = GFL_LEVEL6_VD_REF_PU;
     ctl_dc_bus_feedforward_gain = float2ctrl(1.0f);
 
     //
@@ -145,10 +181,7 @@ void ctl_init()
     // CTRL_DCBUS_VOLTAGE remains the fixed ADC/per-unit base. The selected
     // operating-bus voltage derates the physical AC-voltage target without
     // changing sensor calibration at run time.
-    voltage_ctrl.vdq_set.dat[phase_d] =
-        float2ctrl(GFL_LEVEL6_VD_REF_PU *
-                   (parameter_gt)ctl_dc_bus_voltage_setting_v / (parameter_gt)CTRL_DCBUS_VOLTAGE);
-    voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
+    ctl_update_level67_voltage_reference();
 #endif
 
     //
@@ -381,19 +414,41 @@ void ctl_apply_dc_bus_voltage_request(void)
         return;
 
     ctl_dc_bus_voltage_setting_v = dc_bus_voltage_v;
+    ctl_update_level67_voltage_reference();
+}
 
-#if BUILD_LEVEL == 6 || BUILD_LEVEL == 7
-    voltage_ctrl.vdq_set.dat[phase_d] =
-        float2ctrl(GFL_LEVEL6_VD_REF_PU *
-                   (parameter_gt)dc_bus_voltage_v / (parameter_gt)CTRL_DCBUS_VOLTAGE);
-    voltage_ctrl.vdq_set.dat[phase_q] = float2ctrl(GFL_LEVEL6_VQ_REF_PU);
-#endif
+void ctl_request_voltage_ref_profile(uint16_t profile)
+{
+    if (profile > 4U)
+        return;
+
+    ctl_voltage_ref_profile_request = profile;
+
+    // Apply the new reference only with PWM stopped so the next start still
+    // follows the normal voltage-loop soft-start trajectory.
+    if (ctl_user_run_request || inv_ctrl.flag_enable_system)
+        ctl_set_run_request(0);
+}
+
+void ctl_apply_voltage_ref_profile_request(void)
+{
+    uint16_t profile = ctl_voltage_ref_profile_request;
+
+    if ((profile == ctl_voltage_ref_profile) || (profile > 4U))
+        return;
+
+    if (inv_ctrl.flag_enable_system)
+        return;
+
+    ctl_voltage_ref_profile = profile;
+    ctl_update_level67_voltage_reference();
 }
 
 void ctl_mainloop(void)
 {
     ctl_apply_output_frequency_request();
     ctl_apply_dc_bus_voltage_request();
+    ctl_apply_voltage_ref_profile_request();
     cia402_dispatch(&cia402_sm);
 
     // A controller/state-machine fault must also clear the operator's switch

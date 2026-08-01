@@ -5,7 +5,7 @@
   "description": "Validated IRIS platform timing, sensing and resource bindings for the common GFL controller.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-31",
+  "updated_at": "2026-08-01",
   "output_header": "sdpe_pgs_inv_gfl_iris_settings.h",
   "hardware": [
     {
@@ -1164,9 +1164,29 @@
       "enabled": true,
       "weak": false,
       "binding": {
-        "number": "22"
+        "number": "8"
       },
       "description": "HT16K33 key ID used to toggle the nominal DC-bus operating voltage."
+    },
+    {
+      "role": "ui_key_voltage_ref_id",
+      "macro": "GFL_UI_KEY_VOLTAGE_REF_ID",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "20"
+      },
+      "description": "HT16K33 key ID used to cycle the five output-voltage reference profiles."
+    },
+    {
+      "role": "ui_7segment_rotate_180",
+      "macro": "GFL_UI_7SEG_ROTATE_180",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "number": "1"
+      },
+      "description": "Rotate the eight-digit HT16K33 display by 180 degrees for opposite-side viewing."
     },
     {
       "role": "ui_dc_bus_low_voltage",
@@ -1279,6 +1299,8 @@
         "ui_key_frequency_id",
         "ui_key_fault_reset_id",
         "ui_key_dc_bus_id",
+        "ui_key_voltage_ref_id",
+        "ui_7segment_rotate_180",
         "ui_dc_bus_low_voltage",
         "ui_dc_bus_high_voltage"
       ]

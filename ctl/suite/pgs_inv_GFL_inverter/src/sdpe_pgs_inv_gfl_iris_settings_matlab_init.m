@@ -12,7 +12,7 @@ PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-07-31';
+PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT = '2026-08-01';
 
 %% Hardware macros
 IRIS_F280039C_ID = 'iris_f280039c_node';
@@ -549,10 +549,10 @@ GFL_GRID_FILTER_INDUCTANCE_H = HARMONIA_3PH_LC_FILTER_INDUCTANCE_H;
 GFL_GRID_FILTER_CAPACITANCE_F = HARMONIA_3PH_LC_FILTER_CAPACITANCE_F;
 
 % DC-link voltage sensing gain.
-CTRL_DC_VOLTAGE_SENSITIVITY = 0.03675809;
+CTRL_DC_VOLTAGE_SENSITIVITY = 0.02701586;
 
 % DC-link voltage sensing bias.
-CTRL_DC_VOLTAGE_BIAS = 0.03123957;
+CTRL_DC_VOLTAGE_BIAS = 0.00348571;
 
 % LC-board phase-A (U) voltage sensitivity in volts per volt.
 CTRL_GRID_VOLTAGE_A_SENSITIVITY = 0.0133760665;
@@ -622,6 +622,12 @@ GFL_UI_KEY_FAULT_RESET_ID = 21;
 
 % HT16K33 key ID used to toggle the nominal DC-bus operating voltage.
 GFL_UI_KEY_DCBUS_ID = 22;
+
+% HT16K33 key ID used to cycle the five output-voltage reference profiles.
+GFL_UI_KEY_VOLTAGE_REF_ID = 4;
+
+% Rotate the eight-digit HT16K33 display by 180 degrees for opposite-side viewing.
+GFL_UI_7SEG_ROTATE_180 = 1;
 
 % Low nominal DC-bus operating voltage selected by the local panel.
 GFL_UI_DCBUS_LOW_V = 60;

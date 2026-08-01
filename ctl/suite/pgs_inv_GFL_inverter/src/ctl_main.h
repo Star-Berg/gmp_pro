@@ -77,6 +77,9 @@ extern volatile uint16_t ctl_output_frequency_hz;
 extern volatile uint16_t ctl_output_frequency_request_hz;
 extern volatile uint16_t ctl_dc_bus_voltage_setting_v;
 extern volatile uint16_t ctl_dc_bus_voltage_request_v;
+extern volatile uint16_t ctl_voltage_ref_profile;
+extern volatile uint16_t ctl_voltage_ref_profile_request;
+extern volatile float ctl_voltage_ref_pu;
 extern volatile ctrl_gt ctl_dc_bus_feedforward_gain;
 
 void ctl_set_run_request(fast_gt enable);
@@ -84,6 +87,8 @@ void ctl_request_output_frequency_hz(uint16_t frequency_hz);
 void ctl_apply_output_frequency_request(void);
 void ctl_request_dc_bus_voltage_v(uint16_t dc_bus_voltage_v);
 void ctl_apply_dc_bus_voltage_request(void);
+void ctl_request_voltage_ref_profile(uint16_t profile);
+void ctl_apply_voltage_ref_profile_request(void);
 
 // User commands
 

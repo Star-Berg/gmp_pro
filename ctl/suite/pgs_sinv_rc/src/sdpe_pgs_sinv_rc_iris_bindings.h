@@ -29,7 +29,7 @@ extern "C"
 #define SDPE_PROJECT_ID "pgs_sinv_rc_iris_node"
 #define SDPE_PROJECT_SUITE "pgs_sinv_rc"
 #define SDPE_PROJECT_VERSION "0.2.0"
-#define SDPE_PROJECT_UPDATED_AT "2026-07-31"
+#define SDPE_PROJECT_UPDATED_AT "2026-08-01"
 
 //=================================================================================================
 /**

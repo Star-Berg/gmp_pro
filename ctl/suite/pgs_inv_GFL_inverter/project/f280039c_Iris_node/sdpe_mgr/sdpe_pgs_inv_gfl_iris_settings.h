@@ -31,7 +31,7 @@ extern "C"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_ID "pgs_inv_gfl_f280039c_iris_node"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_SUITE "pgs_inv_GFL_inverter"
 #define PGS_INV_GFL_IRIS_SDPE_PROJECT_VERSION "1.0.0"
-#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-07-31"
+#define PGS_INV_GFL_IRIS_SDPE_PROJECT_UPDATED_AT "2026-08-01"
 
 //=================================================================================================
 /**
@@ -487,7 +487,17 @@ extern "C"
 /**
  * @brief HT16K33 key ID used to toggle the nominal DC-bus operating voltage.
  */
-#define GFL_UI_KEY_DCBUS_ID (22)
+#define GFL_UI_KEY_DCBUS_ID (8)
+
+/**
+ * @brief HT16K33 key ID used to cycle the five output-voltage reference profiles.
+ */
+#define GFL_UI_KEY_VOLTAGE_REF_ID (20)
+
+/**
+ * @brief Rotate the eight-digit HT16K33 display by 180 degrees for opposite-side viewing.
+ */
+#define GFL_UI_7SEG_ROTATE_180 (1)
 
 /**
  * @brief Low nominal DC-bus operating voltage selected by the local panel.

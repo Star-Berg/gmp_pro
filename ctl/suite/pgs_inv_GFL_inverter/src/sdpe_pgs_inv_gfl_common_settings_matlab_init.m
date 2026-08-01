@@ -12,7 +12,7 @@ PGS_INV_GFL_COMMON_SDPE_PROJECT_SUITE = 'pgs_inv_GFL_inverter';
 
 PGS_INV_GFL_COMMON_SDPE_PROJECT_VERSION = '1.0.0';
 
-PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-07-31';
+PGS_INV_GFL_COMMON_SDPE_PROJECT_UPDATED_AT = '2026-08-01';
 
 %% Control Algorithm
 % Enable the existing discrete PID anti-saturation path.
@@ -42,7 +42,7 @@ GFL_CAPACITOR_CURRENT_CALCULATE_MODE = 3;
 %% BUILD LEVEL 6/7 Common Voltage Control
 % Enable measured DC-bus voltage feedforward before final modulation.
 % Options: (0), (1)
-GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD = 1;
+GFL_LEVEL67_ENABLE_DCBUS_FEEDFORWARD = 0;
 
 % Enable BUILD_LEVEL 6/7 negative-sequence voltage/current compensation.
 % Options: (0), (1)
@@ -108,6 +108,18 @@ GFL_CURRENT_LEVEL4_IQ_PU = 0.6;
 
 % BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit.
 GFL_LEVEL6_VD_REF_PU = 0.754247;
+
+% BUILD_LEVEL 6/7 profile 2 d-axis output-voltage reference selected by the local panel.
+GFL_LEVEL6_VD_REF_LOW_MID_PU = 0.755131;
+
+% BUILD_LEVEL 6/7 profile 3 d-axis output-voltage reference selected by the local panel.
+GFL_LEVEL6_VD_REF_MID_PU = 0.756015;
+
+% BUILD_LEVEL 6/7 profile 4 d-axis output-voltage reference selected by the local panel.
+GFL_LEVEL6_VD_REF_HIGH_PU = 0.756899;
+
+% BUILD_LEVEL 6/7 profile 5 d-axis output-voltage reference selected by the local panel.
+GFL_LEVEL6_VD_REF_MAX_PU = 0.757783;
 
 % BUILD_LEVEL 6/7 positive q-axis output-voltage reference in per unit.
 GFL_LEVEL6_VQ_REF_PU = 0.0;

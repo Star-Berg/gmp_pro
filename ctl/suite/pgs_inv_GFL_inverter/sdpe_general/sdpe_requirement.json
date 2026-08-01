@@ -5,7 +5,7 @@
   "description": "Platform-independent control contract shared by all pgs_inv_GFL_inverter projects. Hardware timing, sensing, board resources and BUILD_LEVEL selection remain in each platform requirement.",
   "suite": "pgs_inv_GFL_inverter",
   "version": "1.0.0",
-  "updated_at": "2026-07-31",
+  "updated_at": "2026-08-01",
   "output_header": "sdpe_pgs_inv_gfl_common_settings.h",
   "hardware": [],
   "code_sections": {
@@ -304,6 +304,46 @@
         "float": "0.754247"
       },
       "description": "BUILD_LEVEL 6/7 positive d-axis output-voltage reference in per unit."
+    },
+    {
+      "role": "level6_vd_ref_low_mid",
+      "macro": "GFL_LEVEL6_VD_REF_LOW_MID_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.755131"
+      },
+      "description": "BUILD_LEVEL 6/7 profile 2 d-axis output-voltage reference selected by the local panel."
+    },
+    {
+      "role": "level6_vd_ref_mid",
+      "macro": "GFL_LEVEL6_VD_REF_MID_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.756015"
+      },
+      "description": "BUILD_LEVEL 6/7 profile 3 d-axis output-voltage reference selected by the local panel."
+    },
+    {
+      "role": "level6_vd_ref_high",
+      "macro": "GFL_LEVEL6_VD_REF_HIGH_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.756899"
+      },
+      "description": "BUILD_LEVEL 6/7 profile 4 d-axis output-voltage reference selected by the local panel."
+    },
+    {
+      "role": "level6_vd_ref_max",
+      "macro": "GFL_LEVEL6_VD_REF_MAX_PU",
+      "enabled": true,
+      "weak": false,
+      "binding": {
+        "float": "0.757783"
+      },
+      "description": "BUILD_LEVEL 6/7 profile 5 d-axis output-voltage reference selected by the local panel."
     },
     {
       "role": "level6_vq_ref",
@@ -669,7 +709,11 @@
     {
       "name": "BUILD LEVEL 6/7 Common Voltage Control",
       "requirements": [
-        "level6_vd_ref",
+              "level6_vd_ref",
+              "level6_vd_ref_low_mid",
+              "level6_vd_ref_mid",
+              "level6_vd_ref_high",
+              "level6_vd_ref_max",
         "level6_vq_ref",
         "level6_voltage_d_kp",
         "level6_voltage_d_ki",

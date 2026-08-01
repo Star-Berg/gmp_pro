@@ -17,6 +17,12 @@ SDPE_REQUIREMENT = json.loads(
 SDPE_GENERATED_HEADER = (
     SDPE_MGR / "sdpe_pgs_inv_gfl_iris_settings.h"
 ).read_text(encoding="utf-8")
+COMMON_SDPE_REQUIREMENT = json.loads(
+    (PROJECT_ROOT / "sdpe_general" / "sdpe_requirement.json").read_text(encoding="utf-8")
+)
+COMMON_SDPE_GENERATED_HEADER = (
+    SDPE_MGR / "sdpe_pgs_inv_gfl_common_settings.h"
+).read_text(encoding="utf-8")
 
 
 class IrisOperatorPanelTests(unittest.TestCase):
@@ -29,6 +35,8 @@ class IrisOperatorPanelTests(unittest.TestCase):
             "GFL_UI_KEY_FREQUENCY_ID",
             "GFL_UI_KEY_FAULT_RESET_ID",
             "GFL_UI_KEY_DCBUS_ID",
+            "GFL_UI_KEY_VOLTAGE_REF_ID",
+            "GFL_UI_7SEG_ROTATE_180",
             "GFL_UI_DCBUS_LOW_V",
             "GFL_UI_DCBUS_HIGH_V",
         )
@@ -50,6 +58,8 @@ class IrisOperatorPanelTests(unittest.TestCase):
                 "ui_key_frequency_id",
                 "ui_key_fault_reset_id",
                 "ui_key_dc_bus_id",
+                "ui_key_voltage_ref_id",
+                "ui_7segment_rotate_180",
                 "ui_dc_bus_low_voltage",
                 "ui_dc_bus_high_voltage",
             ],
@@ -64,6 +74,44 @@ class IrisOperatorPanelTests(unittest.TestCase):
         self.assertIn("ctl_set_run_request(ctl_user_run_request ? 0 : 1);", USER_MAIN_C)
         self.assertIn("cia402_fault_reset(&cia402_sm);", USER_MAIN_C)
 
+    def test_voltage_reference_key_cycles_five_sdpe_profiles_after_stopping_pwm(self):
+        common_requirements = {
+            item["macro"]: item for item in COMMON_SDPE_REQUIREMENT["requirements"]
+        }
+        expected = {
+            "GFL_LEVEL6_VD_REF_PU": "0.754247",
+            "GFL_LEVEL6_VD_REF_LOW_MID_PU": "0.755131",
+            "GFL_LEVEL6_VD_REF_MID_PU": "0.756015",
+            "GFL_LEVEL6_VD_REF_HIGH_PU": "0.756899",
+            "GFL_LEVEL6_VD_REF_MAX_PU": "0.757783",
+        }
+        for macro, value in expected.items():
+            self.assertEqual(value, common_requirements[macro]["binding"]["float"])
+            self.assertIn(f"#define {macro} ({value}f)", COMMON_SDPE_GENERATED_HEADER)
+
+        voltage_group = next(
+            group
+            for group in COMMON_SDPE_REQUIREMENT["requirement_groups"]
+            if group["name"] == "BUILD LEVEL 6/7 Common Voltage Control"
+        )
+        for role in (
+            "level6_vd_ref",
+            "level6_vd_ref_low_mid",
+            "level6_vd_ref_mid",
+            "level6_vd_ref_high",
+            "level6_vd_ref_max",
+        ):
+            self.assertIn(role, voltage_group["requirements"])
+
+        self.assertIn("case GFL_UI_KEY_VOLTAGE_REF_ID:", USER_MAIN_C)
+        self.assertIn("(ctl_voltage_ref_profile + 1U) % 5U", USER_MAIN_C)
+        self.assertIn("ctl_request_voltage_ref_profile", CTL_MAIN_C)
+        self.assertIn("ctl_apply_voltage_ref_profile_request();", CTL_MAIN_C)
+        request_body = CTL_MAIN_C.split(
+            "void ctl_request_voltage_ref_profile", 1
+        )[1].split("void ctl_apply_voltage_ref_profile_request", 1)[0]
+        self.assertIn("ctl_set_run_request(0);", request_body)
+
     def test_dc_bus_key_toggles_50_and_60_v_after_stopping_pwm(self):
         self.assertIn("case GFL_UI_KEY_DCBUS_ID:", USER_MAIN_C)
         self.assertIn("GFL_UI_DCBUS_LOW_V", USER_MAIN_C)
@@ -74,7 +122,7 @@ class IrisOperatorPanelTests(unittest.TestCase):
         )
         self.assertIn("ctl_apply_dc_bus_voltage_request();", CTL_MAIN_C)
         self.assertIn(
-            "(parameter_gt)dc_bus_voltage_v / (parameter_gt)CTRL_DCBUS_VOLTAGE",
+            "(parameter_gt)ctl_dc_bus_voltage_setting_v / (parameter_gt)CTRL_DCBUS_VOLTAGE",
             CTL_MAIN_C,
         )
         request_body = CTL_MAIN_C.split(
@@ -111,15 +159,25 @@ class IrisOperatorPanelTests(unittest.TestCase):
         self.assertIn("CIA402_CMD_DISABLE_VOLTAGE", CTL_MAIN_C)
         self.assertIn("ctl_set_run_request(0);", USER_MAIN_C)
 
-    def test_oled_shows_frequency_bus_measurement_switch_and_bus_setting(self):
+    def test_oled_shows_frequency_voltage_reference_bus_and_switch_state(self):
         self.assertIn(
             "ctrl2float(inv_ctrl.filter_udc.out) * (float)CTRL_VOLTAGE_BASE",
             USER_MAIN_C,
         )
-        self.assertIn('"FREQ SET:%02u Hz"', USER_MAIN_C)
-        self.assertIn('"DC BUS:%3u.%u V"', USER_MAIN_C)
+        self.assertIn('"F:%02u V:%2u.%02uV"', USER_MAIN_C)
+        self.assertIn("GFL_LEVEL6_VD_REF_PU * (float)CTRL_VOLTAGE_BASE", USER_MAIN_C)
+        self.assertIn('"DC:%3u.%u SET:%2u"', USER_MAIN_C)
         self.assertIn('"OUTPUT:%s"', USER_MAIN_C)
-        self.assertIn('"BUS SET:%2u V"', USER_MAIN_C)
+        self.assertIn("ui_oled_write_line_with_profile_dot", USER_MAIN_C)
+        self.assertIn("marked_line[15] = show_dot ? '.' : ' ';", USER_MAIN_C)
+        self.assertIn("ctl_voltage_ref_profile >= 1U", USER_MAIN_C)
+        self.assertIn("ui_oled_write_last_line_with_profile_dots", USER_MAIN_C)
+        self.assertIn("if (profile >= 3U)", USER_MAIN_C)
+        self.assertIn("if (profile >= 4U)", USER_MAIN_C)
+        self.assertIn("marked_line[15] = (profile >= 2U) ? '.' : ' ';", USER_MAIN_C)
+        self.assertIn('ui_oled_write_line(6, "");', USER_MAIN_C)
+        self.assertNotIn('"VSET MODE:', USER_MAIN_C)
+        self.assertIn("1.224744871f", USER_MAIN_C)
         self.assertNotIn('"ERR:', USER_MAIN_C)
         self.assertNotIn('"ST:', USER_MAIN_C)
 
@@ -138,6 +196,9 @@ class IrisOperatorPanelTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn('i2c1.bitCount               = "I2C_BITCOUNT_8";', syscfg)
         self.assertIn("ui_set_7segment_frequency", USER_MAIN_C)
+        self.assertIn("ui_rotate_7segment_180", USER_MAIN_C)
+        self.assertIn("2U * (7U - i)", USER_MAIN_C)
+        self.assertIn("#if GFL_UI_7SEG_ROTATE_180 != 0", USER_MAIN_C)
         self.assertIn("ht16k33_update_display(&ui_keypad)", USER_MAIN_C)
 
     def test_ccs_project_links_existing_oled_driver(self):
