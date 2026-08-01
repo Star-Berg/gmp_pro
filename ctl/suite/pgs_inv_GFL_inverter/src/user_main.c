@@ -350,25 +350,24 @@ static void ui_oled_write_last_line_with_profile_dots(uint8_t page, const char* 
 {
     char marked_line[17];
     uint16_t i;
-    uint16_t text_start = (profile >= 3U) ? 2U : 0U;
+    uint16_t marker_count = (profile >= 2U) ? (profile - 1U) : 0U;
+    uint16_t marker_start = 16U - marker_count;
 
     for (i = 0U; i < 16U; ++i)
         marked_line[i] = ' ';
 
-    // Profiles four and five add markers on the last line from left to right.
-    if (profile >= 3U)
-        marked_line[0] = '.';
-    if (profile >= 4U)
-        marked_line[1] = '.';
-
     i = 0U;
-    while (((text_start + i) < 15U) && (text[i] != '\0'))
+    while ((i < marker_start) && (text[i] != '\0'))
     {
-        marked_line[text_start + i] = text[i];
+        marked_line[i] = text[i];
         ++i;
     }
 
-    marked_line[15] = (profile >= 2U) ? '.' : ' ';
+    // Starting with profile three, grow the marker at the line end from
+    // right to left: ".", "..", then "...".
+    for (i = marker_start; i < 16U; ++i)
+        marked_line[i] = '.';
+
     marked_line[16] = '\0';
     ui_oled_write_line(page, marked_line);
 }
